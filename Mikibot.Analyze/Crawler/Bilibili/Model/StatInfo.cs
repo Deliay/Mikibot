@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mikibot.Mirai.Crawler.Bilibili.Model
+namespace Mikibot.Analyze.Crawler.Bilibili.Model
 {
     public struct StatInfo
     {

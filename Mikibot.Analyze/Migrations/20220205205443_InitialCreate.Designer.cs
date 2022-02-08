@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Mikibot.Mirai.Database;
+using Mikibot.Analyze.Database;
 
 #nullable disable
 
-namespace Mikibot.Mirai.Migrations
+namespace Mikibot.Analyze.Migrations
 {
     [DbContext(typeof(MikibotDatabaseContext))]
     [Migration("20220205205443_InitialCreate")]

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Mikibot.Mirai.Database.Model;
+using Mikibot.Analyze.Database.Model;
 using MySqlConnector;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mikibot.Mirai.Database
+namespace Mikibot.Analyze.Database
 {
     public class MikibotDatabaseContext : DbContext
     {

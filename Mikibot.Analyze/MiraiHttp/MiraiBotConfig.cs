@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mikibot.Mirai.MiraiHttp
+namespace Mikibot.Analyze.MiraiHttp
 {
     public struct MiraiBotConfig
     {

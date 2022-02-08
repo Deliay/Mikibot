@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mikibot.Mirai.Database.Model
+namespace Mikibot.Analyze.Database.Model
 {
     public class LiveStatus
     {

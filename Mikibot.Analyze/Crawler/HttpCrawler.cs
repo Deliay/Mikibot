@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Mikibot.Mirai.Crawler
+namespace Mikibot.Analyze.Crawler
 {
     public class HttpCrawler : IDisposable
     {

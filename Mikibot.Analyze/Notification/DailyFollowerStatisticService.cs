@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Mikibot.Mirai.Crawler.Bilibili;
-using Mikibot.Mirai.Database;
-using Mikibot.Mirai.MiraiHttp;
+using Mikibot.Analyze.Crawler.Bilibili;
+using Mikibot.Analyze.Database;
+using Mikibot.Analyze.MiraiHttp;
 using Mirai.Net.Data.Messages;
 using Mirai.Net.Data.Messages.Concretes;
 using System;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mikibot.Mirai.Notification
+namespace Mikibot.Analyze.Notification
 {
     /// <summary>
     /// 每天新增关注数量统计

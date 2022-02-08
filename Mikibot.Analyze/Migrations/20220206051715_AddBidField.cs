@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Mikibot.Mirai.Migrations
+namespace Mikibot.Analyze.Migrations
 {
     public partial class AddBidField : Migration
     {

@@ -2,11 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Mikibot.Mirai.Crawler.Bilibili;
-using Mikibot.Mirai.Database;
-using Mikibot.Mirai.MiraiHttp;
-using Mikibot.Mirai.Notification;
-using Mikibot.Mirai.Util;
+using Mikibot.Analyze.Crawler.Bilibili;
+using Mikibot.Analyze.Database;
+using Mikibot.Analyze.MiraiHttp;
+using Mikibot.Analyze.Notification;
+using Mikibot.Analyze.Util;
 
 var appBuilder = ContainerInitializer.Create();
 

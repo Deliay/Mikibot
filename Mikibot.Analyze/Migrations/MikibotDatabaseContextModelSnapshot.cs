@@ -3,11 +3,11 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Mikibot.Mirai.Database;
+using Mikibot.Analyze.Database;
 
 #nullable disable
 
-namespace Mikibot.Mirai.Migrations
+namespace Mikibot.Analyze.Migrations
 {
     [DbContext(typeof(MikibotDatabaseContext))]
     partial class MikibotDatabaseContextModelSnapshot : ModelSnapshot

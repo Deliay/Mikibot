@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Mikibot.Mirai.Migrations
+namespace Mikibot.Analyze.Migrations
 {
     public partial class InitialCreate : Migration
     {

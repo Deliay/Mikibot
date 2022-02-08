@@ -1,11 +1,11 @@
-﻿using Mikibot.Mirai.Crawler.Bilibili.Model;
+﻿using Mikibot.Analyze.Crawler.Bilibili.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mikibot.Mirai.Crawler.Bilibili
+namespace Mikibot.Analyze.Crawler.Bilibili
 {
     public class BilibiliCrawler : HttpCrawler
     {
