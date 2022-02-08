@@ -5,15 +5,15 @@
 本体目前在群 1001856303 试运营！
 
 ## 技术栈
-网站后端 **Backend** ASP.NET Core + C#
-网站前端 **Frontend** React 17 + Typescript
-数据处理 **Mirai** C#
+- 网站后端 **Backend** ASP.NET Core + C#
+- 网站前端 **Frontend** React 17 + Typescript
+- 数据处理 **Analyze** C#
 
 ## 项目结构
-**Mikibot.API** - Mikibot网站的后端
-**mikibot.fe** - Mikibot网站的前端
-**Mikibot.Mirai** - Mikibot本体
-**buildingBlocks/** - 通用组件
+- **Mikibot.API** - Mikibot网站的后端
+- **mikibot.fe** - Mikibot网站的前端
+- **Mikibot.Analyze** - Mikibot本体
+- **buildingBlocks/** - 通用组件
 
 ## 数据处理Roadmap(TODO 挪到github project)
 - 舰长群体采集和分析：分析舰长上舰和流失情况
