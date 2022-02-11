@@ -71,6 +71,16 @@ namespace Mikibot.Analyze.Notification
                     .LastOrDefaultAsync(s => s.CreatedAt < max , token))?.FollowerCount ?? 0;
         }
 
+        private async Task<string> GetRecentlyLiveStreamStatus(DateTimeOffset start, CancellationToken token)
+        {
+            var result = await db.LiveStatuses
+                    .Where(s => s.CreatedAt > start)
+                    .GroupBy(s => s.Title)
+                    .Select(sg => new { Count = sg.Max().FollowerCount - sg.Min().FollowerCount, sg.FirstOrDefault().Title })
+                    .ToListAsync(token);
+            return string.Join('\n', result.Select(c => $"- {c.Title}, 涨粉: {c.Count}"));
+        }
+
         public async Task DailyReport(CancellationToken token)
         {
             while (!token.IsCancellationRequested)
@@ -87,7 +97,9 @@ namespace Mikibot.Analyze.Notification
                     var startFollowerCount = await GetRangeStartFollowerCount(start, token);
                     var endFollowerCount = await GetRangeEndFollowerCount(end, token);
 
-                    var msg = $"从 {start} 到 {end} 你弥共涨粉 {endFollowerCount - startFollowerCount} 人";
+                    var status = await GetRecentlyLiveStreamStatus(start, token);
+
+                    var msg = $"从 {start} 到 {end} 你弥共涨粉 {endFollowerCount - startFollowerCount} 人\n 直播场次涨粉：{status}";
                     Logger.LogInformation("{}", msg);
                     await Mirai.SendMessageToAllGroup(token, new MessageBase[]
                     {
