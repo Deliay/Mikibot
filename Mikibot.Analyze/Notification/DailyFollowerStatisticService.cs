@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Mikibot.Analyze.Crawler.Bilibili;
+using Mikibot.Crawler.Http.Bilibili;
 using Mikibot.Analyze.Database;
 using Mikibot.Analyze.MiraiHttp;
 using Mirai.Net.Data.Messages;
@@ -20,14 +20,14 @@ namespace Mikibot.Analyze.Notification
     {
         private readonly MikibotDatabaseContext db = new(MySqlConfiguration.FromEnviroment());
 
-        public DailyFollowerStatisticService(BilibiliCrawler crawler, IMiraiService mirai, ILogger<DailyFollowerStatisticService> logger)
+        public DailyFollowerStatisticService(BiliLiveCrawler crawler, IMiraiService mirai, ILogger<DailyFollowerStatisticService> logger)
         {
             Crawler = crawler;
             Mirai = mirai;
             Logger = logger;
         }
 
-        public BilibiliCrawler Crawler { get; }
+        public BiliLiveCrawler Crawler { get; }
         public IMiraiService Mirai { get; }
         public ILogger<DailyFollowerStatisticService> Logger { get; }
 
@@ -38,10 +38,10 @@ namespace Mikibot.Analyze.Notification
                 try
                 {
                     // 每15秒收集一下数据
-                    var count = await Crawler.GetFollowerCount(BilibiliCrawler.mxmk, token);
+                    var count = await Crawler.GetFollowerCount(BiliLiveCrawler.mxmk, token);
                     await db.FollowerStatistic.AddAsync(new()
                     {
-                        Bid = BilibiliCrawler.mxmks,
+                        Bid = BiliLiveCrawler.mxmks,
                         CreatedAt = DateTimeOffset.Now,
                         FollowerCount = count,
                     }, token);
@@ -59,14 +59,14 @@ namespace Mikibot.Analyze.Notification
         private async Task<int> GetRangeStartFollowerCount(DateTimeOffset min, CancellationToken token)
         {
             return (await db.FollowerStatistic
-                    .Where(s => s.Bid == BilibiliCrawler.mxmks)
+                    .Where(s => s.Bid == BiliLiveCrawler.mxmks)
                     .OrderBy(s => s.CreatedAt)
                     .FirstOrDefaultAsync(s => s.CreatedAt > min, token))?.FollowerCount ?? 0;
         }
         private async Task<int> GetRangeEndFollowerCount(DateTimeOffset max, CancellationToken token)
         {
             return (await db.FollowerStatistic
-                    .Where(s => s.Bid == BilibiliCrawler.mxmks)
+                    .Where(s => s.Bid == BiliLiveCrawler.mxmks)
                     .OrderBy(s => s.CreatedAt)
                     .LastOrDefaultAsync(s => s.CreatedAt < max , token))?.FollowerCount ?? 0;
         }

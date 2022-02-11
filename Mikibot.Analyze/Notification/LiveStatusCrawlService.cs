@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Mikibot.Analyze.Crawler.Bilibili;
-using Mikibot.Analyze.Crawler.Bilibili.Model;
 using Mikibot.Analyze.Database;
 using Mikibot.Analyze.Database.Model;
 using Mikibot.Analyze.MiraiHttp;
+using Mikibot.Crawler.Http.Bilibili;
+using Mikibot.Crawler.Http.Bilibili.Model;
 using Mirai.Net.Data.Messages;
 using Mirai.Net.Data.Messages.Concretes;
 using System;
@@ -22,14 +22,14 @@ namespace Mikibot.Analyze.Notification
     {
         private readonly MikibotDatabaseContext db = new (MySqlConfiguration.FromEnviroment());
 
-        public LiveStatusCrawlService(BilibiliCrawler crawler, IMiraiService mirai, ILogger<LiveStatusCrawlService> logger)
+        public LiveStatusCrawlService(BiliLiveCrawler crawler, IMiraiService mirai, ILogger<LiveStatusCrawlService> logger)
         {
             Crawler = crawler;
             Mirai = mirai;
             Logger = logger;
         }
 
-        public BilibiliCrawler Crawler { get; }
+        public BiliLiveCrawler Crawler { get; }
         public IMiraiService Mirai { get; }
         public ILogger<LiveStatusCrawlService> Logger { get; }
 
@@ -39,11 +39,11 @@ namespace Mikibot.Analyze.Notification
                 Cover = info.Cover,
                 Notified = false,
                 Status = info.LiveStatus,
-                FollowerCount = await Crawler.GetFollowerCount(BilibiliCrawler.mxmk, token),
+                FollowerCount = await Crawler.GetFollowerCount(BiliLiveCrawler.mxmk, token),
                 StatusChangedAt = DateTimeOffset.Now,
                 UpdatedAt = DateTimeOffset.Now,
                 Title = info.Title,
-                Bid = $"{BilibiliCrawler.mxmk}",
+                Bid = $"{BiliLiveCrawler.mxmk}",
             };
 
         private async ValueTask InsertStatus(LiveStatus status, CancellationToken token)
@@ -75,7 +75,7 @@ namespace Mikibot.Analyze.Notification
                 try
                 {
                     var latest = await db.LiveStatuses.OrderBy(s => s.Id).LastOrDefaultAsync(token);
-                    var info = (await Crawler.GetPersonalInfo(BilibiliCrawler.mxmk, token)).Live_Room;
+                    var info = (await Crawler.GetPersonalInfo(BiliLiveCrawler.mxmk, token)).LiveRoom;
                     // 发通知咯！
                     if (latest == null || (latest.Status != info.LiveStatus))
                     {

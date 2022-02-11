@@ -2,15 +2,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Mikibot.Analyze.Crawler.Bilibili;
 using Mikibot.Analyze.Database;
 using Mikibot.Analyze.MiraiHttp;
 using Mikibot.Analyze.Notification;
 using Mikibot.Analyze.Util;
+using Mikibot.Crawler.Bilibili;
 
 var appBuilder = ContainerInitializer.Create();
 
-appBuilder.RegisterType<BilibiliCrawler>().AsSelf().SingleInstance();
+appBuilder.RegisterType<BiliLiveCrawler>().AsSelf().SingleInstance();
 appBuilder.Register<MySqlConfiguration>((_) => MySqlConfiguration.FromEnviroment());
 appBuilder.RegisterType<MikibotDatabaseContext>().AsSelf().InstancePerDependency();
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mikibot.Analyze.Crawler.Bilibili.Model
+namespace Mikibot.Crawler.Http.Bilibili.Model
 {
     public struct BilibiliApiResponse<T>
     {

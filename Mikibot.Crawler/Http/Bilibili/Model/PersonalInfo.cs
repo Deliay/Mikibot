@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Mikibot.Analyze.Crawler.Bilibili.Model
+namespace Mikibot.Crawler.Http.Bilibili.Model
 {
     public struct PersonalInfo
     {
@@ -14,8 +15,11 @@ namespace Mikibot.Analyze.Crawler.Bilibili.Model
             public string Title { get; set; }
             public string Url { get; set; }
             public string Cover { get; set; }
+            [JsonPropertyName("roomid")]
+            public int RoomId { get; set; }
         }
 
-        public LiveRoomDetail Live_Room { get; set; }
+        [JsonPropertyName("live_room")]
+        public LiveRoomDetail LiveRoom { get; set; }
     }
 }
