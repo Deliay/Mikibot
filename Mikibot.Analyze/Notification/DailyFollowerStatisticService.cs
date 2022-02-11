@@ -20,7 +20,7 @@ namespace Mikibot.Analyze.Notification
     {
         private readonly MikibotDatabaseContext db = new(MySqlConfiguration.FromEnviroment());
 
-        public DailyFollowerStatisticService(BilibiliCrawler crawler, MiraiService mirai, ILogger<DailyFollowerStatisticService> logger)
+        public DailyFollowerStatisticService(BilibiliCrawler crawler, IMiraiService mirai, ILogger<DailyFollowerStatisticService> logger)
         {
             Crawler = crawler;
             Mirai = mirai;
@@ -28,7 +28,7 @@ namespace Mikibot.Analyze.Notification
         }
 
         public BilibiliCrawler Crawler { get; }
-        public MiraiService Mirai { get; }
+        public IMiraiService Mirai { get; }
         public ILogger<DailyFollowerStatisticService> Logger { get; }
 
         public async Task IntervalCollectStatistics(CancellationToken token)
@@ -76,19 +76,29 @@ namespace Mikibot.Analyze.Notification
             var result = await db.LiveStatuses
                     .Where(s => s.CreatedAt > start)
                     .GroupBy(s => s.Title)
-                    .Select(sg => new { Count = sg.Max().FollowerCount - sg.Min().FollowerCount, sg.FirstOrDefault().Title })
-                    .ToListAsync(token);
+                    .Select(sg => new
+                    {
+                        Count = sg.Max(s => s.FollowerCount) - sg.Min(s => s.FollowerCount),
+                        Title = sg.Key,
+                    }).ToListAsync(token);
             return string.Join('\n', result.Select(c => $"- {c.Title}, 涨粉: {c.Count}"));
+        }
+
+        private static string Format(DateTimeOffset date)
+        {
+            return date.ToString("yyyy-MM-dd HH:mm");
         }
 
         public async Task DailyReport(CancellationToken token)
         {
             while (!token.IsCancellationRequested)
             {
+#if !DEBUG
                 while (DateTimeOffset.Now.Hour != 19)
                 {
                     await Task.Delay(TimeSpan.FromMinutes(5), token);
                 }
+#endif
                 try
                 {
                     var end = DateTimeOffset.Now;
@@ -99,7 +109,7 @@ namespace Mikibot.Analyze.Notification
 
                     var status = await GetRecentlyLiveStreamStatus(start, token);
 
-                    var msg = $"从 {start} 到 {end} 你弥共涨粉 {endFollowerCount - startFollowerCount} 人\n 直播场次涨粉：{status}";
+                    var msg = $"涨粉日报\n{Format(start)} ~ {Format(end)}\n涨粉 {endFollowerCount - startFollowerCount} 人\n直播场次详细：\n{status}";
                     Logger.LogInformation("{}", msg);
                     await Mirai.SendMessageToAllGroup(token, new MessageBase[]
                     {

@@ -22,7 +22,7 @@ namespace Mikibot.Analyze.Notification
     {
         private readonly MikibotDatabaseContext db = new (MySqlConfiguration.FromEnviroment());
 
-        public LiveStatusCrawlService(BilibiliCrawler crawler, MiraiService mirai, ILogger<LiveStatusCrawlService> logger)
+        public LiveStatusCrawlService(BilibiliCrawler crawler, IMiraiService mirai, ILogger<LiveStatusCrawlService> logger)
         {
             Crawler = crawler;
             Mirai = mirai;
@@ -30,7 +30,7 @@ namespace Mikibot.Analyze.Notification
         }
 
         public BilibiliCrawler Crawler { get; }
-        public MiraiService Mirai { get; }
+        public IMiraiService Mirai { get; }
         public ILogger<LiveStatusCrawlService> Logger { get; }
 
         private async ValueTask<LiveStatus> GenerateStatus(PersonalInfo.LiveRoomDetail info, CancellationToken token)

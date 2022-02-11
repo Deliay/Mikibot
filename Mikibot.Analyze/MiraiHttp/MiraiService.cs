@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Mikibot.Analyze.MiraiHttp
 {
-    public class MiraiService : IDisposable
+    public class MiraiService : IDisposable, IMiraiService
     {
         private MiraiBot Bot { get; }
         public ILogger<MiraiService> Logger { get; }

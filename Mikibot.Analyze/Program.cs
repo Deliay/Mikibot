@@ -15,8 +15,11 @@ appBuilder.Register<MySqlConfiguration>((_) => MySqlConfiguration.FromEnviroment
 appBuilder.RegisterType<MikibotDatabaseContext>().AsSelf().InstancePerDependency();
 
 appBuilder.Register<MiraiBotConfig>((_) => MiraiBotConfig.FromEnviroment());
-appBuilder.RegisterType<MiraiService>().AsSelf().SingleInstance();
-
+#if DEBUG
+appBuilder.RegisterType<ConsoleMiraiService>().As<IMiraiService>().SingleInstance();
+#else
+appBuilder.RegisterType<MiraiService>().As<IMiraiService>().SingleInstance();
+#endif
 appBuilder.RegisterType<LiveStatusCrawlService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<DailyFollowerStatisticService>().AsSelf().SingleInstance();
 
@@ -36,7 +39,7 @@ using (var app = appContainer.BeginLifetimeScope())
     await db.Database.MigrateAsync(token);
     logger.LogInformation("Done");
 
-    var mirai = app.Resolve<MiraiService>();
+    var mirai = app.Resolve<IMiraiService>();
     logger.LogInformation("Intiializing mirai service...");
     await mirai.Run();
     logger.LogInformation("Done");
