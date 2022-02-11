@@ -24,7 +24,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
 
         private readonly ClientWebSocket ws = new();
         private CancellationTokenSource csc;
-        private SemaphoreSlim _semaphore;
+        private readonly SemaphoreSlim _semaphore;
 
         public RawWebSocketWorker(ILogger<RawWebSocketWorker> logger)
         {

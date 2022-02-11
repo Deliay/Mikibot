@@ -6,7 +6,7 @@ using Mikibot.Analyze.Database;
 using Mikibot.Analyze.MiraiHttp;
 using Mikibot.Analyze.Notification;
 using Mikibot.Analyze.Util;
-using Mikibot.Crawler.Bilibili;
+using Mikibot.Crawler.Http.Bilibili;
 
 var appBuilder = ContainerInitializer.Create();
 

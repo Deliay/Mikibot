@@ -5,6 +5,7 @@ using Mikibot.Crawler.WebsocketCrawler.Packet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,15 +13,12 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
 {
     public class WebsocketClient : IClient
     {
-        private RawWebSocketWorker _worker;
-        private SemaphoreSlim _semaphore;
+        private readonly RawWebSocketWorker _worker;
         public WebsocketClient(BiliLiveCrawler crawler, ILogger<WebsocketClient> logger, ILogger<RawWebSocketWorker> workerLogger)
         {
             Crawler = crawler;
             Logger = logger;
             _worker = new RawWebSocketWorker(workerLogger);
-            _semaphore = new SemaphoreSlim(1);
-            _semaphore.Wait();
         }
 
         public int RoomId { get; private set; }
@@ -36,11 +34,12 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
             return true;
         }
 
-        public async IAsyncEnumerable<BasePacket> Events(CancellationToken token)
+        public async IAsyncEnumerable<BasePacket> Events([EnumeratorCancellation]CancellationToken token)
         {
-            await _semaphore.WaitAsync(token);
-            
-
+            await foreach (var packet in _worker.ReadPacket(token))
+            {
+                yield return packet;
+            }
         }
     }
 }
