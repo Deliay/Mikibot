@@ -66,36 +66,6 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
             }
         }
 
-        //public async IAsyncEnumerable<BasePacket> ReadPacketV1([EnumeratorCancellation]CancellationToken token)
-        //{
-        //    await _semaphore.WaitAsync(token);
-        //    while (ws.State == WebSocketState.Open && token.IsCancellationRequested == false && !csc.IsCancellationRequested)
-        //    {
-        //        var buffer = new byte[1024 * 10];
-        //        ValueWebSocketReceiveResult result;
-        //        do
-        //        {
-        //            Memory<byte> segment = new ArraySegment<byte>(buffer);
-        //            result = await ws.ReceiveAsync(segment, token);
-        //            switch (result.MessageType)
-        //            {
-        //                case WebSocketMessageType.Text:
-        //                    Logger.LogWarning("Dropped unsupported text message!");
-        //                    break;
-        //                case WebSocketMessageType.Binary:
-        //                    var lengthRaw = segment[..4].ToArray(); Array.Reverse(lengthRaw);
-        //                    var length = (int)BitConverter.ToUInt32(lengthRaw);
-        //                    var bytes = segment[..length].ToArray();
-        //                    segment = segment[(length - 1)..];
-        //                    yield return bytes;
-        //                    break;
-        //                default:
-        //                    yield break;
-        //            }
-        //        } while (!result.EndOfMessage);
-        //    }
-        //}
-
         public async IAsyncEnumerable<byte[]> ReadPacket([EnumeratorCancellation] CancellationToken token)
         {
             await _semaphore.WaitAsync(token);
