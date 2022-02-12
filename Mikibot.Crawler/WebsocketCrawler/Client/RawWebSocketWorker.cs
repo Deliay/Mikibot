@@ -93,6 +93,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
                     }
                     else
                     {
+                        using var _ms = ms;
                         ms = new MemoryStream(data);
                         break;
                     }

@@ -30,9 +30,10 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
 
         public async ValueTask<bool> ConnectAsync(int roomId, CancellationToken token)
         {
-            var liveToken = await Crawler.GetLiveToken(roomId, token);
+            var realRoomId = await Crawler.GetRealRoomId(roomId, token);
+            var liveToken = await Crawler.GetLiveToken(realRoomId, token);
             var host = liveToken.Hosts[0];
-            await _worker.ConnectAsync(host.Host, host.WsPort, roomId, liveToken.Token, token);
+            await _worker.ConnectAsync(host.Host, host.WsPort, realRoomId, liveToken.Token, token);
 
             return true;
         }

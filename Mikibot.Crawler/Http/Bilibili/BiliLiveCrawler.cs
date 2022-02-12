@@ -29,6 +29,14 @@ namespace Mikibot.Crawler.Http.Bilibili
             return result.Data.Follower;
         }
 
+        public async ValueTask<int> GetRealRoomId(int roomId, CancellationToken token = default)
+        {
+            var roomUrl = $"http://api.live.bilibili.com/room/v1/Room/room_init?id={roomId}";
+            var roomResult = await GetAsync<BilibiliApiResponse<LiveInitInfo>>(roomUrl, token);
+
+            return roomResult.Data.RoomId;
+        }
+
         public async ValueTask<LiveToken> GetLiveTokenByUid(int uid, CancellationToken token = default)
         {
             var personal = await GetPersonalInfo(uid, token);
@@ -38,12 +46,7 @@ namespace Mikibot.Crawler.Http.Bilibili
 
         public async ValueTask<LiveToken> GetLiveToken(int roomId, CancellationToken token = default)
         {
-            var roomUrl = $"http://api.live.bilibili.com/room/v1/Room/room_init?id={roomId}";
-            var roomResult = await GetAsync<BilibiliApiResponse<LiveInitInfo>>(roomUrl, token);
-
-            var realRoomId = roomResult.Data.RoomId;
-
-            var tokenUrl = $"http://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id={realRoomId}";
+            var tokenUrl = $"http://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id={roomId}";
             var result = await GetAsync<BilibiliApiResponse<LiveToken>>(tokenUrl, token);
 
             return result.Data;

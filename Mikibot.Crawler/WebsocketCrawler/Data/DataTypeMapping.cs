@@ -11,7 +11,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data
     {
         private static readonly Dictionary<PacketType, Func<BasePacket, byte[], IData>> TypeMapping = new()
         {
-            { PacketType.Online, (p, d) => new OnlineCount() { Type = p.Type, Online = BitConverter.ToUInt32(d) } },
+            { PacketType.Online, (p, d) => { Array.Reverse(d); return new OnlineCount() { Type = p.Type, Online = BitConverter.ToUInt32(d) }; } },
             { PacketType.Normal, (p, d) => new Normal() { Type = p.Type, RawContent = Encoding.UTF8.GetString(d) } }
         };
 
