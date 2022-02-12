@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Mikibot.Crawler.WebsocketCrawler.Package;
 using Mikibot.Crawler.WebsocketCrawler.Packet;
 using System;
 using System.Buffers;
@@ -15,13 +16,6 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
 {
     public class RawWebSocketWorker : IDisposable
     {
-        private static byte[] ProcessEndian(ref byte[] src)
-        {
-            if (BitConverter.IsLittleEndian) Array.Reverse(src);
-
-            return src;
-        }
-
         private readonly ClientWebSocket ws = new();
         private CancellationTokenSource csc;
         private readonly SemaphoreSlim _semaphore;
@@ -40,22 +34,26 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
             csc = CancellationTokenSource.CreateLinkedTokenSource(token);
             var safeToken = csc.Token;
 
-            await ws.ConnectAsync(new UriBuilder(Uri.UriSchemeWs, host, port).Uri, safeToken);
+            var uri = new UriBuilder(Uri.UriSchemeWs, host, port, "/sub").Uri;
+
+            await ws.ConnectAsync(uri, safeToken);
 
             await SendAsync(BasePacket.Auth(roomId, auth), safeToken);
 
-            Keeplive(safeToken).Start();
+            _ = Keeplive(safeToken);
 
             _semaphore.Release();
         }
 
         private async ValueTask SendAsync(BasePacket packet, CancellationToken token)
         {
-            await ws.SendAsync(packet, WebSocketMessageType.Binary, true, token);
+            Logger.LogInformation("packet sent: type={}, datastr={}", packet.Type, Encoding.UTF8.GetString(packet.Data));
+            await SendAsync(packet.ToByte(), token);
         }
 
         private async ValueTask SendAsync(ArraySegment<byte> packet, CancellationToken token)
         {
+            Logger.LogInformation("packet sent: size={}", packet.Count);
             await ws.SendAsync(packet, WebSocketMessageType.Binary, true, token);
         }
 
@@ -68,21 +66,67 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
             }
         }
 
-        public async IAsyncEnumerable<BasePacket> ReadPacket([EnumeratorCancellation]CancellationToken token)
+        //public async IAsyncEnumerable<BasePacket> ReadPacketV1([EnumeratorCancellation]CancellationToken token)
+        //{
+        //    await _semaphore.WaitAsync(token);
+        //    while (ws.State == WebSocketState.Open && token.IsCancellationRequested == false && !csc.IsCancellationRequested)
+        //    {
+        //        var buffer = new byte[1024 * 10];
+        //        ValueWebSocketReceiveResult result;
+        //        do
+        //        {
+        //            Memory<byte> segment = new ArraySegment<byte>(buffer);
+        //            result = await ws.ReceiveAsync(segment, token);
+        //            switch (result.MessageType)
+        //            {
+        //                case WebSocketMessageType.Text:
+        //                    Logger.LogWarning("Dropped unsupported text message!");
+        //                    break;
+        //                case WebSocketMessageType.Binary:
+        //                    var lengthRaw = segment[..4].ToArray(); Array.Reverse(lengthRaw);
+        //                    var length = (int)BitConverter.ToUInt32(lengthRaw);
+        //                    var bytes = segment[..length].ToArray();
+        //                    segment = segment[(length - 1)..];
+        //                    yield return bytes;
+        //                    break;
+        //                default:
+        //                    yield break;
+        //            }
+        //        } while (!result.EndOfMessage);
+        //    }
+        //}
+
+        public async IAsyncEnumerable<byte[]> ReadPacket([EnumeratorCancellation] CancellationToken token)
         {
             await _semaphore.WaitAsync(token);
-            while (ws.State == WebSocketState.Open && token.IsCancellationRequested == false)
+            while (ws.State == WebSocketState.Open && !token.IsCancellationRequested && !csc.IsCancellationRequested)
             {
-                using MemoryStream ms = new(4096);
-                var buffer = new byte[4096];
-                WebSocketReceiveResult result;
+                ValueWebSocketReceiveResult result;
+                MemoryStream ms = new();
+                var buffer = new Memory<byte>(new byte[4096]);
                 do
                 {
                     result = await ws.ReceiveAsync(buffer, token);
-                    ms.Write(buffer, 0, result.Count);
+                    ms.Write(buffer[..result.Count].Span);
+
                 } while (!result.EndOfMessage);
 
-                yield return ms.GetBuffer();
+                var data = ms.ToArray();
+                while (data.Length > 0)
+                {
+                    var lengthRaw = data[..4]; Array.Reverse(lengthRaw);
+                    var length = (int)BitConverter.ToUInt32(lengthRaw);
+                    if (data.Length >= length)
+                    {
+                        yield return data[..length];
+                        data = data[length..];
+                    }
+                    else
+                    {
+                        ms = new MemoryStream(data);
+                        break;
+                    }
+                }
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using Mikibot.Crawler.WebsocketCrawler.Packet;
+﻿using Mikibot.Crawler.WebsocketCrawler.Data;
+using Mikibot.Crawler.WebsocketCrawler.Packet;
 
 namespace Mikibot.Crawler.WebsocketCrawler
 {
@@ -8,6 +9,6 @@ namespace Mikibot.Crawler.WebsocketCrawler
 
         public ValueTask<bool> ConnectAsync(int roomId, CancellationToken token);
 
-        public IAsyncEnumerable<BasePacket> Events(CancellationToken token);
+        public IAsyncEnumerable<IData> Events(CancellationToken token);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mikibot.Crawler.WebsocketCrawler.Package;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -8,33 +9,30 @@ using System.Threading.Tasks;
 
 namespace Mikibot.Crawler.WebsocketCrawler.Packet
 {
-    [StructLayout(LayoutKind.Explicit)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 16)]
     public struct BasePacket
     {
-        [FieldOffset(offset: 0)]
         public uint Size;
 
-        [FieldOffset(offset: sizeof(uint))]
         public ushort HeadSize;
 
-        [FieldOffset(offset: sizeof(uint) + sizeof(ushort))]
-        public ProtocolVersion Version;
+        public ProtocolVersion Version = ProtocolVersion.Heartbeat;
 
-        [FieldOffset(offset: sizeof(ProtocolVersion) + sizeof(ushort) + sizeof(ushort))]
         public PacketType Type;
 
-        private const ushort DefaultHeadSize = sizeof(PacketType) + sizeof(ProtocolVersion) + sizeof(ushort) + sizeof(ushort);
+        public uint Sequence = 1;
 
-        [FieldOffset(offset: DefaultHeadSize)]
-        public byte[] Data;
+        public byte[] Data { get; set; }
 
+        private const int DefaultHeadSize = sizeof(uint) * 3 + sizeof(ushort) * 2;
         private static readonly byte[] KeepliveContent = Encoding.UTF8.GetBytes("[Object asswecan]");
         private static readonly ArraySegment<byte> KeepliveData = new BasePacket()
         {
+            Type = PacketType.Heartbeat,
             HeadSize = DefaultHeadSize,
             Size = (uint)(KeepliveContent.Length + DefaultHeadSize),
             Data = KeepliveContent,
-        };
+        }.ToByte();
         public static ArraySegment<byte> Keeplive() => KeepliveData;
 
         public static BasePacket Auth(int roomId, string auth)
@@ -51,6 +49,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Packet
             var data = Encoding.UTF8.GetBytes(authPacket);
             return new BasePacket()
             {
+                Type = PacketType.Authorize,
                 HeadSize = DefaultHeadSize,
                 Size = (uint)(DefaultHeadSize + data.Length),
                 Data = data,
@@ -62,48 +61,25 @@ namespace Mikibot.Crawler.WebsocketCrawler.Packet
             return DefaultHeadSize + Data.Length;
         }
 
+        //public static implicit operator ArraySegment<byte> (BasePacket packet)
+        //{
+        //    return packet.ToByte();
+        //}
+
+        //public static implicit operator BasePacket(byte[] bytes)
+        //{
+        //    return ToPacket(bytes);
+        //}
+
         public byte[] ToByte()
         {
-            var size = GetSize();
-            byte[] result = new byte[size];
-            IntPtr buffer = Marshal.AllocHGlobal(size);
-
-            try
-            {
-                Marshal.StructureToPtr(this, buffer, false);
-                Marshal.Copy(buffer, result, 0, size);
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(buffer);
-            }
-
-            return result;
-        }
-
-        public static implicit operator ArraySegment<byte> (BasePacket packet)
-        {
-            return packet.ToByte();
-        }
-
-        public static implicit operator BasePacket(byte[] bytes)
-        {
-            return ToPacket(bytes);
+            return EndianUtil.StructToBytes(this);
         }
 
         public static BasePacket ToPacket(byte[] bytes)
         {
-            IntPtr buffer = Marshal.AllocHGlobal(bytes.Length);
-
-            try
-            {
-                Marshal.Copy(bytes, 0, buffer, bytes.Length);
-                return Marshal.PtrToStructure<BasePacket>(buffer);
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(buffer);
-            }
+            return EndianUtil.BytesToStruct(bytes);
         }
+
     }
 }
