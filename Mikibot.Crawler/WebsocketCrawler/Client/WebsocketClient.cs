@@ -64,12 +64,20 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
                 _ => raw,
             };
             var extractedPacket = BasePacket.ToPacket(extractedRaw);
+
+            if (raw.Length == extractedPacket.GetSize())
+            {
+                yield return DataTypeMapping.Parse(extractedPacket, extractedPacket.Data);
+                yield break;
+            }
+                
+
             Logger.LogInformation("packet readed, protocol={}, type={}", extractedPacket.Version, extractedPacket.Type);
             var safeExtractedPacket = BasePacket.ToPacket(extractedRaw[..(int)extractedPacket.Size]);
 
             yield return DataTypeMapping.Parse(safeExtractedPacket, safeExtractedPacket.Data);
 
-            if (extractedRaw.Length > extractedPacket.Size)
+            if (extractedRaw.Length > extractedPacket.GetSize())
             {
                 var restRaw = extractedRaw[(int)extractedPacket.Size..];
                 if (restRaw.Length > 17)
