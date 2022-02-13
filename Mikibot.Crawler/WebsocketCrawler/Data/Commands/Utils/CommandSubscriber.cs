@@ -23,18 +23,18 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils
             { typeof(EntryEffect), KnownCommands.ENTRY_EFFECT },
         };
 
-        private readonly Dictionary<KnownCommands, List<Func<object, ValueTask>>> _handlers = new();
+        private readonly Dictionary<KnownCommands, List<Func<object, Task>>> _handlers = new();
 
-        private static Func<T, ValueTask> Wrap<T>(Action<T> action)
+        private static Func<T, Task> Wrap<T>(Action<T> action)
         {
             return (t) =>
             {
                 action(t);
-                return ValueTask.CompletedTask;
+                return Task.CompletedTask;
             };
         }
 
-        public void Subscribe<T>(KnownCommands command, Func<T, ValueTask> handler)
+        public void Subscribe<T>(KnownCommands command, Func<T, Task> handler)
         {
             if (!_handlers.ContainsKey(command))
             {
@@ -44,7 +44,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils
             _handlers[command].Add((obj) => handler((T)obj));
         }
 
-        public void Subscribe<T>(Func<T, ValueTask> handler)
+        public void Subscribe<T>(Func<T, Task> handler)
         {
             if (_KnwonCommandType.ContainsKey(typeof(T)))
             {
@@ -53,34 +53,34 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils
         }
         public void Subscribe<T>(Action<T> handler) => Subscribe(Wrap(handler));
 
-        public void Subscribe(Func<ComboSend, ValueTask> handler) => Subscribe(handler);
+        public void Subscribe(Func<ComboSend, Task> handler) => Subscribe(handler);
         public void Subscribe(Action<ComboSend> handler) => Subscribe(Wrap(handler));
 
-        public void Subscribe(Func<DanmuMsg, ValueTask> handler) => Subscribe(handler);
+        public void Subscribe(Func<DanmuMsg, Task> handler) => Subscribe(handler);
         public void Subscribe(Action<DanmuMsg> handler) => Subscribe(Wrap(handler));
 
-        public void Subscribe(Func<EntryEffect, ValueTask> handler) => Subscribe(handler);
+        public void Subscribe(Func<EntryEffect, Task> handler) => Subscribe(handler);
         public void Subscribe(Action<EntryEffect> handler) => Subscribe(Wrap(handler));
 
-        public void Subscribe(Func<GuardBuy, ValueTask> handler) => Subscribe(handler);
+        public void Subscribe(Func<GuardBuy, Task> handler) => Subscribe(handler);
         public void Subscribe(Action<GuardBuy> handler) => Subscribe(Wrap(handler));
 
-        public void Subscribe(Func<InteractWord, ValueTask> handler) => Subscribe(handler);
+        public void Subscribe(Func<InteractWord, Task> handler) => Subscribe(handler);
         public void Subscribe(Action<InteractWord> handler) => Subscribe(Wrap(handler));
 
-        public void Subscribe(Func<OnlineRankCount, ValueTask> handler) => Subscribe(handler);
+        public void Subscribe(Func<OnlineRankCount, Task> handler) => Subscribe(handler);
         public void Subscribe(Action<OnlineRankCount> handler) => Subscribe(Wrap(handler));
 
-        public void Subscribe(Func<OnlineRankV2, ValueTask> handler) => Subscribe(handler);
+        public void Subscribe(Func<OnlineRankV2, Task> handler) => Subscribe(handler);
         public void Subscribe(Action<OnlineRankV2> handler) => Subscribe(Wrap(handler));
 
-        public void Subscribe(Func<RoomRealTimeMessageUpdate, ValueTask> handler) => Subscribe(handler);
+        public void Subscribe(Func<RoomRealTimeMessageUpdate, Task> handler) => Subscribe(handler);
         public void Subscribe(Action<RoomRealTimeMessageUpdate> handler) => Subscribe(Wrap(handler));
 
-        public void Subscribe(Func<SendGift, ValueTask> handler) => Subscribe(handler);
+        public void Subscribe(Func<SendGift, Task> handler) => Subscribe(handler);
         public void Subscribe(Action<SendGift> handler) => Subscribe(Wrap(handler));
 
-        public void Subscribe(Func<SuperChatMessage, ValueTask> handler) => Subscribe(handler);
+        public void Subscribe(Func<SuperChatMessage, Task> handler) => Subscribe(handler);
         public void Subscribe(Action<SuperChatMessage> handler) => Subscribe(Wrap(handler));
 
 
@@ -94,7 +94,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils
             return cmd.GetType().GetProperty("Data")?.GetValue(cmd)!;
         }
 
-        public async ValueTask Handle(ICommandBase? cmd)
+        public async Task Handle(ICommandBase? cmd)
         {
             if (cmd == null) return;
             if (_handlers.ContainsKey(cmd.Command))
@@ -103,15 +103,15 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils
             }
         }
 
-        public ValueTask Handle(Normal normal) => Handle(ICommandBase.Parse(normal.RawContent));
+        public Task Handle(Normal normal) => Handle(ICommandBase.Parse(normal.RawContent));
 
-        public ValueTask Handle(IData data)
+        public Task Handle(IData data)
         {
             if (data.Type == PacketType.Normal)
             {
                 return Handle((Normal)data);
             }
-            return ValueTask.CompletedTask;
+            return Task.CompletedTask;
         }
 
         public void Dispose()

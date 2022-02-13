@@ -113,6 +113,10 @@ namespace Mikibot.Analyze.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("Msg")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<DateTimeOffset>("SentAt")
                         .HasColumnType("datetime(6)");
 

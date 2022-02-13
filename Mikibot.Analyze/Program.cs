@@ -7,6 +7,8 @@ using Mikibot.Analyze.MiraiHttp;
 using Mikibot.Analyze.Notification;
 using Mikibot.Analyze.Util;
 using Mikibot.Crawler.Http.Bilibili;
+using Mikibot.Crawler.WebsocketCrawler;
+using Mikibot.Crawler.WebsocketCrawler.Client;
 
 var appBuilder = ContainerInitializer.Create();
 
@@ -22,6 +24,7 @@ appBuilder.RegisterType<MiraiService>().As<IMiraiService>().SingleInstance();
 #endif
 appBuilder.RegisterType<LiveStatusCrawlService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<DailyFollowerStatisticService>().AsSelf().SingleInstance();
+appBuilder.RegisterType<DanmakuCollectorService>().AsSelf().SingleInstance();
 
 var appContainer = appBuilder.Build();
 
@@ -46,7 +49,8 @@ using (var app = appContainer.BeginLifetimeScope())
 
     var statusCrawler = app.Resolve<LiveStatusCrawlService>();
     var followerStat = app.Resolve<DailyFollowerStatisticService>();
+    var danmakuCrawler = app.Resolve<DanmakuCollectorService>();
 
     logger.LogInformation("Starting schedule module...");
-    await Task.WhenAll(statusCrawler.Run(token), followerStat.Run(token));
+    await Task.WhenAll(statusCrawler.Run(token), followerStat.Run(token), danmakuCrawler.Run(token));
 }

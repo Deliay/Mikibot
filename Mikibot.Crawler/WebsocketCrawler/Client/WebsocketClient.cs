@@ -3,7 +3,6 @@ using Mikibot.Crawler.Http.Bilibili;
 using Mikibot.Crawler.WebsocketCrawler.Client;
 using Mikibot.Crawler.WebsocketCrawler.Data;
 using Mikibot.Crawler.WebsocketCrawler.Packet;
-using Mikibot.Crawler.WebsocketCrawler.Packet;
 using System;
 using System.Collections.Generic;
 using System.IO.Compression;
@@ -14,19 +13,22 @@ using System.Threading.Tasks;
 
 namespace Mikibot.Crawler.WebsocketCrawler.Client
 {
-    public class WebsocketClient : IClient
+    public class WebsocketClient : IClient, IDisposable
     {
         private readonly RawWebSocketWorker _worker;
+        private readonly CancellationTokenSource _csc;
         public WebsocketClient()
         {
-            _worker = new RawWebSocketWorker();
+            _worker = new();
+            _csc = new();
         }
 
         public int RoomId { get; private set; }
 
         public async ValueTask<bool> ConnectAsync(string host, int port, int roomId, string liveToken, string protocol = "ws", CancellationToken cancellationToken = default)
         {
-            await _worker.ConnectAsync(host, port, roomId, liveToken, protocol, cancellationToken);
+            var connectCsc = CancellationTokenSource.CreateLinkedTokenSource(_csc.Token, cancellationToken);
+            await _worker.ConnectAsync(host, port, roomId, liveToken, protocol, connectCsc.Token);
             return true;
         }
 
@@ -82,13 +84,22 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
 
         public async IAsyncEnumerable<IData> Events([EnumeratorCancellation]CancellationToken token)
         {
-            await foreach (var raw in _worker.ReadPacket(token))
+            var connectCsc = CancellationTokenSource.CreateLinkedTokenSource(_csc.Token, token);
+            await foreach (var raw in _worker.ReadPacket(connectCsc.Token))
             {
                 foreach (var data in ProcessPacket(raw))
                 {
                     yield return data;
                 }
             }
+        }
+
+        public void Dispose()
+        {
+            using var worker = this._worker;
+            using var csc = this._csc;
+            GC.SuppressFinalize(this);
+
         }
     }
 }

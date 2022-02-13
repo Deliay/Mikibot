@@ -17,5 +17,8 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
         public int Price { get; set; }
         [JsonPropertyName("gift_name")]
         public string GiftName { get; set; }
+        [JsonPropertyName("start_time")]
+        [JsonConverter(typeof(UnixSecondOffsetConverter))]
+        public DateTimeOffset StartedAt { get; set; }
     }
 }

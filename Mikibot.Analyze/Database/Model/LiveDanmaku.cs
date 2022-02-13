@@ -13,6 +13,7 @@ namespace Mikibot.Analyze.Database.Model
         public int Id { get; set; }
         public int Bid { get; set; }
         public int UserId { get; set; }
+        public string Msg { get; set; }
         public string UserName { get; set; }
         public string FansTag { get; set; }
         public int FansLevel { get; set; }
