@@ -8,11 +8,13 @@
 - 网站后端 **Backend** ASP.NET Core + C#
 - 网站前端 **Frontend** React 17 + Typescript
 - 数据处理 **Analyze** C#
+- **Crawler** C#
 
 ## 项目结构
 - **Mikibot.API** - Mikibot网站的后端
 - **mikibot.fe** - Mikibot网站的前端
 - **Mikibot.Analyze** - Mikibot本体
+- **Mikibot.Crawler** - Crawler相关，包括HTTP API和Websocket相关
 - **buildingBlocks/** - 通用组件
 
 ## 数据处理Roadmap(TODO 挪到github project)
