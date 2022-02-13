@@ -22,6 +22,11 @@ namespace Mikibot.Analyze.Database
         public DbSet<FollowerStatistic> FollowerStatistic { get; set; }
         public DbSet<StatisticReportLog> StatisticReportLogs { get; set; }
         public DbSet<LiveDanmaku> LiveDanmakus { get; set; }
+        public DbSet<LiveUserInteractiveLog> LiveUserInteractiveLogs { get; set; }
+        public DbSet<LiveBuyGuardLog> LiveBuyGuardLogs { get; set; }
+        public DbSet<LiveGuardEnterLog> LiveGuardEnterLogs { get; set; }
+        public DbSet<LiveGift> LiveGifts { get; set; }
+        public DbSet<LiveGiftCombo> LiveGiftCombos { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -65,6 +70,50 @@ namespace Mikibot.Analyze.Database
                 model.HasKey(m => m.Id);
                 model.HasIndex(m => new { m.Bid, m.UserId });
                 model.HasIndex(m => new { m.Bid, m.FansTagUserId });
+                model.HasIndex(m => new { m.Bid, m.SentAt });
+                model.Property(m => m.CreatedAt).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<LiveUserInteractiveLog>(model =>
+            {
+                model.HasKey(m => m.Id);
+                model.HasIndex(m => new { m.Bid, m.UserId });
+                model.HasIndex(m => new { m.Bid, m.FansTagUserId });
+                model.HasIndex(m => new { m.Bid, m.InteractedAt });
+                model.Property(m => m.CreatedAt).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<LiveBuyGuardLog>(model =>
+            {
+                model.HasKey(m => m.Id);
+                model.HasIndex(m => new { m.Bid, m.Uid });
+                model.HasIndex(m => new { m.Bid, m.BoughtAt });
+                model.Property(m => m.CreatedAt).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<LiveGuardEnterLog>(model =>
+            {
+                model.HasKey(m => m.Id);
+                model.HasIndex(m => new { m.Bid, m.UserId });
+                model.HasIndex(m => new { m.Bid, m.EnteredAt });
+                model.Property(m => m.CreatedAt).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<LiveGift>(model =>
+            {
+                model.HasKey(m => m.Id);
+                model.HasIndex(m => new { m.Bid, m.Uid });
+                model.HasIndex(m => new { m.Bid, m.SentAt });
+                model.HasIndex(m => new { m.Bid, m.ComboId });
+                model.Property(m => m.CreatedAt).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<LiveGiftCombo>(model =>
+            {
+                model.HasKey(m => m.Id);
+                model.HasIndex(m => new { m.Bid, m.Uid });
+                model.HasIndex(m => new { m.Bid, m.CreatedAt });
+                model.HasIndex(m => new { m.Bid, m.ComboId });
                 model.Property(m => m.CreatedAt).ValueGeneratedOnAdd();
             });
         }

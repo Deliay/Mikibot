@@ -7,18 +7,15 @@ using System.Threading.Tasks;
 
 namespace Mikibot.Analyze.Database.Model
 {
-    public class LiveDanmaku
+    public class LiveGuardEnterLog
     {
         [Key]
         public int Id { get; set; }
         public int Bid { get; set; }
         public int UserId { get; set; }
-        public string UserName { get; set; }
-        public string FansTag { get; set; }
-        public int FansLevel { get; set; }
-        public int FansTagUserId { get; set; }
-        public string FansTagUserName { get; set; }
-        public DateTimeOffset SentAt { get; set; }
+        public int GuardLevel { get; set; }
+        public string CopyWriting { get; set; }
+        public DateTimeOffset EnteredAt { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
     }
 }
