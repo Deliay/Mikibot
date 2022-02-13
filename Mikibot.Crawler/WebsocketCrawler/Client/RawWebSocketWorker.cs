@@ -20,16 +20,13 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
         private CancellationTokenSource csc;
         private readonly SemaphoreSlim _semaphore;
 
-        public RawWebSocketWorker(ILogger<RawWebSocketWorker> logger)
+        public RawWebSocketWorker()
         {
-            Logger = logger;
             _semaphore = new(1);
             _semaphore.Wait();
         }
 
-        public ILogger<RawWebSocketWorker> Logger { get; }
-
-        public async ValueTask ConnectAsync(string host, int port, int roomId, string auth, CancellationToken token)
+        public async ValueTask ConnectAsync(string host, int port, int roomId, string auth, string protocol, CancellationToken token)
         {
             csc = CancellationTokenSource.CreateLinkedTokenSource(token);
             var safeToken = csc.Token;
@@ -47,13 +44,11 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
 
         private async ValueTask SendAsync(BasePacket packet, CancellationToken token)
         {
-            Logger.LogInformation("packet sent: type={}, datastr={}", packet.Type, Encoding.UTF8.GetString(packet.Data));
             await SendAsync(packet.ToByte(), token);
         }
 
         private async ValueTask SendAsync(ArraySegment<byte> packet, CancellationToken token)
         {
-            Logger.LogInformation("packet sent: size={}", packet.Count);
             await ws.SendAsync(packet, WebSocketMessageType.Binary, true, token);
         }
 
@@ -105,6 +100,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
         {
             using var socket = this.ws;
             using var csc = this.csc;
+            GC.SuppressFinalize(this);
         }
     }
 }

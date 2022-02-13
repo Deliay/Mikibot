@@ -7,7 +7,7 @@ namespace Mikibot.Crawler.WebsocketCrawler
     {
         public int RoomId { get; }
 
-        public ValueTask<bool> ConnectAsync(int roomId, CancellationToken token);
+        public ValueTask<bool> ConnectAsync(string host, int port, int roomId, string liveToken, string protocol, CancellationToken cancellationToken = default);
 
         public IAsyncEnumerable<IData> Events(CancellationToken token);
     }

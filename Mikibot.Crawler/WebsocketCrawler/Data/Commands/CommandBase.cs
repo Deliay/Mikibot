@@ -8,27 +8,22 @@ using System.Threading.Tasks;
 
 namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
 {
-    public struct CommandBase<T>
+    public interface ICommandBase
     {
-        [JsonPropertyName("cmd")]
-        public string Command { get; set; }
-        [JsonPropertyName("data")]
-        public T Data { get; set; }
-        [JsonPropertyName("info")]
-        public T Info { get; set; }
+        public KnownCommands Command { get; set; }
 
         private static readonly Type PartialCommandType = typeof(CommandBase<>);
-        private static readonly Dictionary<string, Type> CommandMapping = new()
+        private static readonly Dictionary<KnownCommands, Type> CommandMapping = new()
         {
-            { "DANMU_MSG", PartialCommandType.MakeGenericType(typeof(DanmuMsg)) },
-            { "SEND_GIFT", PartialCommandType.MakeGenericType(typeof(SendGift)) },
-            { "GUARD_BUY", PartialCommandType.MakeGenericType(typeof(GuardBuy)) },
-            { "ROOM_REAL_TIME_MESSAGE_UPDATE", PartialCommandType.MakeGenericType(typeof(RoomRealTimeMessageUpdate)) },
-            { "SUPER_CHAT_MESSAGE", PartialCommandType.MakeGenericType(typeof(SuperChatMessage)) },
-            { "COMBO_SEND", PartialCommandType.MakeGenericType(typeof(ComboSend)) },
-            { "INTERACT_WORD", PartialCommandType.MakeGenericType(typeof(InteractWord)) },
-            { "ONLINE_RANK_COUNT", PartialCommandType.MakeGenericType(typeof(OnlineRankCount)) },
-            { "ONLINE_RANK_V2", PartialCommandType.MakeGenericType(typeof(OnlineRankV2)) },
+            { KnownCommands.DANMU_MSG, PartialCommandType.MakeGenericType(typeof(DanmuMsg)) },
+            { KnownCommands.SEND_GIFT, PartialCommandType.MakeGenericType(typeof(SendGift)) },
+            { KnownCommands.GUARD_BUY, PartialCommandType.MakeGenericType(typeof(GuardBuy)) },
+            { KnownCommands.ROOM_REAL_TIME_MESSAGE_UPDATE, PartialCommandType.MakeGenericType(typeof(RoomRealTimeMessageUpdate)) },
+            { KnownCommands.SUPER_CHAT_MESSAGE, PartialCommandType.MakeGenericType(typeof(SuperChatMessage)) },
+            { KnownCommands.COMBO_SEND, PartialCommandType.MakeGenericType(typeof(ComboSend)) },
+            { KnownCommands.INTERACT_WORD, PartialCommandType.MakeGenericType(typeof(InteractWord)) },
+            { KnownCommands.ONLINE_RANK_COUNT, PartialCommandType.MakeGenericType(typeof(OnlineRankCount)) },
+            { KnownCommands.ONLINE_RANK_V2, PartialCommandType.MakeGenericType(typeof(OnlineRankV2)) },
         };
 
         private static readonly JsonSerializerOptions JsonSerializerOptions = new()
@@ -37,27 +32,45 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         };
 
-        public static object Parse(string raw)
+        public static ICommandBase? Parse(string raw)
         {
-            var cmd = JsonSerializer.Deserialize<CommandBase<JsonElement>>(raw, JsonSerializerOptions);
-            if (CommandMapping.ContainsKey(cmd.Command))
+            try
             {
-                var type = CommandMapping[cmd.Command];
-                var underlying = type.GenericTypeArguments[0];
-                var instance = Activator.CreateInstance(type)!;
+                var cmd = JsonSerializer.Deserialize<CommandBase<JsonElement>>(raw, JsonSerializerOptions);
+                if (CommandMapping.ContainsKey(cmd.Command))
+                {
+                    var type = CommandMapping[cmd.Command];
+                    var underlying = type.GenericTypeArguments[0];
+                    var instance = Activator.CreateInstance(type)!;
 
-                instance.GetType().GetProperty("Command")?.SetValue(instance, cmd.Command);
+                    instance.GetType().GetProperty("Command")?.SetValue(instance, cmd.Command);
 
-                if (cmd.Info.ValueKind != JsonValueKind.Undefined)
-                    instance.GetType().GetProperty("Info")?.SetValue(instance, cmd.Info.Deserialize(underlying, JsonSerializerOptions));
+                    if (cmd.Info.ValueKind != JsonValueKind.Undefined)
+                        instance.GetType().GetProperty("Info")?.SetValue(instance, cmd.Info.Deserialize(underlying, JsonSerializerOptions));
 
-                if (cmd.Data.ValueKind != JsonValueKind.Undefined)
-                    instance.GetType().GetProperty("Data")?.SetValue(instance, cmd.Data.Deserialize(underlying, JsonSerializerOptions));
+                    if (cmd.Data.ValueKind != JsonValueKind.Undefined)
+                        instance.GetType().GetProperty("Data")?.SetValue(instance, cmd.Data.Deserialize(underlying, JsonSerializerOptions));
 
-                return instance;
+                    return (ICommandBase)instance;
+                }
+
+                return cmd;
             }
-
-            return cmd;
+            catch
+            {
+                return null!;
+            }
         }
+    }
+
+    public struct CommandBase<T> : ICommandBase
+    {
+        [JsonPropertyName("cmd")]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public KnownCommands Command { get; set; }
+        [JsonPropertyName("data")]
+        public T Data { get; set; }
+        [JsonPropertyName("info")]
+        public T Info { get; set; }
     }
 }

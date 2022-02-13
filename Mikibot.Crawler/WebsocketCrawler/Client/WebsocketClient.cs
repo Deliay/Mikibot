@@ -17,24 +17,16 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
     public class WebsocketClient : IClient
     {
         private readonly RawWebSocketWorker _worker;
-        public WebsocketClient(BiliLiveCrawler crawler, ILogger<WebsocketClient> logger, ILogger<RawWebSocketWorker> workerLogger)
+        public WebsocketClient()
         {
-            Crawler = crawler;
-            Logger = logger;
-            _worker = new RawWebSocketWorker(workerLogger);
+            _worker = new RawWebSocketWorker();
         }
 
         public int RoomId { get; private set; }
-        public BiliLiveCrawler Crawler { get; }
-        public ILogger<WebsocketClient> Logger { get; }
 
-        public async ValueTask<bool> ConnectAsync(int roomId, CancellationToken token)
+        public async ValueTask<bool> ConnectAsync(string host, int port, int roomId, string liveToken, string protocol = "ws", CancellationToken cancellationToken = default)
         {
-            var realRoomId = await Crawler.GetRealRoomId(roomId, token);
-            var liveToken = await Crawler.GetLiveToken(realRoomId, token);
-            var host = liveToken.Hosts[0];
-            await _worker.ConnectAsync(host.Host, host.WsPort, realRoomId, liveToken.Token, token);
-
+            await _worker.ConnectAsync(host, port, roomId, liveToken, protocol, cancellationToken);
             return true;
         }
 
@@ -52,7 +44,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
         private static Stream Zlib(Stream data) => new ZLibStream(data, CompressionMode.Decompress);
         private static Stream Brotli(Stream data) => new BrotliStream(data, CompressionMode.Decompress);
 
-        private IEnumerable<IData> ProcessPacket(byte[] raw)
+        public static IEnumerable<IData> ProcessPacket(byte[] raw)
         {
             var packet = BasePacket.ToPacket(raw);
             if (packet.Size == 0) yield break;
@@ -70,9 +62,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
                 yield return DataTypeMapping.Parse(extractedPacket, extractedPacket.Data);
                 yield break;
             }
-                
 
-            Logger.LogInformation("packet readed, protocol={}, type={}", extractedPacket.Version, extractedPacket.Type);
             var safeExtractedPacket = BasePacket.ToPacket(extractedRaw[..(int)extractedPacket.Size]);
 
             yield return DataTypeMapping.Parse(safeExtractedPacket, safeExtractedPacket.Data);
