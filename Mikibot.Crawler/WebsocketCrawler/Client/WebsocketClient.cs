@@ -65,7 +65,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
                 yield break;
             }
 
-            BasePacket headPacket = = BasePacket.ToPacket(extractedRaw[..(int)extractedPacket.Size]);
+            BasePacket headPacket = BasePacket.ToPacket(extractedRaw[..(int)extractedPacket.Size]);
 
             yield return DataTypeMapping.Parse(headPacket, headPacket.Data);
 

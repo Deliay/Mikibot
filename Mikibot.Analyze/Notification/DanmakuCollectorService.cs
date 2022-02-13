@@ -16,7 +16,7 @@ namespace Mikibot.Analyze.Notification
 {
     public class DanmakuCollectorService
     {
-        private const int mxmk = 21452505;
+        private const int mxmk = 21672023;
         private readonly MikibotDatabaseContext db = new(MySqlConfiguration.FromEnviroment());
 
         public DanmakuCollectorService(ILifetimeScope scope)
