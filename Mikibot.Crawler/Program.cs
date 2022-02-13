@@ -3,14 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Mikibot.Crawler.Http.Bilibili;
 using Mikibot.Crawler.WebsocketCrawler.Client;
-using Mikibot.Crawler.WebsocketCrawler.Data;
 using Mikibot.Crawler.WebsocketCrawler.Data.Commands;
 using Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils;
-using Mikibot.Crawler.WebsocketCrawler.Package;
 using Mikibot.Crawler.WebsocketCrawler.Packet;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using System.Text.Unicode;
 
 var serviceBuilder = new ServiceCollection();
 serviceBuilder.AddLogging(b => b.AddConsole());
