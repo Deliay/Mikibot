@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mikibot.Analyze.Database;
 
@@ -10,9 +11,10 @@ using Mikibot.Analyze.Database;
 namespace Mikibot.Analyze.Migrations
 {
     [DbContext(typeof(MikibotDatabaseContext))]
-    partial class MikibotDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20220213111312_add-many-database-model")]
+    partial class addmanydatabasemodel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
