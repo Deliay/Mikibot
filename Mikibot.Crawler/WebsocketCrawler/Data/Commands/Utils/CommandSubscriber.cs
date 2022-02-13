@@ -59,6 +59,9 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils
         public void Subscribe(Func<DanmuMsg, ValueTask> handler) => Subscribe(handler);
         public void Subscribe(Action<DanmuMsg> handler) => Subscribe(Wrap(handler));
 
+        public void Subscribe(Func<EntryEffect, ValueTask> handler) => Subscribe(handler);
+        public void Subscribe(Action<EntryEffect> handler) => Subscribe(Wrap(handler));
+
         public void Subscribe(Func<GuardBuy, ValueTask> handler) => Subscribe(handler);
         public void Subscribe(Action<GuardBuy> handler) => Subscribe(Wrap(handler));
 
