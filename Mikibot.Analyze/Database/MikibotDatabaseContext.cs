@@ -21,6 +21,7 @@ namespace Mikibot.Analyze.Database
         public DbSet<LiveStatus> LiveStatuses { get; set; }
         public DbSet<FollowerStatistic> FollowerStatistic { get; set; }
         public DbSet<StatisticReportLog> StatisticReportLogs { get; set; }
+        public DbSet<LiveDanmaku> LiveDanmakus { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -57,6 +58,14 @@ namespace Mikibot.Analyze.Database
                 model.Property(model => model.Bid).IsRequired();
                 model.Property(model => model.FollowerCount).IsRequired();
                 model.Property(model => model.CreatedAt).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<LiveDanmaku>(model =>
+            {
+                model.HasKey(m => m.Id);
+                model.HasIndex(m => new { m.Bid, m.UserId });
+                model.HasIndex(m => new { m.Bid, m.FansTagUserId });
+                model.Property(m => m.CreatedAt).ValueGeneratedOnAdd();
             });
         }
     }
