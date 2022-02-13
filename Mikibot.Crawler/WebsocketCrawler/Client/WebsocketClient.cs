@@ -2,7 +2,7 @@
 using Mikibot.Crawler.Http.Bilibili;
 using Mikibot.Crawler.WebsocketCrawler.Client;
 using Mikibot.Crawler.WebsocketCrawler.Data;
-using Mikibot.Crawler.WebsocketCrawler.Package;
+using Mikibot.Crawler.WebsocketCrawler.Packet;
 using Mikibot.Crawler.WebsocketCrawler.Packet;
 using System;
 using System.Collections.Generic;

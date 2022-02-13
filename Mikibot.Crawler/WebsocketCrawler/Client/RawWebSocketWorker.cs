@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Mikibot.Crawler.WebsocketCrawler.Package;
+using Mikibot.Crawler.WebsocketCrawler.Packet;
 using Mikibot.Crawler.WebsocketCrawler.Packet;
 using System;
 using System.Buffers;

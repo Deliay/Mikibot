@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mikibot.Crawler.WebsocketCrawler.Package
+namespace Mikibot.Crawler.WebsocketCrawler.Packet
 {
     public static class EndianUtil
     {
