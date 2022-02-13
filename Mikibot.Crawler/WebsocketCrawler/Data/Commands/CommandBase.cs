@@ -24,6 +24,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
             { KnownCommands.INTERACT_WORD, PartialCommandType.MakeGenericType(typeof(InteractWord)) },
             { KnownCommands.ONLINE_RANK_COUNT, PartialCommandType.MakeGenericType(typeof(OnlineRankCount)) },
             { KnownCommands.ONLINE_RANK_V2, PartialCommandType.MakeGenericType(typeof(OnlineRankV2)) },
+            { KnownCommands.ENTRY_EFFECT, PartialCommandType.MakeGenericType(typeof(EntryEffect)) },
         };
 
         private static readonly JsonSerializerOptions JsonSerializerOptions = new()

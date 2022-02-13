@@ -20,6 +20,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils
             { typeof(RoomRealTimeMessageUpdate), KnownCommands.ROOM_REAL_TIME_MESSAGE_UPDATE },
             { typeof(SendGift), KnownCommands.SEND_GIFT },
             { typeof(SuperChatMessage), KnownCommands.SUPER_CHAT_MESSAGE },
+            { typeof(EntryEffect), KnownCommands.ENTRY_EFFECT },
         };
 
         private readonly Dictionary<KnownCommands, List<Func<object, ValueTask>>> _handlers = new();
