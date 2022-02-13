@@ -9,6 +9,8 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
 {
     public struct SendGift
     {
+        [JsonPropertyName("batch_combo_id")]
+        public string ComboId { get; set; }
         public string Action { get; set; }
         [JsonPropertyName("coin_type")]
         public string CoinType { get; set; }
