@@ -11,8 +11,6 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
     {
         [JsonPropertyName("guard_level")]
         public int GuardLevel { get; set; }
-        [JsonPropertyName("user_level")]
-        public int FansTagLevel { get; set; }
         [JsonPropertyName("uname")]
         public string UserName { get; set; }
     }

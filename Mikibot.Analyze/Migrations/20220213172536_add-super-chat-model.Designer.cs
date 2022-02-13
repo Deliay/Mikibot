@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mikibot.Analyze.Database;
 
@@ -10,9 +11,10 @@ using Mikibot.Analyze.Database;
 namespace Mikibot.Analyze.Migrations
 {
     [DbContext(typeof(MikibotDatabaseContext))]
-    partial class MikibotDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20220213172536_add-super-chat-model")]
+    partial class addsuperchatmodel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -363,10 +365,6 @@ namespace Mikibot.Analyze.Migrations
 
                     b.Property<int>("Uid")
                         .HasColumnType("int");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 

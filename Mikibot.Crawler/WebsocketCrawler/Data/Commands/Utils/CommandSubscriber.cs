@@ -51,37 +51,37 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils
                 Subscribe(_KnwonCommandType[typeof(T)], handler);
             }
         }
-        public void Subscribe<T>(Action<T> handler) => Subscribe(Wrap(handler));
+        public void Subscribe<T>(Action<T> handler) => Subscribe<T>(Wrap(handler));
 
-        public void Subscribe(Func<ComboSend, Task> handler) => Subscribe(handler);
-        public void Subscribe(Action<ComboSend> handler) => Subscribe(Wrap(handler));
+        public void Subscribe(Func<ComboSend, Task> handler) => Subscribe<ComboSend>(handler);
+        public void Subscribe(Action<ComboSend> handler) => Subscribe<ComboSend>(Wrap(handler));
 
-        public void Subscribe(Func<DanmuMsg, Task> handler) => Subscribe(handler);
-        public void Subscribe(Action<DanmuMsg> handler) => Subscribe(Wrap(handler));
+        public void Subscribe(Func<DanmuMsg, Task> handler) => Subscribe<DanmuMsg>(handler);
+        public void Subscribe(Action<DanmuMsg> handler) => Subscribe<DanmuMsg>(Wrap(handler));
 
-        public void Subscribe(Func<EntryEffect, Task> handler) => Subscribe(handler);
-        public void Subscribe(Action<EntryEffect> handler) => Subscribe(Wrap(handler));
+        public void Subscribe(Func<EntryEffect, Task> handler) => Subscribe<EntryEffect>(handler);
+        public void Subscribe(Action<EntryEffect> handler) => Subscribe<EntryEffect>(Wrap(handler));
 
-        public void Subscribe(Func<GuardBuy, Task> handler) => Subscribe(handler);
-        public void Subscribe(Action<GuardBuy> handler) => Subscribe(Wrap(handler));
+        public void Subscribe(Func<GuardBuy, Task> handler) => Subscribe<GuardBuy>(handler);
+        public void Subscribe(Action<GuardBuy> handler) => Subscribe<GuardBuy>(Wrap(handler));
 
-        public void Subscribe(Func<InteractWord, Task> handler) => Subscribe(handler);
-        public void Subscribe(Action<InteractWord> handler) => Subscribe(Wrap(handler));
+        public void Subscribe(Func<InteractWord, Task> handler) => Subscribe<InteractWord>(handler);
+        public void Subscribe(Action<InteractWord> handler) => Subscribe<InteractWord>(Wrap(handler));
 
-        public void Subscribe(Func<OnlineRankCount, Task> handler) => Subscribe(handler);
-        public void Subscribe(Action<OnlineRankCount> handler) => Subscribe(Wrap(handler));
+        public void Subscribe(Func<OnlineRankCount, Task> handler) => Subscribe<OnlineRankCount>(handler);
+        public void Subscribe(Action<OnlineRankCount> handler) => Subscribe<OnlineRankCount>(Wrap(handler));
 
-        public void Subscribe(Func<OnlineRankV2, Task> handler) => Subscribe(handler);
-        public void Subscribe(Action<OnlineRankV2> handler) => Subscribe(Wrap(handler));
+        public void Subscribe(Func<OnlineRankV2, Task> handler) => Subscribe<OnlineRankV2>(handler);
+        public void Subscribe(Action<OnlineRankV2> handler) => Subscribe<OnlineRankV2>(Wrap(handler));
 
-        public void Subscribe(Func<RoomRealTimeMessageUpdate, Task> handler) => Subscribe(handler);
-        public void Subscribe(Action<RoomRealTimeMessageUpdate> handler) => Subscribe(Wrap(handler));
+        public void Subscribe(Func<RoomRealTimeMessageUpdate, Task> handler) => Subscribe<RoomRealTimeMessageUpdate>(handler);
+        public void Subscribe(Action<RoomRealTimeMessageUpdate> handler) => Subscribe<RoomRealTimeMessageUpdate>(Wrap(handler));
 
-        public void Subscribe(Func<SendGift, Task> handler) => Subscribe(handler);
-        public void Subscribe(Action<SendGift> handler) => Subscribe(Wrap(handler));
+        public void Subscribe(Func<SendGift, Task> handler) => Subscribe<SendGift>(handler);
+        public void Subscribe(Action<SendGift> handler) => Subscribe<SendGift>(Wrap(handler));
 
-        public void Subscribe(Func<SuperChatMessage, Task> handler) => Subscribe(handler);
-        public void Subscribe(Action<SuperChatMessage> handler) => Subscribe(Wrap(handler));
+        public void Subscribe(Func<SuperChatMessage, Task> handler) => Subscribe<SuperChatMessage>(handler);
+        public void Subscribe(Action<SuperChatMessage> handler) => Subscribe<SuperChatMessage>(Wrap(handler));
 
 
         private static object SelectData(ICommandBase cmd)

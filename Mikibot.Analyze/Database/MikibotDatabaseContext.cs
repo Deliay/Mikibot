@@ -27,6 +27,7 @@ namespace Mikibot.Analyze.Database
         public DbSet<LiveGuardEnterLog> LiveGuardEnterLogs { get; set; }
         public DbSet<LiveGift> LiveGifts { get; set; }
         public DbSet<LiveGiftCombo> LiveGiftCombos { get; set; }
+        public DbSet<LiveSuperChat> LiveSuperChats { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -114,6 +115,13 @@ namespace Mikibot.Analyze.Database
                 model.HasIndex(m => new { m.Bid, m.Uid });
                 model.HasIndex(m => new { m.Bid, m.CreatedAt });
                 model.HasIndex(m => new { m.Bid, m.ComboId });
+                model.Property(m => m.CreatedAt).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<LiveSuperChat>(model =>
+            {
+                model.HasKey(m => m.Id);
+                model.HasIndex(m => new { m.Bid, m.Uid });
                 model.Property(m => m.CreatedAt).ValueGeneratedOnAdd();
             });
         }

@@ -17,6 +17,8 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
         public DateTimeOffset SendAt { get; set; }
         [JsonPropertyName("user_info")]
         public SuperChatUserInfo User { get; set; }
+        [JsonPropertyName("medal_info")]
+        public SuperChatMedalInfo MedalInfo { get; set; }
         [JsonPropertyName("uid")]
         public int UserId { get; set; }
 

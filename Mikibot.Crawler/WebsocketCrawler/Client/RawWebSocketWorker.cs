@@ -4,6 +4,7 @@ using Mikibot.Crawler.WebsocketCrawler.Packet;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Sockets;
 using System.Net.WebSockets;
@@ -67,32 +68,48 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
             while (ws.State == WebSocketState.Open && !token.IsCancellationRequested && !csc.IsCancellationRequested)
             {
                 ValueWebSocketReceiveResult result;
-                MemoryStream ms = new();
-                var buffer = new Memory<byte>(new byte[4096]);
                 do
                 {
+                    var buffer = new Memory<byte>(new byte[4096]);
                     result = await ws.ReceiveAsync(buffer, token);
-                    ms.Write(buffer[..result.Count].Span);
-
+#if DEBUG
+                    var lengthBE = BitConverter.ToUInt32(buffer[..4].ToArray());
+                    var length = ((lengthBE & 0x000000FF) << 24)
+                        | ((lengthBE & 0x0000FF00) << 8)
+                        | ((lengthBE & 0x00FF0000) >> 8)
+                        | ((lengthBE & 0xFF000000) >> 24);
+                    if (length != result.Count)
+                        Debug.WriteLine("[Socket] packet required={0} socket receive={1}", length, result.Count);
+#endif
+                    yield return buffer[..result.Count].ToArray();
                 } while (!result.EndOfMessage);
 
-                var data = ms.ToArray();
-                while (data.Length > 0)
-                {
-                    var lengthRaw = data[..4]; Array.Reverse(lengthRaw);
-                    var length = (int)BitConverter.ToUInt32(lengthRaw);
-                    if (data.Length >= length)
-                    {
-                        yield return data[..length];
-                        data = data[length..];
-                    }
-                    else
-                    {
-                        using var _ms = ms;
-                        ms = new MemoryStream(data);
-                        break;
-                    }
-                }
+                //var data = ms.ToArray();
+                //while (data.Length > 0)
+                //{
+                //    var lengthRaw = data[..4]; Array.Reverse(lengthRaw);
+                //    var length = (int)BitConverter.ToUInt32(lengthRaw);
+                //    Debug.WriteLine("[Packet] required length {0}, current size = {1}", length, data.Length);
+                //    if (data.Length >= length)
+                //    {
+                //        yield return data[..length];
+                //        //Debug.WriteLine("Packet payload loaded, dispatched data length={0}, remain=", length, data.Length);
+                //        data = data[length..];
+                //    }
+                //    else
+                //    {
+                //        using var _ms = ms;
+                //        ms = new();
+                //        ms.Write(data);
+                //        Debug.WriteLine("[Packet] payload still loading...require={0}, actual={1}", length, ms.Length);
+                //        break;
+                //    }
+                //    if (data.Length == 0)
+                //    {
+                //        using var _ms = ms;
+                //        ms = new();
+                //    }
+                //}
             }
         }
 

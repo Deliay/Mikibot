@@ -59,7 +59,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
             };
             var extractedPacket = BasePacket.ToPacket(extractedRaw);
 
-            if (raw.Length == extractedPacket.GetSize())
+            if (raw.Length == extractedPacket.Size)
             {
                 yield return DataTypeMapping.Parse(extractedPacket, extractedPacket.Data);
                 yield break;
@@ -69,9 +69,9 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
 
             yield return DataTypeMapping.Parse(safeExtractedPacket, safeExtractedPacket.Data);
 
-            if (extractedRaw.Length > extractedPacket.GetSize())
+            if (extractedRaw.Length > safeExtractedPacket.Size)
             {
-                var restRaw = extractedRaw[(int)extractedPacket.Size..];
+                var restRaw = extractedRaw[(int)safeExtractedPacket.Size..];
                 if (restRaw.Length > 17)
                 {
                     foreach (var data in ProcessPacket(restRaw))

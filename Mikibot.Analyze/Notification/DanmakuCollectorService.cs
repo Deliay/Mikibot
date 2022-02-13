@@ -26,12 +26,13 @@ namespace Mikibot.Analyze.Notification
             Crawler = scope.Resolve<BiliLiveCrawler>();
             CmdHandler = new CommandSubscriber();
 
-            CmdHandler.Subscribe<DanmuMsg>(HandleDanmu);
-            CmdHandler.Subscribe<GuardBuy>(HandleBuyGuard);
-            CmdHandler.Subscribe<SendGift>(HandleGift);
-            CmdHandler.Subscribe<ComboSend>(HandleGiftCombo);
-            CmdHandler.Subscribe<EntryEffect>(HandleGuardEnter);
-            CmdHandler.Subscribe<InteractWord>(HandleInteractive);
+            CmdHandler.Subscribe(HandleDanmu);
+            CmdHandler.Subscribe(HandleBuyGuard);
+            CmdHandler.Subscribe(HandleGift);
+            CmdHandler.Subscribe(HandleGiftCombo);
+            CmdHandler.Subscribe(HandleGuardEnter);
+            CmdHandler.Subscribe(HandleInteractive);
+            CmdHandler.Subscribe(HandleSuperChat);
         }
 
         public ILifetimeScope Scope { get; }
@@ -135,6 +136,25 @@ namespace Mikibot.Analyze.Notification
                 MedalLevel = msg.FansMedal.MedalLevel,
                 MedalName = msg.FansMedal.MedalName,
                 UserName = msg.UserName,
+            });
+            await db.SaveChangesAsync();
+        }
+
+        private async Task HandleSuperChat(SuperChatMessage msg)
+        {
+            Logger.LogInformation("[SC] (Lv.{} {}){}: ￥{} {}", msg.MedalInfo.Level, msg.MedalInfo.Name, msg.User.UserName, msg.Price, msg.Message);
+            await db.AddAsync(new LiveSuperChat()
+            {
+                Bid = mxmk,
+                Price = msg.Price,
+                Message = msg.Message,
+                MedalGuardLevel = msg.MedalInfo.GuardLevel,
+                MedalLevel = msg.MedalInfo.Level,
+                MedalName = msg.MedalInfo.Name,
+                MedalUserId = msg.MedalInfo.MedalUserId,
+                UserName = msg.User.UserName,
+                SentAt = msg.SendAt,
+                Uid = msg.UserId,
             });
             await db.SaveChangesAsync();
         }
