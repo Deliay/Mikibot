@@ -95,14 +95,14 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
 
             return new DanmuMsg()
             {
-                Msg = msg,
+                Msg = msg!,
                 UserId = userId,
-                UserName = userName,
+                UserName = userName!,
                 SentAt = DateTimeOffset.FromUnixTimeMilliseconds(sentAt),
                 FansLevel = fansLevel,
-                FansTag = fansTag,
+                FansTag = fansTag!,
                 FansTagUserId = fansUserId,
-                FansTagUserName = fansUserName,
+                FansTagUserName = fansUserName!,
             };
         }
 

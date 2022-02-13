@@ -46,7 +46,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
         private static Stream Zlib(Stream data) => new ZLibStream(data, CompressionMode.Decompress);
         private static Stream Brotli(Stream data) => new BrotliStream(data, CompressionMode.Decompress);
 
-        public static IEnumerable<IData> ProcessPacket(byte[] raw)
+        public static IEnumerable<IData> ProcessPacket(ReadOnlyMemory<byte> raw)
         {
             var packet = BasePacket.ToPacket(raw);
             if (packet.Size == 0) yield break;
@@ -65,14 +65,14 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
                 yield break;
             }
 
-            var safeExtractedPacket = BasePacket.ToPacket(extractedRaw[..(int)extractedPacket.Size]);
+            var headPacket = BasePacket.ToPacket(extractedRaw[..(int)extractedPacket.Size]);
 
-            yield return DataTypeMapping.Parse(safeExtractedPacket, safeExtractedPacket.Data);
+            yield return DataTypeMapping.Parse(headPacket, headPacket.Data);
 
-            if (extractedRaw.Length > safeExtractedPacket.Size)
+            if (extractedRaw.Length > headPacket.Size)
             {
-                var restRaw = extractedRaw[(int)safeExtractedPacket.Size..];
-                if (restRaw.Length > 17)
+                var restRaw = extractedRaw[(int)headPacket.Size..];
+                if (restRaw.Length > 16)
                 {
                     foreach (var data in ProcessPacket(restRaw))
                     {

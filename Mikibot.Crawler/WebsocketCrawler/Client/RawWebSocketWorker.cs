@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using Mikibot.Crawler.WebsocketCrawler.Packet;
-using Mikibot.Crawler.WebsocketCrawler.Packet;
 using System;
 using System.Buffers;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -18,21 +18,22 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
     public class RawWebSocketWorker : IDisposable
     {
         private readonly ClientWebSocket ws = new();
-        private CancellationTokenSource csc;
+        private readonly CancellationTokenSource _csc;
         private readonly SemaphoreSlim _semaphore;
 
         public RawWebSocketWorker()
         {
+            _csc = new CancellationTokenSource();
             _semaphore = new(1);
             _semaphore.Wait();
         }
 
         public async ValueTask ConnectAsync(string host, int port, int roomId, string auth, string protocol, CancellationToken token)
         {
-            csc = CancellationTokenSource.CreateLinkedTokenSource(token);
+            using var csc = CancellationTokenSource.CreateLinkedTokenSource(token);
             var safeToken = csc.Token;
 
-            var uri = new UriBuilder(Uri.UriSchemeWs, host, port, "/sub").Uri;
+            var uri = new UriBuilder(protocol, host, port, "/sub").Uri;
 
             await ws.ConnectAsync(uri, safeToken);
 
@@ -48,7 +49,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
             await SendAsync(packet.ToByte(), token);
         }
 
-        private async ValueTask SendAsync(ArraySegment<byte> packet, CancellationToken token)
+        private async ValueTask SendAsync(ReadOnlyMemory<byte> packet, CancellationToken token)
         {
             await ws.SendAsync(packet, WebSocketMessageType.Binary, true, token);
         }
@@ -62,10 +63,11 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
             }
         }
 
-        public async IAsyncEnumerable<byte[]> ReadPacket([EnumeratorCancellation] CancellationToken token)
+        public async IAsyncEnumerable<Memory<byte>> ReadPacket([EnumeratorCancellation] CancellationToken token)
         {
-            await _semaphore.WaitAsync(token);
-            while (ws.State == WebSocketState.Open && !token.IsCancellationRequested && !csc.IsCancellationRequested)
+            using var csc = CancellationTokenSource.CreateLinkedTokenSource(token);
+            await _semaphore.WaitAsync(csc.Token);
+            while (ws.State == WebSocketState.Open && !token.IsCancellationRequested && !csc.Token.IsCancellationRequested)
             {
                 ValueWebSocketReceiveResult result;
                 do
@@ -73,15 +75,11 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
                     var buffer = new Memory<byte>(new byte[4096]);
                     result = await ws.ReceiveAsync(buffer, token);
 #if DEBUG
-                    var lengthBE = BitConverter.ToUInt32(buffer[..4].ToArray());
-                    var length = ((lengthBE & 0x000000FF) << 24)
-                        | ((lengthBE & 0x0000FF00) << 8)
-                        | ((lengthBE & 0x00FF0000) >> 8)
-                        | ((lengthBE & 0xFF000000) >> 24);
+                    var length = BinaryPrimitives.ReadUInt32BigEndian(buffer[..4].Span);
                     if (length != result.Count)
                         Debug.WriteLine("[Socket] packet required={0} socket receive={1}", length, result.Count);
 #endif
-                    yield return buffer[..result.Count].ToArray();
+                    yield return buffer[..result.Count];
                 } while (!result.EndOfMessage);
 
                 //var data = ms.ToArray();
@@ -116,7 +114,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
         public void Dispose()
         {
             using var socket = this.ws;
-            using var csc = this.csc;
+            using var csc = this._csc;
             GC.SuppressFinalize(this);
         }
     }

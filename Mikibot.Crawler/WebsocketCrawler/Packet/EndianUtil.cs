@@ -1,5 +1,6 @@
 ﻿using Mikibot.Crawler.WebsocketCrawler.Packet;
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -10,53 +11,34 @@ namespace Mikibot.Crawler.WebsocketCrawler.Packet
 {
     public static class EndianUtil
     {
-        public static void AdjustEndianness(byte[] data)
+
+        public static BasePacket BytesToStruct(ReadOnlySpan<byte> buffer)
         {
-
-            Array.Reverse(data, 0, 4);
-            Array.Reverse(data, 4, 2);
-            Array.Reverse(data, 6, 2);
-            Array.Reverse(data, 8, 4);
-            Array.Reverse(data, 12, 4);
-        }
-
-        public static BasePacket BytesToStruct(byte[] rawData)
-        {
-            AdjustEndianness(rawData);
-
             var result = new BasePacket()
             {
-                Size = BitConverter.ToUInt32(rawData, 0),
-                HeadSize = BitConverter.ToUInt16(rawData, 4),
-                Version = (ProtocolVersion)BitConverter.ToUInt16(rawData, 6),
-                Type = (PacketType)BitConverter.ToUInt32(rawData, 8),
-                Sequence = BitConverter.ToUInt32(rawData, 12),
-                Data = rawData[16..],
+                Size = BinaryPrimitives.ReadUInt32BigEndian(buffer[0..]),
+                HeadSize = BinaryPrimitives.ReadUInt16BigEndian(buffer[4..]),
+                Version = (ProtocolVersion)BinaryPrimitives.ReadUInt16BigEndian(buffer[6..]),
+                Type = (PacketType)BinaryPrimitives.ReadUInt32BigEndian(buffer[8..]),
+                Sequence = BinaryPrimitives.ReadUInt32BigEndian(buffer[12..]),
+                Data = buffer[16..].ToArray(),
             };
-            AdjustEndianness(rawData);
             return result;
         }
 
         public static byte[] StructToBytes(BasePacket data)
         {
             var size = data.GetSize();
-            byte[] result = new byte[size];
-            IntPtr buffer = Marshal.AllocHGlobal(16);
+            Span<byte> buffer = stackalloc byte[size];
 
-            try
-            {
-                Marshal.StructureToPtr(data, buffer, false);
-                Marshal.Copy(buffer, result, 0, 16);
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(buffer);
-            }
+            BinaryPrimitives.WriteUInt32BigEndian(buffer[0..], data.Size);
+            BinaryPrimitives.WriteUInt16BigEndian(buffer[4..], data.HeadSize);
+            BinaryPrimitives.WriteUInt16BigEndian(buffer[6..], (ushort)data.Version);
+            BinaryPrimitives.WriteUInt32BigEndian(buffer[8..], (uint)data.Type);
+            BinaryPrimitives.WriteUInt32BigEndian(buffer[12..], data.Sequence);
+            data.Data.CopyTo(buffer[16..]);
 
-            data.Data.CopyTo(result, 16);
-            AdjustEndianness(result);
-
-            return result;
+            return buffer.ToArray();
         }
 
     }

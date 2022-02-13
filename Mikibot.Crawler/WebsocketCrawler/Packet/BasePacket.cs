@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace Mikibot.Crawler.WebsocketCrawler.Packet
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 16)]
     public struct BasePacket
     {
         public uint Size;
@@ -21,7 +20,8 @@ namespace Mikibot.Crawler.WebsocketCrawler.Packet
 
         public uint Sequence = 1;
 
-        public byte[] Data { get; set; }
+        [NonSerialized]
+        public byte[] Data;
 
         private const int DefaultHeadSize = sizeof(uint) * 3 + sizeof(ushort) * 2;
         private static readonly byte[] KeepliveContent = Encoding.UTF8.GetBytes("[Object asswecan]");
@@ -60,24 +60,14 @@ namespace Mikibot.Crawler.WebsocketCrawler.Packet
             return DefaultHeadSize + Data.Length;
         }
 
-        //public static implicit operator ArraySegment<byte> (BasePacket packet)
-        //{
-        //    return packet.ToByte();
-        //}
-
-        //public static implicit operator BasePacket(byte[] bytes)
-        //{
-        //    return ToPacket(bytes);
-        //}
-
         public byte[] ToByte()
         {
             return EndianUtil.StructToBytes(this);
         }
 
-        public static BasePacket ToPacket(byte[] bytes)
+        public static BasePacket ToPacket(ReadOnlyMemory<byte> data)
         {
-            return EndianUtil.BytesToStruct(bytes);
+            return EndianUtil.BytesToStruct(data.Span);
         }
 
     }

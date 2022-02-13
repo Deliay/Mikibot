@@ -17,9 +17,9 @@ namespace Mikibot.Analyze.MiraiHttp
         {
             return new()
             {
-                Address = Environment.GetEnvironmentVariable("MIRAI_ADDRESS"),
-                VerifyKey = Environment.GetEnvironmentVariable("MIRAI_VERIFY_KEY"),
-                Uid = Environment.GetEnvironmentVariable("MIKIBOT_QQ"),
+                Address = Environment.GetEnvironmentVariable("MIRAI_ADDRESS")!,
+                VerifyKey = Environment.GetEnvironmentVariable("MIRAI_VERIFY_KEY")!,
+                Uid = Environment.GetEnvironmentVariable("MIKIBOT_QQ")!,
             };
         }
     }
