@@ -63,7 +63,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
             }
         }
 
-        public async IAsyncEnumerable<Memory<byte>> ReadPacket([EnumeratorCancellation] CancellationToken token)
+        public async IAsyncEnumerable<ReadOnlyMemory<byte>> ReadPacket([EnumeratorCancellation] CancellationToken token)
         {
             using var csc = CancellationTokenSource.CreateLinkedTokenSource(token);
             await _semaphore.WaitAsync(csc.Token);

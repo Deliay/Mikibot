@@ -65,14 +65,14 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
                 yield break;
             }
 
-            var headPacket = BasePacket.ToPacket(extractedRaw[..(int)extractedPacket.Size]);
+            BasePacket headPacket = = BasePacket.ToPacket(extractedRaw[..(int)extractedPacket.Size]);
 
             yield return DataTypeMapping.Parse(headPacket, headPacket.Data);
 
             if (extractedRaw.Length > headPacket.Size)
             {
                 var restRaw = extractedRaw[(int)headPacket.Size..];
-                if (restRaw.Length > 16)
+                if (restRaw.Length > 17)
                 {
                     foreach (var data in ProcessPacket(restRaw))
                     {
