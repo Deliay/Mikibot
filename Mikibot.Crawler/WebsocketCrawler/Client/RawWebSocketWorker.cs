@@ -81,33 +81,6 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
 #endif
                     yield return buffer[..result.Count];
                 } while (!result.EndOfMessage);
-
-                //var data = ms.ToArray();
-                //while (data.Length > 0)
-                //{
-                //    var lengthRaw = data[..4]; Array.Reverse(lengthRaw);
-                //    var length = (int)BitConverter.ToUInt32(lengthRaw);
-                //    Debug.WriteLine("[Packet] required length {0}, current size = {1}", length, data.Length);
-                //    if (data.Length >= length)
-                //    {
-                //        yield return data[..length];
-                //        //Debug.WriteLine("Packet payload loaded, dispatched data length={0}, remain=", length, data.Length);
-                //        data = data[length..];
-                //    }
-                //    else
-                //    {
-                //        using var _ms = ms;
-                //        ms = new();
-                //        ms.Write(data);
-                //        Debug.WriteLine("[Packet] payload still loading...require={0}, actual={1}", length, ms.Length);
-                //        break;
-                //    }
-                //    if (data.Length == 0)
-                //    {
-                //        using var _ms = ms;
-                //        ms = new();
-                //    }
-                //}
             }
         }
 
