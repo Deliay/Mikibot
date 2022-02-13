@@ -30,7 +30,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
 
         public async ValueTask ConnectAsync(string host, int port, int roomId, string auth, string protocol, CancellationToken token)
         {
-            using var csc = CancellationTokenSource.CreateLinkedTokenSource(token);
+            using var csc = CancellationTokenSource.CreateLinkedTokenSource(_csc.Token, token);
             var safeToken = csc.Token;
 
             var uri = new UriBuilder(protocol, host, port, "/sub").Uri;
@@ -65,7 +65,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
 
         public async IAsyncEnumerable<ReadOnlyMemory<byte>> ReadPacket([EnumeratorCancellation] CancellationToken token)
         {
-            using var csc = CancellationTokenSource.CreateLinkedTokenSource(token);
+            using var csc = CancellationTokenSource.CreateLinkedTokenSource(_csc.Token, token);
             await _semaphore.WaitAsync(csc.Token);
             while (ws.State == WebSocketState.Open && !token.IsCancellationRequested && !csc.Token.IsCancellationRequested)
             {
