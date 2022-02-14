@@ -88,5 +88,8 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
         PK_ATTENTION,
         PK_SHARE,
         WIDGET_BANNER,
+        WATCHED_CHANGE,
+        HOT_RANK_CHANGED_V2,
+        POPULARITY_RED_POCKET_WINNER_LIST,
     }
 }

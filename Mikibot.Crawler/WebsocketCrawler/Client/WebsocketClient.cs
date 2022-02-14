@@ -5,6 +5,7 @@ using Mikibot.Crawler.WebsocketCrawler.Data;
 using Mikibot.Crawler.WebsocketCrawler.Packet;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.Compression;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -59,13 +60,22 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
             };
             var extractedPacket = BasePacket.ToPacket(extractedRaw);
 
-            if (raw.Length == extractedPacket.Size)
+            if (extractedRaw.Length <= extractedPacket.Size)
             {
                 yield return DataTypeMapping.Parse(extractedPacket, extractedPacket.Data);
                 yield break;
             }
 
-            BasePacket headPacket = BasePacket.ToPacket(extractedRaw[..(int)extractedPacket.Size]);
+            BasePacket headPacket = default;
+
+            try
+            {
+                headPacket = BasePacket.ToPacket(extractedRaw[..(int)extractedPacket.Size]);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
 
             yield return DataTypeMapping.Parse(headPacket, headPacket.Data);
 

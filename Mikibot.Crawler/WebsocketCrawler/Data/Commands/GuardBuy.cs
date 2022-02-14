@@ -13,7 +13,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
         [JsonPropertyName("username")]
         public string UserName { get; set; }
         [JsonPropertyName("guard_level")]
-        public string GuardLevel { get; set; }
+        public int GuardLevel { get; set; }
         public int Price { get; set; }
         [JsonPropertyName("gift_name")]
         public string GiftName { get; set; }

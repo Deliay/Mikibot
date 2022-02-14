@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -57,8 +58,9 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
 
                 return cmd;
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine(ex.ToString());
                 return null!;
             }
         }
