@@ -60,7 +60,9 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.ToString());
+#if DEBUG
+                Debug.WriteLine("{0} error {1}", raw, ex.ToString());
+#endif
                 return null!;
             }
         }

@@ -62,20 +62,15 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
 
             if (extractedRaw.Length <= extractedPacket.Size)
             {
+#if DEBUG
+                Debug.WriteLineIf(extractedRaw.Length < extractedPacket.Size,
+                    () => $"[Packet] Invalid packet length, except={extractedPacket.Size}, actual={extractedRaw.Length}");
+#endif
                 yield return DataTypeMapping.Parse(extractedPacket, extractedPacket.Data);
                 yield break;
             }
 
-            BasePacket headPacket = default;
-
-            try
-            {
-                headPacket = BasePacket.ToPacket(extractedRaw[..(int)extractedPacket.Size]);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.ToString());
-            }
+            BasePacket headPacket = BasePacket.ToPacket(extractedRaw[..(int)extractedPacket.Size]);
 
             yield return DataTypeMapping.Parse(headPacket, headPacket.Data);
 
