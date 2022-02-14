@@ -68,7 +68,7 @@ namespace Mikibot.Analyze.Notification
                 UserName = msg.UserName,
                 BoughtAt = msg.StartedAt,
                 GiftName = msg.GiftName,
-                GuardLevel = msg.GuardLevel,
+                GuardLevel = $"{msg.GuardLevel}",
                 Price = msg.Price,
             });
             await db.SaveChangesAsync();
