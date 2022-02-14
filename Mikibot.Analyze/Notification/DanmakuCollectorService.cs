@@ -184,7 +184,11 @@ namespace Mikibot.Analyze.Notification
         {
             while (!token.IsCancellationRequested && failedRetry++ < 5)
             {
-                try { await ConnectAsync(token); }
+                try
+                {
+                    await ConnectAsync(token);
+                    failedRetry -= 1;
+                }
                 catch (Exception ex)
                 {
                     Logger.LogError(ex, "在抓弹幕的时候发生异常");
