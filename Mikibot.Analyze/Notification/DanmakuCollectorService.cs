@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Mikibot.Analyze.Database;
 using Mikibot.Analyze.Database.Model;
+using Mikibot.Analyze.Service;
 using Mikibot.Crawler.Http.Bilibili;
 using Mikibot.Crawler.WebsocketCrawler.Client;
 using Mikibot.Crawler.WebsocketCrawler.Data.Commands;
@@ -17,36 +18,21 @@ namespace Mikibot.Analyze.Notification
 {
     public class DanmakuCollectorService
     {
-        private const int mxmk = 21672023;
         private readonly MikibotDatabaseContext db = new(MySqlConfiguration.FromEnviroment());
 
-        public DanmakuCollectorService(ILifetimeScope scope)
-        {
-            Scope = scope;
-            Logger = scope.Resolve<ILogger<DanmakuCollectorService>>();
-            Crawler = scope.Resolve<BiliLiveCrawler>();
-            CmdHandler = new CommandSubscriber();
+        public ILogger<DanmakuCollectorService> Logger { get; }
 
-            CmdHandler.Subscribe<DanmuMsg>(HandleDanmu);
-            CmdHandler.Subscribe<GuardBuy>(HandleBuyGuard);
-            CmdHandler.Subscribe<SendGift>(HandleGift);
-            CmdHandler.Subscribe<ComboSend>(HandleGiftCombo);
-            CmdHandler.Subscribe<EntryEffect>(HandleGuardEnter);
-            CmdHandler.Subscribe<InteractWord>(HandleInteractive);
-            CmdHandler.Subscribe<SuperChatMessage>(HandleSuperChat);
+        public DanmakuCollectorService(ILogger<DanmakuCollectorService> logger)
+        {
+            Logger = logger;
         }
 
-        public ILifetimeScope Scope { get; }
-        public ILogger<DanmakuCollectorService> Logger { get; }
-        public BiliLiveCrawler Crawler { get; }
-        public CommandSubscriber CmdHandler { get; }
-
-        private async Task HandleDanmu(DanmuMsg msg)
+        public async Task HandleDanmu(DanmuMsg msg)
         {
             Logger.LogInformation("[弹幕] (Lv.{} {}){}: {}", msg.FansLevel, msg.FansTag, msg.UserName, msg.Msg);
             await db.LiveDanmakus.AddAsync(new LiveDanmaku()
             {
-                Bid = mxmk,
+                Bid = LiveStreamEventService.mxmk,
                 UserId = msg.UserId,
                 UserName = msg.UserName,
                 FansLevel = msg.FansLevel,
@@ -59,12 +45,12 @@ namespace Mikibot.Analyze.Notification
             await db.SaveChangesAsync();
         }
 
-        private async Task HandleBuyGuard(GuardBuy msg)
+        public async Task HandleBuyGuard(GuardBuy msg)
         {
             Logger.LogInformation("[上舰] ({}){}: (种类:{})￥{}", msg.Uid, msg.UserName, msg.Price, msg.GuardLevel);
             await db.LiveBuyGuardLogs.AddAsync(new LiveBuyGuardLog()
             {
-                Bid = mxmk,
+                Bid = LiveStreamEventService.mxmk,
                 Uid = msg.Uid,
                 UserName = msg.UserName,
                 BoughtAt = msg.StartedAt,
@@ -75,14 +61,14 @@ namespace Mikibot.Analyze.Notification
             await db.SaveChangesAsync();
         }
 
-        private async Task HandleGift(SendGift msg)
+        public async Task HandleGift(SendGift msg)
         {
             Logger.LogInformation("[礼物] ({}){}: ({})￥{}, 付费:{}", msg.SenderUid, msg.SenderName, msg.GiftName, msg.DiscountPrice, msg.CoinType);
             await db.AddAsync(new LiveGift()
             {
                 Uid = msg.SenderUid,
                 Action = msg.Action,
-                Bid = mxmk,
+                Bid = LiveStreamEventService.mxmk,
                 CoinType = msg.CoinType,
                 ComboId = msg.ComboId,
                 DiscountPrice = msg.DiscountPrice,
@@ -93,13 +79,13 @@ namespace Mikibot.Analyze.Notification
             await db.SaveChangesAsync();
         }
 
-        private async Task HandleGiftCombo(ComboSend msg)
+        public async Task HandleGiftCombo(ComboSend msg)
         {
             Logger.LogInformation("[礼物] 连击 ({}){}: {},连击{},总价{}", msg.SenderUid, msg.SenderName, msg.GiftName, msg.ComboNum, msg.TotalCoin);
             await db.AddAsync(new LiveGiftCombo()
             {
                 Action = msg.Action,
-                Bid = mxmk,
+                Bid = LiveStreamEventService.mxmk,
                 ComboId = msg.ComboId,
                 ComboNum = msg.ComboNum,
                 GiftName = msg.GiftName,
@@ -110,12 +96,12 @@ namespace Mikibot.Analyze.Notification
             await db.SaveChangesAsync();
         }
 
-        private async Task HandleGuardEnter(EntryEffect msg)
+        public async Task HandleGuardEnter(EntryEffect msg)
         {
             Logger.LogInformation("[舰长] {}进入: {}", msg.UserId, msg.CopyWriting);
             await db.AddAsync(new LiveGuardEnterLog()
             {
-                Bid = mxmk,
+                Bid = LiveStreamEventService.mxmk,
                 CopyWriting = msg.CopyWriting,
                 EnteredAt = msg.EnteredAt,
                 GuardLevel = msg.GuardLevel,
@@ -124,12 +110,12 @@ namespace Mikibot.Analyze.Notification
             await db.SaveChangesAsync();
         }
 
-        private async Task HandleInteractive(InteractWord msg)
+        public async Task HandleInteractive(InteractWord msg)
         {
             Logger.LogInformation("[进入] (Lv.{} {}, {}){} 进入了直播间", msg.FansMedal.MedalLevel, msg.FansMedal.MedalName, msg.UserId, msg.UserName);
             await db.AddAsync(new LiveUserInteractiveLog()
             {
-                Bid = mxmk,
+                Bid = LiveStreamEventService.mxmk,
                 UserId = msg.UserId,
                 FansTagUserId = msg.FansMedal.FansTagUserId,
                 GuardLevel = msg.FansMedal.GuardLevel,
@@ -141,12 +127,12 @@ namespace Mikibot.Analyze.Notification
             await db.SaveChangesAsync();
         }
 
-        private async Task HandleSuperChat(SuperChatMessage msg)
+        public async Task HandleSuperChat(SuperChatMessage msg)
         {
             Logger.LogInformation("[SC] (Lv.{} {}){}: ￥{} {}", msg.MedalInfo.Level, msg.MedalInfo.Name, msg.User.UserName, msg.Price, msg.Message);
             await db.AddAsync(new LiveSuperChat()
             {
-                Bid = mxmk,
+                Bid = LiveStreamEventService.mxmk,
                 Price = msg.Price,
                 Message = msg.Message,
                 MedalGuardLevel = msg.MedalInfo.GuardLevel,
@@ -158,43 +144,6 @@ namespace Mikibot.Analyze.Notification
                 Uid = msg.UserId,
             });
             await db.SaveChangesAsync();
-        }
-
-        private async Task ConnectAsync(CancellationToken token)
-        {
-            using var wsClient = new WebsocketClient();
-
-            Logger.LogInformation("准备连接到房间: {}....", mxmk);
-            var realRoomId = await Crawler.GetRealRoomId(mxmk, token);
-            var spectatorEndpoint = await Crawler.GetLiveToken(realRoomId, token);
-            var spectatorHost = spectatorEndpoint.Hosts[0];
-
-            Logger.LogInformation("准备连接到服务器: ws://{}:{}....", spectatorHost.Host, spectatorHost.Port);
-            await wsClient.ConnectAsync(spectatorHost.Host, spectatorHost.WsPort, realRoomId, spectatorEndpoint.Token, cancellationToken: token);
-
-            Logger.LogInformation("准备连接到房间: ws://{}:{}....连接成功", spectatorHost.Host, spectatorHost.Port);
-            await foreach (var @event in wsClient.Events(token))
-            {
-                await CmdHandler.Handle(@event);
-            }
-        }
-
-        private int failedRetry = 0;
-
-        public async Task Run(CancellationToken token)
-        {
-            while (!token.IsCancellationRequested && failedRetry++ < 5)
-            {
-                try
-                {
-                    await ConnectAsync(token);
-                    failedRetry -= 1;
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogError(ex, "在抓弹幕的时候发生异常");
-                }
-            }
         }
     }
 }
