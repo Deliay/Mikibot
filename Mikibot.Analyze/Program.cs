@@ -59,13 +59,7 @@ using (var app = appContainer.BeginLifetimeScope())
 
     var danmakuCrawler = app.Resolve<DanmakuCollectorService>();
 
-    eventService.CmdHandler.Subscribe<DanmuMsg>(danmakuCrawler.HandleDanmu);
-    eventService.CmdHandler.Subscribe<GuardBuy>(danmakuCrawler.HandleBuyGuard);
-    eventService.CmdHandler.Subscribe<SendGift>(danmakuCrawler.HandleGift);
-    eventService.CmdHandler.Subscribe<ComboSend>(danmakuCrawler.HandleGiftCombo);
-    eventService.CmdHandler.Subscribe<EntryEffect>(danmakuCrawler.HandleGuardEnter);
-    eventService.CmdHandler.Subscribe<InteractWord>(danmakuCrawler.HandleInteractive);
-    eventService.CmdHandler.Subscribe<SuperChatMessage>(danmakuCrawler.HandleSuperChat);
+    eventService.CmdHandler.Register(danmakuCrawler);
 
     logger.LogInformation("Starting schedule module...");
     await Task.WhenAll(statusCrawler.Run(token), followerStat.Run(token), eventService.Run(token));

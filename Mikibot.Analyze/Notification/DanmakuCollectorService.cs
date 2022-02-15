@@ -16,6 +16,20 @@ using System.Threading.Tasks;
 
 namespace Mikibot.Analyze.Notification
 {
+    public static class CollectorCommandSubscriberRegisterHelper
+    {
+        public static void Register(this CommandSubscriber subscriber, DanmakuCollectorService danmakuCollector)
+        {
+            subscriber.Subscribe<DanmuMsg>(danmakuCollector.HandleDanmu);
+            subscriber.Subscribe<GuardBuy>(danmakuCollector.HandleBuyGuard);
+            subscriber.Subscribe<SendGift>(danmakuCollector.HandleGift);
+            subscriber.Subscribe<ComboSend>(danmakuCollector.HandleGiftCombo);
+            subscriber.Subscribe<EntryEffect>(danmakuCollector.HandleGuardEnter);
+            subscriber.Subscribe<InteractWord>(danmakuCollector.HandleInteractive);
+            subscriber.Subscribe<SuperChatMessage>(danmakuCollector.HandleSuperChat);
+        }
+    }
+
     public class DanmakuCollectorService
     {
         private readonly MikibotDatabaseContext db = new(MySqlConfiguration.FromEnviroment());
@@ -26,6 +40,7 @@ namespace Mikibot.Analyze.Notification
         {
             Logger = logger;
         }
+
 
         public async Task HandleDanmu(DanmuMsg msg)
         {
