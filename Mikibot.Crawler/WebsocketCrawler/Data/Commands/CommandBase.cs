@@ -13,20 +13,30 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
     {
         public KnownCommands Command { get; set; }
 
-        private static readonly Type PartialCommandType = typeof(CommandBase<>);
-        private static readonly Dictionary<KnownCommands, Type> CommandMapping = new()
+        private static readonly Dictionary<KnownCommands, Type> CommandTypeMapping = new()
         {
-            { KnownCommands.DANMU_MSG, PartialCommandType.MakeGenericType(typeof(DanmuMsg)) },
-            { KnownCommands.SEND_GIFT, PartialCommandType.MakeGenericType(typeof(SendGift)) },
-            { KnownCommands.GUARD_BUY, PartialCommandType.MakeGenericType(typeof(GuardBuy)) },
-            { KnownCommands.ROOM_REAL_TIME_MESSAGE_UPDATE, PartialCommandType.MakeGenericType(typeof(RoomRealTimeMessageUpdate)) },
-            { KnownCommands.SUPER_CHAT_MESSAGE, PartialCommandType.MakeGenericType(typeof(SuperChatMessage)) },
-            { KnownCommands.COMBO_SEND, PartialCommandType.MakeGenericType(typeof(ComboSend)) },
-            { KnownCommands.INTERACT_WORD, PartialCommandType.MakeGenericType(typeof(InteractWord)) },
-            { KnownCommands.ONLINE_RANK_COUNT, PartialCommandType.MakeGenericType(typeof(OnlineRankCount)) },
-            { KnownCommands.ONLINE_RANK_V2, PartialCommandType.MakeGenericType(typeof(OnlineRankV2)) },
-            { KnownCommands.ENTRY_EFFECT, PartialCommandType.MakeGenericType(typeof(EntryEffect)) },
+            { KnownCommands.DANMU_MSG, typeof(DanmuMsg) },
+            { KnownCommands.SEND_GIFT, typeof(SendGift) },
+            { KnownCommands.GUARD_BUY, typeof(GuardBuy) },
+            { KnownCommands.ROOM_REAL_TIME_MESSAGE_UPDATE, typeof(RoomRealTimeMessageUpdate) },
+            { KnownCommands.SUPER_CHAT_MESSAGE, typeof(SuperChatMessage) },
+            { KnownCommands.COMBO_SEND, typeof(ComboSend) },
+            { KnownCommands.INTERACT_WORD, typeof(InteractWord) },
+            { KnownCommands.ONLINE_RANK_COUNT, typeof(OnlineRankCount) },
+            { KnownCommands.ONLINE_RANK_V2, typeof(OnlineRankV2) },
+            { KnownCommands.ENTRY_EFFECT, typeof(EntryEffect) },
         };
+        private static readonly Dictionary<Type, KnownCommands> KnownCommandMapping =
+            CommandTypeMapping.ToDictionary(p => p.Value, p => p.Key);
+
+        public static Type Mapping(KnownCommands command) => CommandTypeMapping[command];
+        public static KnownCommands Mapping(Type type) => KnownCommandMapping[type];
+        public static bool IsKnown(KnownCommands command) => CommandTypeMapping.ContainsKey(command);
+        public static bool IsKnown(Type type) => KnownCommandMapping.ContainsKey(type);
+
+        private static readonly Type PartialCommandBase = typeof(CommandBase<>);
+        private static readonly Dictionary<KnownCommands, Type> CommandMapping = 
+            CommandTypeMapping.ToDictionary(p => p.Key, p => PartialCommandBase.MakeGenericType(p.Value));
 
         private static readonly JsonSerializerOptions JsonSerializerOptions = new()
         {

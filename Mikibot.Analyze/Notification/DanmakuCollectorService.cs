@@ -26,13 +26,13 @@ namespace Mikibot.Analyze.Notification
             Crawler = scope.Resolve<BiliLiveCrawler>();
             CmdHandler = new CommandSubscriber();
 
-            CmdHandler.Subscribe(HandleDanmu);
-            CmdHandler.Subscribe(HandleBuyGuard);
-            CmdHandler.Subscribe(HandleGift);
-            CmdHandler.Subscribe(HandleGiftCombo);
-            CmdHandler.Subscribe(HandleGuardEnter);
-            CmdHandler.Subscribe(HandleInteractive);
-            CmdHandler.Subscribe(HandleSuperChat);
+            CmdHandler.Subscribe<DanmuMsg>(HandleDanmu);
+            CmdHandler.Subscribe<GuardBuy>(HandleBuyGuard);
+            CmdHandler.Subscribe<SendGift>(HandleGift);
+            CmdHandler.Subscribe<ComboSend>(HandleGiftCombo);
+            CmdHandler.Subscribe<EntryEffect>(HandleGuardEnter);
+            CmdHandler.Subscribe<InteractWord>(HandleInteractive);
+            CmdHandler.Subscribe<SuperChatMessage>(HandleSuperChat);
         }
 
         public ILifetimeScope Scope { get; }
