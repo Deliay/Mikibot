@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
+namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand
 {
     public struct GuardBuy
     {

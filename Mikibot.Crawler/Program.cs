@@ -5,6 +5,7 @@ using Mikibot.Crawler.Http.Bilibili;
 using Mikibot.Crawler.WebsocketCrawler.Client;
 using Mikibot.Crawler.WebsocketCrawler.Data;
 using Mikibot.Crawler.WebsocketCrawler.Data.Commands;
+using Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 using Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils;
 using Mikibot.Crawler.WebsocketCrawler.Packet;
 
