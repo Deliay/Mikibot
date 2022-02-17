@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Autofac.Extensions.DependencyInjection;
 
-namespace Mikibot.Analyze.Util
+namespace Mikibot.BuildingBlocks.Util
 {
 
     public class ContainerInitializer : ILoggingBuilder

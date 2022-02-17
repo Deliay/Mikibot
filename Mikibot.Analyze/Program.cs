@@ -6,7 +6,7 @@ using Mikibot.Analyze.Database;
 using Mikibot.Analyze.MiraiHttp;
 using Mikibot.Analyze.Notification;
 using Mikibot.Analyze.Service;
-using Mikibot.Analyze.Util;
+using Mikibot.BuildingBlocks.Util;
 using Mikibot.Crawler.Http.Bilibili;
 using Mikibot.Crawler.WebsocketCrawler;
 using Mikibot.Crawler.WebsocketCrawler.Client;

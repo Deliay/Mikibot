@@ -33,6 +33,7 @@ namespace Mikibot.Crawler.Http.Bilibili
         {
             var roomUrl = $"http://api.live.bilibili.com/room/v1/Room/room_init?id={roomId}";
             var roomResult = await GetAsync<BilibiliApiResponse<LiveInitInfo>>(roomUrl, token);
+            roomResult.AssertCode();
 
             return roomResult.Data.RoomId;
         }
@@ -48,6 +49,16 @@ namespace Mikibot.Crawler.Http.Bilibili
         {
             var tokenUrl = $"http://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id={roomId}";
             var result = await GetAsync<BilibiliApiResponse<LiveToken>>(tokenUrl, token);
+            result.AssertCode();
+
+            return result.Data;
+        }
+
+        public async ValueTask<List<LiveStreamAddress>> GetLiveStreamAddress(int roomid, CancellationToken token = default)
+        {
+            var url = $"http://api.live.bilibili.com/room/v1/Room/playUrl?cid={roomid}&platform=web&quality=4&qn=400";
+            var result = await GetAsync<BilibiliApiResponse<List<LiveStreamAddress>>>(url, token);
+            result.AssertCode();
 
             return result.Data;
         }

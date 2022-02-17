@@ -9,7 +9,13 @@ Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "Mikibot.FE", "Mikibot.FE\Mi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mikibot.Analyze", "Mikibot.Analyze\Mikibot.Analyze.csproj", "{AB6D0C34-C986-43AF-BC9F-85A943017B98}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mikibot.Crawler", "Mikibot.Crawler\Mikibot.Crawler.csproj", "{7CADBB5A-BAFC-4CBB-9E3C-543AF4DB028C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mikibot.Crawler", "Mikibot.Crawler\Mikibot.Crawler.csproj", "{7CADBB5A-BAFC-4CBB-9E3C-543AF4DB028C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mikibot.AutoClipper", "Mikibot.AutoClipper\Mikibot.AutoClipper.csproj", "{8F5E8027-B73F-42BC-99DE-8B5BD1861586}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mikibot.BuildingBlocks", "Mikibot.BuildingBlocks\Mikibot.BuildingBlocks.csproj", "{FFF1B70A-825C-43CD-949A-E8AE86B22950}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mikibot.AutoClipper.Abstract", "Mikibot.AutoClipper.Abstract\Mikibot.AutoClipper.Abstract.csproj", "{450CFBCC-9C0E-4305-89C3-07534841B872}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +41,18 @@ Global
 		{7CADBB5A-BAFC-4CBB-9E3C-543AF4DB028C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7CADBB5A-BAFC-4CBB-9E3C-543AF4DB028C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7CADBB5A-BAFC-4CBB-9E3C-543AF4DB028C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F5E8027-B73F-42BC-99DE-8B5BD1861586}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F5E8027-B73F-42BC-99DE-8B5BD1861586}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F5E8027-B73F-42BC-99DE-8B5BD1861586}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F5E8027-B73F-42BC-99DE-8B5BD1861586}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFF1B70A-825C-43CD-949A-E8AE86B22950}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFF1B70A-825C-43CD-949A-E8AE86B22950}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFF1B70A-825C-43CD-949A-E8AE86B22950}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFF1B70A-825C-43CD-949A-E8AE86B22950}.Release|Any CPU.Build.0 = Release|Any CPU
+		{450CFBCC-9C0E-4305-89C3-07534841B872}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{450CFBCC-9C0E-4305-89C3-07534841B872}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{450CFBCC-9C0E-4305-89C3-07534841B872}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{450CFBCC-9C0E-4305-89C3-07534841B872}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

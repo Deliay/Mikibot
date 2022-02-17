@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<PackageReference Include="Autofac" Version="6.3.0" />
+	<PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.2.0" />
+	<PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+	<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
+    <PackageReference Include="EmberSimpleHttpServer" Version="1.0.0" />
+    <PackageReference Include="Xabe.FFmpeg" Version="5.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Mikibot.AutoClipper.Abstract\Mikibot.AutoClipper.Abstract.csproj" />
+    <ProjectReference Include="..\Mikibot.BuildingBlocks\Mikibot.BuildingBlocks.csproj" />
+    <ProjectReference Include="..\Mikibot.Crawler\Mikibot.Crawler.csproj" />
+  </ItemGroup>
+
+</Project>
