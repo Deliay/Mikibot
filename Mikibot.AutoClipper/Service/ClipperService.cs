@@ -15,9 +15,9 @@ namespace Mikibot.AutoClipper.Service
         }
 
         public BiliLiveCrawler Crawler { get; }
-        private Dictionary<int, CancellationTokenSource> _taskController = new();
-        private Dictionary<int, Task> _tasks = new();
-        private SemaphoreSlim _semaphore = new(1);
+        private readonly Dictionary<int, CancellationTokenSource> _taskController = new();
+        private readonly Dictionary<int, Task> _tasks = new();
+        private readonly SemaphoreSlim _semaphore = new(1);
 
         private async Task ClipStream(int roomId, CancellationToken token)
         {
@@ -28,8 +28,8 @@ namespace Mikibot.AutoClipper.Service
                 if (allAddresses.Count <= 0) continue;
 
                 var address = allAddresses[0].Url;
-
-                // 用ffmpeg
+                
+                // 采集10分钟的数据写入
 
             }
         }
@@ -42,10 +42,8 @@ namespace Mikibot.AutoClipper.Service
             await _tasks[roomId];
             _tasks.Remove(roomId);
         }
-
-        public async ValueTask<bool> StartRecording(int roomId, CancellationToken token)
+        private async ValueTask<bool> InnerStartRecording(int roomId, CancellationToken token)
         {
-            await _semaphore.WaitAsync(token);
             if (_taskController.ContainsKey(roomId))
             {
                 if (!token.IsCancellationRequested)
@@ -60,6 +58,19 @@ namespace Mikibot.AutoClipper.Service
             _tasks.Add(roomId, ClipStream(roomId, _clipperCts.Token));
 
             return true;
+        }
+
+        public async ValueTask<bool> StartRecording(int roomId, CancellationToken token)
+        {
+            await _semaphore.WaitAsync(token);
+            try
+            {
+                return await InnerStartRecording(roomId, token);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
     }
 }
