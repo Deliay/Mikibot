@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mikibot.Database;
 
@@ -10,9 +11,10 @@ using Mikibot.Database;
 namespace Mikibot.Migrations
 {
     [DbContext(typeof(MikibotDatabaseContext))]
-    partial class MikibotDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20220218164656_add-clip-reserve-field")]
+    partial class addclipreservefield
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

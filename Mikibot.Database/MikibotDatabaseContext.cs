@@ -28,6 +28,7 @@ namespace Mikibot.Database
         public DbSet<LiveGift> LiveGifts { get; set; }
         public DbSet<LiveGiftCombo> LiveGiftCombos { get; set; }
         public DbSet<LiveSuperChat> LiveSuperChats { get; set; }
+        public DbSet<LiveStreamRecord> LiveStreamRecords { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -123,6 +124,12 @@ namespace Mikibot.Database
                 model.HasKey(m => m.Id);
                 model.HasIndex(m => new { m.Bid, m.Uid });
                 model.Property(m => m.CreatedAt).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<LiveStreamRecord>(model =>
+            {
+                model.HasKey(m => m.Id);
+                model.HasIndex(m => new { m.Bid, m.CreatedAt, m.RecordStoppedAt });
             });
         }
     }

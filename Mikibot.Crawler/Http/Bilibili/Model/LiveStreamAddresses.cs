@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace Mikibot.Crawler.Http.Bilibili.Model
 {
-    public struct LiveStreamAddress
+    public struct LiveStreamAddresses
     {
-        public string Url { get; set; }
+        [JsonPropertyName("durl")]
+        public List<LiveStreamAddress> Urls { get; set; }
     }
 }

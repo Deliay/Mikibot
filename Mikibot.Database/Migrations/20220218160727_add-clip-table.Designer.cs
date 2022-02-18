@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mikibot.Database;
 
@@ -10,9 +11,10 @@ using Mikibot.Database;
 namespace Mikibot.Migrations
 {
     [DbContext(typeof(MikibotDatabaseContext))]
-    partial class MikibotDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20220218160727_add-clip-table")]
+    partial class addcliptable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -346,9 +348,6 @@ namespace Mikibot.Migrations
 
                     b.Property<DateTimeOffset>("RecordStoppedAt")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<bool>("Reserve")
-                        .HasColumnType("tinyint(1)");
 
                     b.HasKey("Id");
 

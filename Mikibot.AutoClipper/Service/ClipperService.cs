@@ -1,4 +1,8 @@
-﻿using Mikibot.Crawler.Http.Bilibili;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Mikibot.Crawler.Http.Bilibili;
+using Mikibot.Database;
+using Mikibot.Database.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,70 +13,188 @@ namespace Mikibot.AutoClipper.Service
 {
     public class ClipperService
     {
-        public ClipperService(BiliLiveCrawler crawler)
+        public ClipperService(BiliLiveCrawler crawler, ILogger<ClipperService> logger, MikibotDatabaseContext db)
         {
             Crawler = crawler;
+            Logger = logger;
+            Db = db;
         }
 
-        private static HttpClient HttpClient = new();
+        private static readonly HttpClient HttpClient = new();
         public BiliLiveCrawler Crawler { get; }
+        public ILogger<ClipperService> Logger { get; }
+        public MikibotDatabaseContext Db { get; }
+
         private readonly Dictionary<int, CancellationTokenSource> _taskController = new();
         private readonly Dictionary<int, Task> _tasks = new();
         private readonly SemaphoreSlim _semaphore = new(1);
 
-        private async Task ClipStream(int roomId, CancellationToken token)
+        /// <summary>
+        /// 移除 n * 3 分钟之前的切片（只保留最近3个切片）
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task RemoveOldClips(TimeSpan duration, CancellationToken cancellationToken)
         {
+            var reserveTime = DateTimeOffset.Now.Subtract(duration * 3 + TimeSpan.FromSeconds(1));
+            var oldClips = await Db.LiveStreamRecords
+                .Where(rec => rec.RecordStoppedAt <= reserveTime)
+                .Where(rec => !rec.Reserve)
+                .ToListAsync(cancellationToken);
+
+            foreach (var rec in oldClips)
+            {
+                try
+                {
+                    Logger.LogInformation("Trying remove old clips: #{} - {}", rec.Id, rec.LocalFileName);
+                    File.Delete(rec.LocalFileName);
+                    Db.Remove(rec);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, "Error thrown when clean old clips");
+                }
+            }
+            await Db.SaveChangesAsync(cancellationToken);
+        }
+
+        /// <summary>
+        /// 进行指定时间的切片
+        /// </summary>
+        /// <param name="roomId"></param>
+        /// <param name="url"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task PeriodicClip(int roomId, string url, TimeSpan duration, CancellationToken cancellationToken)
+        {
+            var clipRecord = new LiveStreamRecord()
+            {
+                LocalFileName = Path.GetTempFileName(),
+                Bid = roomId,
+            };
+            await Db.AddAsync(clipRecord, cancellationToken);
+            await Db.SaveChangesAsync(cancellationToken);
+
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+            Logger.LogInformation("Clip will save to {}", clipRecord.LocalFileName);
+            using var fileStream = File.OpenWrite(clipRecord.LocalFileName);
+
+            var startedAt = DateTimeOffset.Now;
+            cts.CancelAfter(duration);
+
+            try
+            {
+                while (!cts.IsCancellationRequested)
+                {
+                    Logger.LogInformation("Request live stream from {}", url);
+                    using var res = await HttpClient.GetStreamAsync(url, cts.Token);
+                    await res.CopyToAsync(fileStream, cts.Token);
+                    await fileStream.FlushAsync(cancellationToken);
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                cts.Cancel();
+                throw ex;
+            }
+            var endedAt = DateTimeOffset.Now;
+
+            clipRecord.Duration = duration.Milliseconds;
+
+            Db.Update(clipRecord);
+            await Db.SaveChangesAsync(cancellationToken);
+        }
+
+        /// <summary>
+        /// 循环10分钟进行切片，并只保留最近30分钟的切片
+        /// </summary>
+        /// <param name="roomId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        private async Task LoopingClipStream(int roomId, CancellationTokenSource cts)
+        {
+            var token = cts.Token;
+            var retry = 0;
+            var periodic = TimeSpan.FromMinutes(10);
             while (!token.IsCancellationRequested)
             {
-                // 调用API，拿到直播流地址
+                await RemoveOldClips(periodic, token);
+
                 var allAddresses = await Crawler.GetLiveStreamAddress(roomId, token);
                 if (allAddresses.Count <= 0) continue;
 
                 var address = allAddresses[0].Url;
-                
-                var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
-                // 采集10分钟的数据写入
-                var stream = await HttpClient.GetStreamAsync(address, cts.Token);
+                try
+                {
+                    await PeriodicClip(roomId, address, periodic, token);
+                }
+                catch (Exception ex)
+                {
+                    if (++retry > 10)
+                    {
+                        Logger.LogError("Clipping error exceed 10 times, clipper will stop clip", ex);
+                        cts.Cancel();
+                        throw;
+                    }
+                    Logger.LogError("Error when request remote server, clipper will wait 10 seconds", ex);
+                    await Task.Delay(TimeSpan.FromSeconds(10), token);
+                }
             }
         }
 
-        public async ValueTask CancelRecording(int roomId, CancellationToken token)
+        /// <summary>
+        /// 停止循环切片
+        /// </summary>
+        /// <param name="roomId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public async ValueTask CancelLoopRecording(int roomId, CancellationToken token)
         {
             using var _cts = _taskController[roomId];
             _taskController.Remove(roomId);
+            _cts.Cancel();
 
             await _tasks[roomId];
             _tasks.Remove(roomId);
         }
-        private async ValueTask<bool> InnerStartRecording(int roomId, CancellationToken token)
+
+        /// <summary>
+        /// 开始循环切片
+        /// </summary>
+        /// <param name="roomId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public async ValueTask<bool> StartLoopRecording(int roomId, CancellationToken token)
+        {
+            await _semaphore.WaitAsync(token);
+            try
+            {
+                return await InnerStartLoopRecording(roomId, token);
+            }
+            finally
+            {
+                Logger.LogInformation("开始进行直播间 #{} 的循环切片", roomId);
+                _semaphore.Release();
+            }
+        }
+        private async ValueTask<bool> InnerStartLoopRecording(int roomId, CancellationToken token)
         {
             if (_taskController.ContainsKey(roomId))
             {
                 if (!token.IsCancellationRequested)
                     return true;
 
-                await CancelRecording(roomId, token);
+                await CancelLoopRecording(roomId, token);
             }
 
             var _clipperCts = CancellationTokenSource.CreateLinkedTokenSource(token);
 
             _taskController.Add(roomId, _clipperCts);
-            _tasks.Add(roomId, ClipStream(roomId, _clipperCts.Token));
+            _tasks.Add(roomId, LoopingClipStream(roomId, _clipperCts));
 
+            Logger.LogInformation("停止对直播间 #{} 的循环切片", roomId);
             return true;
-        }
-
-        public async ValueTask<bool> StartRecording(int roomId, CancellationToken token)
-        {
-            await _semaphore.WaitAsync(token);
-            try
-            {
-                return await InnerStartRecording(roomId, token);
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
         }
     }
 }

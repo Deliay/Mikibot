@@ -57,10 +57,10 @@ namespace Mikibot.Crawler.Http.Bilibili
         public async ValueTask<List<LiveStreamAddress>> GetLiveStreamAddress(int roomid, CancellationToken token = default)
         {
             var url = $"http://api.live.bilibili.com/room/v1/Room/playUrl?cid={roomid}&platform=web&quality=4&qn=400";
-            var result = await GetAsync<BilibiliApiResponse<List<LiveStreamAddress>>>(url, token);
+            var result = await GetAsync<BilibiliApiResponse<LiveStreamAddresses>>(url, token);
             result.AssertCode();
 
-            return result.Data;
+            return result.Data.Urls;
         }
     }
 }
