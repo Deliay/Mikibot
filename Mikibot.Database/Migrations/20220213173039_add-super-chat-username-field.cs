@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Mikibot.Analyze.Migrations
+namespace Mikibot.Migrations
 {
     public partial class addsuperchatusernamefield : Migration
     {

@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Mikibot.Analyze.Database;
+using Mikibot.Database;
 
 #nullable disable
 
-namespace Mikibot.Analyze.Migrations
+namespace Mikibot.Migrations
 {
     [DbContext(typeof(MikibotDatabaseContext))]
     [Migration("20220213123621_add-many-database-model-again")]
@@ -21,7 +21,7 @@ namespace Mikibot.Analyze.Migrations
                 .HasAnnotation("ProductVersion", "6.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("Mikibot.Analyze.Database.Model.FollowerStatistic", b =>
+            modelBuilder.Entity("Mikibot.Database.Model.FollowerStatistic", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -45,7 +45,7 @@ namespace Mikibot.Analyze.Migrations
                     b.ToTable("FollowerStatistic");
                 });
 
-            modelBuilder.Entity("Mikibot.Analyze.Database.Model.LiveBuyGuardLog", b =>
+            modelBuilder.Entity("Mikibot.Database.Model.LiveBuyGuardLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -88,7 +88,7 @@ namespace Mikibot.Analyze.Migrations
                     b.ToTable("LiveBuyGuardLogs");
                 });
 
-            modelBuilder.Entity("Mikibot.Analyze.Database.Model.LiveDanmaku", b =>
+            modelBuilder.Entity("Mikibot.Database.Model.LiveDanmaku", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -140,7 +140,7 @@ namespace Mikibot.Analyze.Migrations
                     b.ToTable("LiveDanmakus");
                 });
 
-            modelBuilder.Entity("Mikibot.Analyze.Database.Model.LiveGift", b =>
+            modelBuilder.Entity("Mikibot.Database.Model.LiveGift", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -193,7 +193,7 @@ namespace Mikibot.Analyze.Migrations
                     b.ToTable("LiveGifts");
                 });
 
-            modelBuilder.Entity("Mikibot.Analyze.Database.Model.LiveGiftCombo", b =>
+            modelBuilder.Entity("Mikibot.Database.Model.LiveGiftCombo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -242,7 +242,7 @@ namespace Mikibot.Analyze.Migrations
                     b.ToTable("LiveGiftCombos");
                 });
 
-            modelBuilder.Entity("Mikibot.Analyze.Database.Model.LiveGuardEnterLog", b =>
+            modelBuilder.Entity("Mikibot.Database.Model.LiveGuardEnterLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -277,7 +277,7 @@ namespace Mikibot.Analyze.Migrations
                     b.ToTable("LiveGuardEnterLogs");
                 });
 
-            modelBuilder.Entity("Mikibot.Analyze.Database.Model.LiveStatus", b =>
+            modelBuilder.Entity("Mikibot.Database.Model.LiveStatus", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -327,7 +327,7 @@ namespace Mikibot.Analyze.Migrations
                     b.ToTable("LiveStatuses");
                 });
 
-            modelBuilder.Entity("Mikibot.Analyze.Database.Model.LiveUserInteractiveLog", b =>
+            modelBuilder.Entity("Mikibot.Database.Model.LiveUserInteractiveLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -374,7 +374,7 @@ namespace Mikibot.Analyze.Migrations
                     b.ToTable("LiveUserInteractiveLogs");
                 });
 
-            modelBuilder.Entity("Mikibot.Analyze.Database.Model.StatisticReportLog", b =>
+            modelBuilder.Entity("Mikibot.Database.Model.StatisticReportLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

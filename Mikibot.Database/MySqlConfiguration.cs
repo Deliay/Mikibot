@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mikibot.Analyze.Database
+namespace Mikibot.Database
 {
     public struct MySqlConfiguration
     {
