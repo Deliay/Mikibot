@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Mikibot.BuildingBlocks\Mikibot.BuildingBlocks.csproj" />
     <ProjectReference Include="..\Mikibot.Crawler\Mikibot.Crawler.csproj" />
+    <ProjectReference Include="..\Mikibot.Database\Mikibot.Database.csproj" />
   </ItemGroup>
 
 </Project>

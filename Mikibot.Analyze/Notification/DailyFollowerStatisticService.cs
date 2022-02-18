@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Mikibot.Crawler.Http.Bilibili;
-using Mikibot.Analyze.Database;
+using Mikibot.Database;
 using Mikibot.Analyze.MiraiHttp;
 using Mirai.Net.Data.Messages;
 using Mirai.Net.Data.Messages.Concretes;

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Mikibot.Analyze.Database;
+using Mikibot.Database;
 using Mikibot.Analyze.MiraiHttp;
 using Mikibot.Analyze.Notification;
 using Mikibot.Analyze.Service;
