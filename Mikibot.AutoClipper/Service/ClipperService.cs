@@ -14,6 +14,7 @@ namespace Mikibot.AutoClipper.Service
             Crawler = crawler;
         }
 
+        private static HttpClient HttpClient = new();
         public BiliLiveCrawler Crawler { get; }
         private readonly Dictionary<int, CancellationTokenSource> _taskController = new();
         private readonly Dictionary<int, Task> _tasks = new();
@@ -29,8 +30,9 @@ namespace Mikibot.AutoClipper.Service
 
                 var address = allAddresses[0].Url;
                 
+                var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
                 // 采集10分钟的数据写入
-
+                var stream = await HttpClient.GetStreamAsync(address, cts.Token);
             }
         }
 
