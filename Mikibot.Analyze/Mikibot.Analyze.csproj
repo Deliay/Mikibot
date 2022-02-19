@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Mikibot.AutoClipper.Abstract\Mikibot.AutoClipper.Abstract.csproj" />
     <ProjectReference Include="..\Mikibot.BuildingBlocks\Mikibot.BuildingBlocks.csproj" />
     <ProjectReference Include="..\Mikibot.Crawler\Mikibot.Crawler.csproj" />
     <ProjectReference Include="..\Mikibot.Database\Mikibot.Database.csproj" />

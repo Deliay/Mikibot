@@ -231,7 +231,7 @@ namespace Mikibot.AutoClipper.Service
         {
             try
             {
-                await PeriodicClip(roomId, url, TimeSpan.FromHours(1), cts, true);
+                await PeriodicClip(roomId, url, TimeSpan.FromMinutes(15), cts, true);
             }
             catch (Exception ex)
             {

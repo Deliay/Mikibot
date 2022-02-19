@@ -13,7 +13,7 @@ namespace Mikibot.Analyze.Service
 {
     public class LiveStreamEventService
     {
-        public const int mxmk = 21672023;
+        public const int mxmk = 30066;
         public CommandSubscriber CmdHandler { get; }
         public ILogger<DanmakuCollectorService> Logger { get; }
         public BiliLiveCrawler Crawler { get; }

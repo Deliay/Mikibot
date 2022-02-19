@@ -30,6 +30,7 @@ appBuilder.RegisterType<LiveStreamEventService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<LiveStatusCrawlService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<DailyFollowerStatisticService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<DanmakuCollectorService>().AsSelf().SingleInstance();
+appBuilder.RegisterType<DanmakuRecordControlService>().AsSelf().SingleInstance();
 
 var appContainer = appBuilder.Build();
 
@@ -57,9 +58,12 @@ using (var app = appContainer.BeginLifetimeScope())
     var followerStat = app.Resolve<DailyFollowerStatisticService>();
     var eventService = app.Resolve<LiveStreamEventService>();
 
+    var danmakuClip = app.Resolve<DanmakuRecordControlService>();
     var danmakuCrawler = app.Resolve<DanmakuCollectorService>();
 
     eventService.CmdHandler.Register(danmakuCrawler);
+
+    eventService.CmdHandler.Subscribe<DanmuMsg>(danmakuClip.HandleDanmu);
 
     logger.LogInformation("Starting schedule module...");
     await Task.WhenAll(statusCrawler.Run(token), followerStat.Run(token), eventService.Run(token));

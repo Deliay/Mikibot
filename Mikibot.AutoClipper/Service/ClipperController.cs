@@ -22,44 +22,67 @@ namespace Mikibot.AutoClipper.Service
             Route = RouterMiddleware.Route("/api", (route) => route
             .Post("/loop-record", async (ctx) =>
             {
-                var body = await JsonSerializer.DeserializeAsync<StartRecording>(ctx.Http.Request.InputStream);
+                if (int.TryParse(ctx.Http.Request.QueryString["Bid"], out var bid))
+                {
+                    await ctx.Http.Response.Ok(await StartLoopRecording(bid, ctx.CancelToken));
+                }
+                else
+                {
+                    await ctx.Http.Response.NotFound();
+                }
 
-                await ctx.Http.Response.Ok(await StartLoopRecording(body!, ctx.CancelToken));
             })
             .Delete("/loop-record", async (ctx) =>
             {
-                var body = await JsonSerializer.DeserializeAsync<StartRecording>(ctx.Http.Request.InputStream);
-                await StopLoopRecording(body!, ctx.CancelToken);
-                await ctx.Http.Response.Ok();
+                if (int.TryParse(ctx.Http.Request.QueryString["Bid"], out var bid))
+                {
+                    await StopLoopRecording(bid, ctx.CancelToken);
+                    await ctx.Http.Response.Ok(ctx.CancelToken);
+                }
+                else
+                {
+                    await ctx.Http.Response.NotFound();
+                }
             })
             .Post("/danmaku-record", async (ctx) =>
             {
-                var body = await JsonSerializer.DeserializeAsync<StartRecording>(ctx.Http.Request.InputStream);
-
-                await ctx.Http.Response.Ok(await StartDanmakuRecording(body!, ctx.CancelToken));
+                if (int.TryParse(ctx.Http.Request.QueryString["Bid"], out var bid))
+                {
+                    await ctx.Http.Response.Ok(await StartDanmakuRecording(bid, ctx.CancelToken));
+                }
+                else
+                {
+                    await ctx.Http.Response.NotFound();
+                }
             })
             .Delete("/danmaku-record", async (ctx) =>
             {
-                var body = await JsonSerializer.DeserializeAsync<StartRecording>(ctx.Http.Request.InputStream);
-                await StopDanmakuRecording(body!, ctx.CancelToken);
-                await ctx.Http.Response.Ok();
+                if (int.TryParse(ctx.Http.Request.QueryString["Bid"], out var bid))
+                {
+                    await StopDanmakuRecording(bid, ctx.CancelToken);
+                    await ctx.Http.Response.Ok(ctx.CancelToken);
+                }
+                else
+                {
+                    await ctx.Http.Response.NotFound();
+                }
             }));
         }
 
         private ClipperService Clipper { get; }
         public ILogger<ClipperController> Logger { get; }
 
-        private async ValueTask<StartRecordingResponse> StartDanmakuRecording(StartRecording recording, CancellationToken token)
-            => new() { IsStarted = await Clipper.StartDanmakuRecording(recording.Bid, token) };
+        private async ValueTask<StartRecordingResponse> StartDanmakuRecording(int bid, CancellationToken token)
+            => new() { IsStarted = await Clipper.StartDanmakuRecording(bid, token) };
 
-        private async ValueTask StopDanmakuRecording(StartRecording recording, CancellationToken token)
-            => await Clipper.StopDanmakuRecording(recording.Bid, token);
+        private async ValueTask StopDanmakuRecording(int bid, CancellationToken token)
+            => await Clipper.StopDanmakuRecording(bid, token);
 
-        private async ValueTask<StartRecordingResponse> StartLoopRecording(StartRecording recording, CancellationToken token)
-            => new () { IsStarted = await Clipper.StartLoopRecording(recording.Bid, token) };
+        private async ValueTask<StartRecordingResponse> StartLoopRecording(int bid, CancellationToken token)
+            => new () { IsStarted = await Clipper.StartLoopRecording(bid, token) };
 
-        private async ValueTask StopLoopRecording(StartRecording recording, CancellationToken token)
-            => await Clipper.CancelLoopRecording(recording.Bid, token);
+        private async ValueTask StopLoopRecording(int bid, CancellationToken token)
+            => await Clipper.CancelLoopRecording(bid, token);
 
     }
 }
