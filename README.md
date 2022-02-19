@@ -22,10 +22,12 @@
 
 ## 项目结构
 - **Mikibot.API** - Mikibot网站的后端
-- **mikibot.fe** - Mikibot网站的前端
+- **Mikibot.FE** - Mikibot网站的前端
 - **Mikibot.Analyze** - Mikibot本体
+- **Mikibot.AutoClipper** - 切片服务
+- **Mikibot.Database** - 数据库访问和相关模型
 - **Mikibot.Crawler** - Crawler相关，包括HTTP API和Websocket相关
-- **buildingBlocks/** - 通用组件
+- **Mikibot.BuildingBlocks** - 通用组件
 
 ## 数据处理Roadmap(TODO 挪到github project)
 - 舰长群体采集和分析：分析舰长上舰和流失情况
