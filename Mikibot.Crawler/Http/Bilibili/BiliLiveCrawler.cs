@@ -10,9 +10,9 @@ namespace Mikibot.Crawler.Http.Bilibili
 {
     public class BiliLiveCrawler : HttpCrawler
     {
-        public const int mxmkr = 30066;
-        public const int mxmk = 403496;
-        public const string mxmks = "403496";
+        public const int mxmkr = 21672023;
+        public const int mxmk = 477317922;
+        public const string mxmks = "477317922";
 
         public async ValueTask<PersonalInfo> GetPersonalInfo(int uid, CancellationToken token = default)
         {

@@ -15,6 +15,10 @@ namespace Mikibot.Analyze.Notification
 
         }
     }
+
+    /// <summary>
+    /// 按照弹幕流速自动切片
+    /// </summary>
     public class DanmakuSpeedStatisticService
     {
         public async Task HandleDanmu(DanmuMsg msg)

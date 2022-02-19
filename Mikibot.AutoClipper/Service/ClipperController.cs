@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Mikibot.AutoClipper.Abstract.Rquest;
+using Mikibot.Database.Model;
 using SimpleHttpServer.Pipeline;
 using SimpleHttpServer.Pipeline.Middlewares;
 using SimpleHttpServer.Response;
@@ -59,8 +60,7 @@ namespace Mikibot.AutoClipper.Service
             {
                 if (int.TryParse(ctx.Http.Request.QueryString["Bid"], out var bid))
                 {
-                    await StopDanmakuRecording(bid, ctx.CancelToken);
-                    await ctx.Http.Response.Ok(ctx.CancelToken);
+                    await ctx.Http.Response.Ok(await StopDanmakuRecording(bid, ctx.CancelToken));
                 }
                 else
                 {
@@ -75,7 +75,7 @@ namespace Mikibot.AutoClipper.Service
         private async ValueTask<StartRecordingResponse> StartDanmakuRecording(int bid, CancellationToken token)
             => new() { IsStarted = await Clipper.StartDanmakuRecording(bid, token) };
 
-        private async ValueTask StopDanmakuRecording(int bid, CancellationToken token)
+        private async ValueTask<LiveStreamRecord> StopDanmakuRecording(int bid, CancellationToken token)
             => await Clipper.StopDanmakuRecording(bid, token);
 
         private async ValueTask<StartRecordingResponse> StartLoopRecording(int bid, CancellationToken token)

@@ -31,7 +31,7 @@ namespace Mikibot.AutoClipper.Service
         public MikibotDatabaseContext Db { get; }
 
         private readonly Dictionary<int, CancellationTokenSource> _danmakuController = new();
-        private readonly Dictionary<int, Task> _danmakuTask = new();
+        private readonly Dictionary<int, Task<LiveStreamRecord>> _danmakuTask = new();
         private readonly Dictionary<int, CancellationTokenSource> _taskController = new();
         private readonly Dictionary<int, Task> _tasks = new();
         private readonly SemaphoreSlim _semaphore = new(1);
@@ -65,6 +65,16 @@ namespace Mikibot.AutoClipper.Service
             await Db.SaveChangesAsync(cancellationToken);
         }
 
+        private string GetClipFileName(int roomId)
+        {
+            var path = Environment.GetEnvironmentVariable("MIKIBOT_AUTO_CLIP_PATH") ?? Path.GetTempPath();
+            if (!Directory.Exists(path)) path = Path.GetTempPath();
+
+            var file = $"clip-{roomId}-{DateTimeOffset.Now:yyyy-MM-dd-HH-mm-ss}.flv";
+
+            return Path.Combine(path, file);
+        }
+
         /// <summary>
         /// 进行指定时间的切片
         /// </summary>
@@ -72,12 +82,13 @@ namespace Mikibot.AutoClipper.Service
         /// <param name="url"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task PeriodicClip(int roomId, string url, TimeSpan duration, CancellationTokenSource cts, bool reserve = false)
+        public async Task<LiveStreamRecord> PeriodicClip(int roomId, string url, TimeSpan duration, CancellationTokenSource cts, bool reserve = false)
         {
             var token = cts.Token;
+            
             var clipRecord = new LiveStreamRecord()
             {
-                LocalFileName = Path.GetTempFileName(),
+                LocalFileName = GetClipFileName(roomId),
                 Bid = roomId,
                 CreatedAt = DateTimeOffset.Now,
                 Reserve = reserve,
@@ -113,6 +124,7 @@ namespace Mikibot.AutoClipper.Service
             Db.Update(clipRecord);
             await Db.SaveChangesAsync(default);
 
+            return clipRecord;
         }
 
         private Random _random = new Random();
@@ -215,34 +227,37 @@ namespace Mikibot.AutoClipper.Service
             return true;
         }
 
-        public async Task StopDanmakuRecording(int roomId, CancellationToken token)
+        public async Task<LiveStreamRecord> StopDanmakuRecording(int roomId, CancellationToken token)
         {
-            if (!_danmakuController.ContainsKey(roomId)) return;
+            if (!_danmakuController.ContainsKey(roomId)) return default!;
 
             using var _cts = _danmakuController[roomId];
             _danmakuController.Remove(roomId);
             _cts.Cancel();
 
-            await _danmakuTask[roomId];
+            var record = await _danmakuTask[roomId];
             _danmakuTask.Remove(roomId);
+
+            return record;
         }
 
-        private async Task InnerStartDanmakuRecording(int roomId, string url, CancellationTokenSource cts, int times = 0)
+        private async Task<LiveStreamRecord> InnerStartDanmakuRecording(int roomId, string url, CancellationTokenSource cts, int times = 0)
         {
             try
             {
-                await PeriodicClip(roomId, url, TimeSpan.FromMinutes(15), cts, true);
+                return await PeriodicClip(roomId, url, TimeSpan.FromMinutes(15), cts, true);
             }
             catch (Exception ex)
             {
                 if (times < 4)
                 {
-                    await InnerStartDanmakuRecording(roomId, url, cts, times + 1);
+                    return await InnerStartDanmakuRecording(roomId, url, cts, times + 1);
                 }
                 else
                 {
                     cts.Cancel();
                     Logger.LogError(ex, "Clipping error, clipper will stop clip");
+                    return default!;
                 }
             }
         }

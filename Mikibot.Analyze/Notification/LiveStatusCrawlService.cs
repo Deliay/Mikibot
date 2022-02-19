@@ -33,6 +33,9 @@ namespace Mikibot.Analyze.Notification
         public IMiraiService Mirai { get; }
         public ILogger<LiveStatusCrawlService> Logger { get; }
 
+        public async Task<LiveStatus> GetCurrentStatus(CancellationToken token)
+        => await db.LiveStatuses.OrderBy(s => s.Id).LastOrDefaultAsync(token);
+
         private async ValueTask<LiveStatus> GenerateStatus(PersonalInfo.LiveRoomDetail info, CancellationToken token)
             => new()
             {
