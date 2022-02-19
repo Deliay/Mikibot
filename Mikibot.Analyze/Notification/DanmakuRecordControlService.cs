@@ -47,7 +47,7 @@ namespace Mikibot.Analyze.Notification
             if (status.Status == 1)
             {
                 RecordingStatus = true;
-                await httpClient.PostAsync($"http://localhost:19999/api/danmaku-record?Bid={RoomId}", null);
+                await httpClient.PostAsync($"http://localhost:19990/api/danmaku-record?Bid={RoomId}", null);
             }
             else
             {
@@ -60,7 +60,7 @@ namespace Mikibot.Analyze.Notification
             Logger.LogInformation("将在 {} 秒后结束自动切片", 10);
             await Task.Delay(TimeSpan.FromSeconds(10));
             RecordingStatus = false;
-            var result = await httpClient.DeleteAsync($"http://localhost:19999/api/danmaku-record?Bid={RoomId}");
+            var result = await httpClient.DeleteAsync($"http://localhost:19990/api/danmaku-record?Bid={RoomId}");
             var record = await JsonSerializer.DeserializeAsync<LiveStreamRecord>(result.Content.ReadAsStream());
             if (record != null)
             {

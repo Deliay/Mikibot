@@ -21,6 +21,7 @@ namespace Mikibot.AutoClipper.Service
             Clipper = clipper;
             Logger = logger;
             Route = RouterMiddleware.Route("/api", (route) => route
+            .Get("/health", async (ctx) => await ctx.Http.Response.Ok("health"))
             .Post("/loop-record", async (ctx) =>
             {
                 if (int.TryParse(ctx.Http.Request.QueryString["Bid"], out var bid))

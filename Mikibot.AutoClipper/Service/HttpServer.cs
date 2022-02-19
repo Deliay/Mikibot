@@ -18,7 +18,7 @@ namespace Mikibot.AutoClipper.Service
         {
             Logger = logger;
             Host = new SimpleHostBuilder()
-                .ConfigureServer((server) => server.ListenLocalPort(19999))
+                .ConfigureServer((server) => server.ListenLocalPort(19990))
                 .Build();
         }
         public void AddHandlers(Action<IRequestPipeline<RequestContext>> builder)
@@ -28,7 +28,7 @@ namespace Mikibot.AutoClipper.Service
 
         public async Task Run(CancellationToken token)
         {
-            Logger.LogInformation("Server will listening at port {}", 19999);
+            Logger.LogInformation("Server will listening at port {}", 19990);
             await Host.Run(token);
         }
     }
