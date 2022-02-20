@@ -19,7 +19,10 @@ namespace Mikibot.Analyze.Notification
 {
     public class DanmakuRecordControlService
     {
-        private static readonly HttpClient httpClient = new();
+        private static readonly HttpClient httpClient = new()
+        {
+            Timeout = TimeSpan.FromMinutes(30),
+        };
         public DanmakuRecordControlService(
             BiliLiveCrawler crawler,
             ILogger<DanmakuRecordControlService> logger,
@@ -64,6 +67,10 @@ namespace Mikibot.Analyze.Notification
             var record = await JsonSerializer.DeserializeAsync<LiveStreamRecord>(result.Content.ReadAsStream());
             if (record != null)
             {
+                await Mirai.SendMessageToAllGroup(default, new MessageBase[]
+                {
+                    new PlainMessage($"刚才触发的切片: {record.LocalFileName} 已经完成，正在上传中...")
+                });
                 Logger.LogInformation("正在上传切片...");
                 var body = new MultipartFormDataContent
                     {
@@ -81,7 +88,7 @@ namespace Mikibot.Analyze.Notification
                 Logger.LogInformation("切片上传完成, 发送群通知中....{}", url);
                 await Mirai.SendMessageToAllGroup(default, new MessageBase[]
                 {
-                    new PlainMessage($"刚才触发的自动切片下载地址： {url}")
+                    new PlainMessage($"刚才触发的切片: {record.LocalFileName} 上传完成, 下载地址： {url}")
                 });
             }
         }
@@ -109,7 +116,6 @@ namespace Mikibot.Analyze.Notification
 
         private async Task StopRecording()
         {
-            await semaphore.WaitAsync();
             try
             {
                 if (RecordingStatus)
@@ -123,10 +129,6 @@ namespace Mikibot.Analyze.Notification
                 Logger.LogError(ex, "An error was thrown when starting clip");
                 throw;
             }
-            finally
-            {
-                semaphore.Release();
-            }
         }
 
         private readonly HashSet<int> AllowList = new()
@@ -136,15 +138,36 @@ namespace Mikibot.Analyze.Notification
             3542675,
             5152457,
         };
+
+        // 开始切片关键词
+        private readonly HashSet<string> StartWords = new()
+        {
+            "草！！",
+            "好！！",
+            "111！！",
+            "确实！！",
+            "2333！！",
+            "笑嘻了！！",
+        };
+        // 停止切片关键词
+        private readonly HashSet<string> StopWords = new()
+        {
+            "草！！！",
+            "好！！！",
+            "111！！！",
+            "确实！！！",
+            "2333！！！",
+            "笑嘻了！！！",
+        };
         public Task HandleDanmu(DanmuMsg msg)
         {
             if (AllowList.Contains(msg.UserId))
             {
-                if (msg.Msg == "草！！")
+                if (StartWords.Contains(msg.Msg))
                 {
                     _ = StartRecording();
                 }
-                if(msg.Msg == "草！！！")
+                else if(StopWords.Contains(msg.Msg))
                 {
                     _ = StopRecording();
                 }
