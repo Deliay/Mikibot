@@ -32,6 +32,8 @@ appBuilder.RegisterType<DailyFollowerStatisticService>().AsSelf().SingleInstance
 appBuilder.RegisterType<DanmakuCollectorService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<DanmakuRecordControlService>().AsSelf().SingleInstance();
 
+appBuilder.RegisterType<OssService>().AsSelf().SingleInstance();
+
 var appContainer = appBuilder.Build();
 
 using (var csc = new CancellationTokenSource())

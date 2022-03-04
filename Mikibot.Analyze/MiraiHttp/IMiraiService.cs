@@ -6,5 +6,6 @@ namespace Mikibot.Analyze.MiraiHttp
     {
         ValueTask Run();
         ValueTask SendMessageToAllGroup(CancellationToken token, params MessageBase[] messages);
+        ValueTask SendMessageToSliceManGroup(CancellationToken token, params MessageBase[] messages);
     }
 }

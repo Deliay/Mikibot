@@ -14,6 +14,10 @@
 	<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
     <PackageReference Include="EmberSimpleHttpServer" Version="1.0.0" />
     <PackageReference Include="Xabe.FFmpeg" Version="5.1.0" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.2">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

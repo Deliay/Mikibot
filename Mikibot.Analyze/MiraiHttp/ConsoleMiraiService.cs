@@ -28,5 +28,10 @@ namespace Mikibot.Analyze.MiraiHttp
             Logger.LogInformation("{}", string.Join("", (object[])messages));
             return ValueTask.CompletedTask;
         }
+
+        public ValueTask SendMessageToSliceManGroup(CancellationToken token, params MessageBase[] messages)
+        {
+            return SendMessageToAllGroup(token, messages);
+        }
     }
 }

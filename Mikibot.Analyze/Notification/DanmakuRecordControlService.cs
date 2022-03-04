@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Mikibot.Analyze.MiraiHttp;
 using Mikibot.AutoClipper.Abstract.Rquest;
+using Mikibot.BuildingBlocks.Util;
 using Mikibot.Crawler.Http.Bilibili;
 using Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 using Mikibot.Database.Model;
@@ -27,18 +28,21 @@ namespace Mikibot.Analyze.Notification
             BiliLiveCrawler crawler,
             ILogger<DanmakuRecordControlService> logger,
             IMiraiService mirai,
-            LiveStatusCrawlService liveStatus)
+            LiveStatusCrawlService liveStatus,
+            OssService oss)
         {
             Crawler = crawler;
             Logger = logger;
             Mirai = mirai;
             LiveStatus = liveStatus;
+            Oss = oss;
         }
 
         public BiliLiveCrawler Crawler { get; }
         public ILogger<DanmakuRecordControlService> Logger { get; }
         public IMiraiService Mirai { get; }
         public LiveStatusCrawlService LiveStatus { get; }
+        public OssService Oss { get; }
         public int RoomId { get; set; } = BiliLiveCrawler.mxmkr;
         private bool RecordingStatus { get; set; } = false;
         private readonly SemaphoreSlim semaphore = new(1);
@@ -72,23 +76,12 @@ namespace Mikibot.Analyze.Notification
                     new PlainMessage($"刚才触发的切片: {record.LocalFileName} 已经完成，正在上传中...")
                 });
                 Logger.LogInformation("正在上传切片...");
-                var body = new MultipartFormDataContent
-                    {
-                        { new StringContent("tjnxltvberuj1gcugs6f"), "token" },
-                        { new StringContent("0"), "model" },
-                        { new StreamContent(File.OpenRead(record.LocalFileName)), "file", record.LocalFileName }
-                    };
-                var uploadResResult = await httpClient.PostAsync("https://connect.tmp.link/api_v2/cli_uploader", body);
-                var uploadResult = await uploadResResult.Content.ReadAsStringAsync();
-                var url = Regex
-                    .Match(uploadResult, ".*?(http.*?)\n.*", RegexOptions.Multiline | RegexOptions.IgnoreCase)
-                    .Groups[1]
-                    .Value;
+                var downloadUrl = await Oss.Upload(record.LocalFileName);
 
-                Logger.LogInformation("切片上传完成, 发送群通知中....{}", url);
-                await Mirai.SendMessageToAllGroup(default, new MessageBase[]
+                Logger.LogInformation("切片上传完成, 发送群通知中....{}", downloadUrl);
+                await Mirai.SendMessageToSliceManGroup(default, new MessageBase[]
                 {
-                    new PlainMessage($"刚才触发的切片: {record.LocalFileName} 上传完成, 下载地址： {url}")
+                    new PlainMessage($"刚才触发的切片: {record.LocalFileName} 上传完成, 下载地址： {downloadUrl}")
                 });
             }
         }
@@ -139,37 +132,17 @@ namespace Mikibot.Analyze.Notification
             5152457,
         };
 
-        // 开始切片关键词
-        private readonly HashSet<string> StartWords = new()
-        {
-            "草！！",
-            "好！！",
-            "111！！",
-            "确实！！",
-            "2333！！",
-            "笑嘻了！！",
-        };
-        // 停止切片关键词
-        private readonly HashSet<string> StopWords = new()
-        {
-            "草！！！",
-            "好！！！",
-            "111！！！",
-            "确实！！！",
-            "2333！！！",
-            "笑嘻了！！！",
-        };
         public Task HandleDanmu(DanmuMsg msg)
         {
             if (AllowList.Contains(msg.UserId))
             {
-                if (StartWords.Contains(msg.Msg))
-                {
-                    _ = StartRecording();
-                }
-                else if(StopWords.Contains(msg.Msg))
+                if (msg.Msg.EndsWith("！！！"))
                 {
                     _ = StopRecording();
+                }
+                else if (msg.Msg.EndsWith("！！"))
+                {
+                    _ = StartRecording();
                 }
             }
 

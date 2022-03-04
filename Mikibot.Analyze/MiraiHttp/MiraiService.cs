@@ -31,6 +31,25 @@ namespace Mikibot.Analyze.MiraiHttp
             await Bot.LaunchAsync();
         }
         private DateTimeOffset latestSentAt = DateTimeOffset.Now;
+
+        public async ValueTask SendMessageToSliceManGroup(CancellationToken token, params MessageBase[] messages)
+        {
+            foreach (var group in Bot.Groups.Value)
+            {
+                if (group.Id != "139528984") continue;
+                if (token.IsCancellationRequested) break;
+                if (DateTimeOffset.Now - latestSentAt < TimeSpan.FromSeconds(3))
+                {
+                    Logger.LogInformation("推送频率限制 3秒后再进行下一次推送");
+                    await Task.Delay(3000);
+                    latestSentAt = DateTimeOffset.Now;
+                }
+                Logger.LogInformation("即将推送信息 ({})", group.Id);
+                var result = await group.SendGroupMessageAsync(messages);
+                Logger.LogInformation("发送消息回执:{}", result);
+            }
+        }
+
         public async ValueTask SendMessageToAllGroup(CancellationToken token, params MessageBase[] messages)
         {
             foreach (var group in Bot.Groups.Value)
