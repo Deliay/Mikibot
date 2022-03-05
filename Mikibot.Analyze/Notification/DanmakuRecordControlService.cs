@@ -133,21 +133,30 @@ namespace Mikibot.Analyze.Notification
             23034348,
         };
 
-        public Task HandleDanmu(DanmuMsg msg)
+        public async Task HandleDanmu(DanmuMsg msg)
         {
             if (AllowList.Contains(msg.UserId))
             {
                 if (msg.Msg.EndsWith("！！！"))
                 {
+                    if (RecordingStatus)
+                    {
+                        await Mirai.SendMessageToSliceManGroup(default, new MessageBase[]
+                        {
+                            new PlainMessage($"用户: {msg.FansTagUserName} 停止切片，切片将会继续录制10秒。")
+                        });
+                    }
                     _ = StopRecording();
                 }
                 else if (msg.Msg.EndsWith("！！"))
                 {
+                    await Mirai.SendMessageToSliceManGroup(default, new MessageBase[]
+                    {
+                        new PlainMessage($"用户: {msg.FansTagUserName} 开始切片")
+                    });
                     _ = StartRecording();
                 }
             }
-
-            return Task.CompletedTask;
         }
     }
 }
