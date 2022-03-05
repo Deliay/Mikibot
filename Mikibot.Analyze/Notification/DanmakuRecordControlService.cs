@@ -130,6 +130,7 @@ namespace Mikibot.Analyze.Notification
             1829374,
             3542675,
             5152457,
+            23034348,
         };
 
         public Task HandleDanmu(DanmuMsg msg)
