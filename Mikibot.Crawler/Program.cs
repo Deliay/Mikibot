@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Mikibot.Crawler.Http.Bilibili;
+using Mikibot.Crawler.Http.Bilibili.Model;
 using Mikibot.Crawler.WebsocketCrawler.Client;
 using Mikibot.Crawler.WebsocketCrawler.Data;
 using Mikibot.Crawler.WebsocketCrawler.Data.Commands;
@@ -25,10 +26,23 @@ var original = BasePacket.Auth(114514, "1919810");
 var bytes = original.ToByte();
 var restored = BasePacket.ToPacket(bytes);
 
-var roomId = 510;
+var roomId = 22637261;
 var realRoomId = await crawler.GetRealRoomId(roomId, csc.Token);
 var spectatorEndpoint = await crawler.GetLiveToken(realRoomId, csc.Token);
 var spectatorHost = spectatorEndpoint.Hosts[0];
+
+var allGuards = new HashSet<GuardUserInfo>();
+var init = await crawler.GetRoomGuardList(21672023, token: csc.Token);
+allGuards.UnionWith(init.List);
+allGuards.UnionWith(init.Top3);
+while (init.List.Count > 0
+    && init.Info.Count > allGuards.Count
+    && init.Info.PageCount > init.Info.Current)
+{
+    init = await crawler.GetRoomGuardList(21672023, init.Info.Current + 1, csc.Token);
+    allGuards.UnionWith(init.List);
+}
+Console.WriteLine($"弥人舰长在线数量:{allGuards.Where(n => n.Online != 0).Count()}");
 
 await wsClient.ConnectAsync(spectatorHost.Host, spectatorHost.WsPort, realRoomId, spectatorEndpoint.Token, cancellationToken: csc.Token);
 

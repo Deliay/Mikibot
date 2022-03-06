@@ -34,6 +34,15 @@ namespace Mikibot.Crawler.WebsocketCrawler.Packet
         }.ToByte();
         public static ArraySegment<byte> Keeplive() => KeepliveData;
 
+        public readonly static BasePacket Empty = new()
+        {
+            HeadSize = 0,
+            Sequence = 0,
+            Size = 0,
+            Type = PacketType.Empty,
+            Version = 0,
+        };
+
         public static BasePacket Auth(int roomId, string auth)
         {
             var authPacket = JsonSerializer.Serialize(new

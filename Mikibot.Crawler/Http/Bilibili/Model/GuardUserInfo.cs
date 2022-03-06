@@ -15,7 +15,7 @@ namespace Mikibot.Crawler.Http.Bilibili.Model
             public string Name { get; set; }
 
             [JsonPropertyName("medal_level")]
-            public int Leve { get; set; }
+            public int Level { get; set; }
         }
         [JsonPropertyName("uid")]
         public int Uid { get; set; }
@@ -23,7 +23,7 @@ namespace Mikibot.Crawler.Http.Bilibili.Model
         [JsonPropertyName("ruid")]
         public int RoomUid { get; set; }
 
-        [JsonPropertyName("medal_level")]
+        [JsonPropertyName("username")]
         public string UserName { get; set; }
 
         [JsonPropertyName("rank")]
@@ -33,7 +33,7 @@ namespace Mikibot.Crawler.Http.Bilibili.Model
         public string Avatar { get; set; }
 
         [JsonPropertyName("is_alive")]
-        public bool Online { get; set; }
+        public int Online { get; set; }
 
         [JsonPropertyName("guard_level")]
         public int GuardType { get; set; }

@@ -28,5 +28,8 @@ namespace Mikibot.Crawler.Http.Bilibili.Model
 
         [JsonPropertyName("list")]
         public List<GuardUserInfo> List { get; set; }
+
+        [JsonPropertyName("top3")]
+        public List<GuardUserInfo> Top3 { get; set; }
     }
 }

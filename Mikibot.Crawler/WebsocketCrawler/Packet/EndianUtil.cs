@@ -14,6 +14,11 @@ namespace Mikibot.Crawler.WebsocketCrawler.Packet
 
         public static BasePacket BytesToStruct(ReadOnlySpan<byte> buffer)
         {
+            if (buffer.Length < 16)
+            {
+                return BasePacket.Empty;
+            }
+
             var result = new BasePacket()
             {
                 Size = BinaryPrimitives.ReadUInt32BigEndian(buffer[0..]),
