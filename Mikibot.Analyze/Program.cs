@@ -21,8 +21,12 @@ appBuilder.RegisterType<MikibotDatabaseContext>().AsSelf().InstancePerDependency
 appBuilder.Register<MiraiBotConfig>((_) => MiraiBotConfig.FromEnviroment());
 #if DEBUG
 appBuilder.RegisterType<ConsoleMiraiService>().As<IMiraiService>().SingleInstance();
+appBuilder.RegisterType<LocalOssService>().As<IOssService>().SingleInstance();
+appBuilder.RegisterType<TecentEmailService>().AsSelf().SingleInstance();
 #else
 appBuilder.RegisterType<MiraiService>().As<IMiraiService>().SingleInstance();
+appBuilder.RegisterType<OssService>().As<IOssService>().SingleInstance();
+appBuilder.RegisterType<EmailService>().AsSelf().SingleInstance();
 #endif
 
 appBuilder.RegisterType<LiveStreamEventService>().AsSelf().SingleInstance();
@@ -31,8 +35,8 @@ appBuilder.RegisterType<LiveStatusCrawlService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<DailyFollowerStatisticService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<DanmakuCollectorService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<DanmakuRecordControlService>().AsSelf().SingleInstance();
+appBuilder.RegisterType<DanmakuExportGuardList>().AsSelf().SingleInstance();
 
-appBuilder.RegisterType<OssService>().AsSelf().SingleInstance();
 
 var appContainer = appBuilder.Build();
 
@@ -62,10 +66,12 @@ using (var app = appContainer.BeginLifetimeScope())
 
     var danmakuClip = app.Resolve<DanmakuRecordControlService>();
     var danmakuCrawler = app.Resolve<DanmakuCollectorService>();
+    var danmakuExportGuard = app.Resolve<DanmakuExportGuardList>();
 
     eventService.CmdHandler.Register(danmakuCrawler);
 
     eventService.CmdHandler.Subscribe<DanmuMsg>(danmakuClip.HandleDanmu);
+    eventService.CmdHandler.Subscribe<DanmuMsg>(danmakuExportGuard.HandleDanmaku);
 
     logger.LogInformation("Starting schedule module...");
     await Task.WhenAll(statusCrawler.Run(token), followerStat.Run(token), eventService.Run(token));

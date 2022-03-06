@@ -29,7 +29,7 @@ namespace Mikibot.Analyze.Notification
             ILogger<DanmakuRecordControlService> logger,
             IMiraiService mirai,
             LiveStatusCrawlService liveStatus,
-            OssService oss)
+            IOssService oss)
         {
             Crawler = crawler;
             Logger = logger;
@@ -42,7 +42,7 @@ namespace Mikibot.Analyze.Notification
         public ILogger<DanmakuRecordControlService> Logger { get; }
         public IMiraiService Mirai { get; }
         public LiveStatusCrawlService LiveStatus { get; }
-        public OssService Oss { get; }
+        public IOssService Oss { get; }
         public int RoomId { get; set; } = BiliLiveCrawler.mxmkr;
         private bool RecordingStatus { get; set; } = false;
         private readonly SemaphoreSlim semaphore = new(1);

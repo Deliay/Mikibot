@@ -13,7 +13,7 @@ using static COSXML.Transfer.COSXMLUploadTask;
 
 namespace Mikibot.BuildingBlocks.Util
 {
-    public class OssService
+    public class OssService : IOssService
     {
         private string SecretId { get; }
         private string SecretKey { get; }
@@ -62,7 +62,7 @@ namespace Mikibot.BuildingBlocks.Util
             return GetDownloadAddress(name);
         }
 
-        public string GetDownloadAddress(string key)
+        private string GetDownloadAddress(string key)
         {
             return CosXml.GenerateSignURL(new PreSignatureStruct
             {
