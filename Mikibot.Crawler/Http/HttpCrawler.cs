@@ -25,6 +25,13 @@ namespace Mikibot.Crawler.Http
             return await JsonSerializer.DeserializeAsync<T>(stream, JsonParseOptions, token);
         }
 
+        protected async ValueTask<T?> PostFormAsync<T>(string url, FormUrlEncodedContent ctx, CancellationToken token)
+        {
+            var raw = await client.PostAsync(url, ctx, token);
+            var stream = raw.Content.ReadAsStream(token);
+            return await JsonSerializer.DeserializeAsync<T>(stream, JsonParseOptions, token);
+        }
+
         public void Dispose()
         {
             GC.SuppressFinalize(this);

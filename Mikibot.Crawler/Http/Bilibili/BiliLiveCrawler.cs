@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Mikibot.Crawler.Http.Bilibili
@@ -88,6 +89,39 @@ namespace Mikibot.Crawler.Http.Bilibili
             result.AssertCode();
 
             return result.Data;
+        }
+
+        private static string GetDevId()
+        {
+            var array = Guid.NewGuid().ToByteArray();
+            array[6] = (byte)(0x40 | (array[6] & 0xF0));
+            array[8] = (byte)(3 & array[8] | 8);
+
+            return new Guid(array).ToString();
+        }
+
+        public async ValueTask SendMessage(string cookie, int senderBid, int targetBid, string message, CancellationToken token = default)
+        {
+            var indexOfCsrf = cookie.IndexOf("bili_jct=") + 9;
+            if (indexOfCsrf == -1) throw new InvalidDataException("Cookie not include any csrf token, consider update you cookie!");
+
+            var csrf = cookie[indexOfCsrf..cookie.IndexOf(';', indexOfCsrf)];
+
+            var body = new FormUrlEncodedContent(new Dictionary<string ,string>()
+            {
+                { "msg[sender_uid]", $"{senderBid}" },
+                { "msg[receiver_id]", $"{targetBid}" },
+                { "msg[receiver_type]", "1" },
+                { "msg[msg_type]", "1" },
+                { "msg[dev_id]", GetDevId() },
+                { "msg[timestamp]", $"{DateTimeOffset.Now.ToUnixTimeSeconds()}" },
+                { "msg[content]", $"{{\"content\":{JsonSerializer.Serialize(message)}}}" },
+                { "csrf", csrf },
+            });
+            body.Headers.Add("cookie", cookie);
+
+            var res = await PostFormAsync<BilibiliApiResponse<object>>("http://api.vc.bilibili.com/web_im/v1/web_im/send_msg", body, token);
+            res.AssertCode();
         }
     }
 }
