@@ -30,13 +30,18 @@ namespace Mikibot.Crawler.Http.Bilibili
             return result.Data.Follower;
         }
 
-        public async ValueTask<int> GetRealRoomId(int roomId, CancellationToken token = default)
+        public async ValueTask<LiveInitInfo> GetRealRoomInfo(int roomId, CancellationToken token = default)
         {
             var roomUrl = $"http://api.live.bilibili.com/room/v1/Room/room_init?id={roomId}";
             var roomResult = await GetAsync<BilibiliApiResponse<LiveInitInfo>>(roomUrl, token);
             roomResult.AssertCode();
 
-            return roomResult.Data.RoomId;
+            return roomResult.Data;
+        }
+
+        public async ValueTask<int> GetRealRoomId(int roomId, CancellationToken token = default)
+        {
+            return (await GetRealRoomInfo(roomId, token)).RoomId;
         }
 
         public async ValueTask<LiveToken> GetLiveTokenByUid(int uid, CancellationToken token = default)
@@ -62,6 +67,21 @@ namespace Mikibot.Crawler.Http.Bilibili
             result.AssertCode();
 
             return result.Data.Urls;
+        }
+
+        public async ValueTask<GuardInfo> GetRoomGuardList(int roomId, int page = 1, CancellationToken token = default)
+        {
+            var roomInfo = await GetRealRoomInfo(roomId, token);
+            return await GetRoomGuardList(roomInfo.RoomId, roomInfo.BId, page, token);
+        }
+
+        public async ValueTask<GuardInfo> GetRoomGuardList(int roomId, int bId, int page = 1, CancellationToken token = default)
+        {
+            var url = $"http://api.live.bilibili.com/xlive/app-room/v2/guardTab/topList?roomid={roomId}&page={page}&ruid={bId}&page_size=29";
+            var result = await GetAsync<BilibiliApiResponse<GuardInfo>>(url, token);
+            result.AssertCode();
+
+            return result.Data;
         }
     }
 }
