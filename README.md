@@ -13,6 +13,7 @@
 - 直播间送礼统计
 - 上下播通知、单次直播粉丝数量统计
 - 特定弹幕开始自动切片
+- 发送弹幕支持导出舰长列表到邮箱
 
 ## 技术栈
 - 网站后端 **Backend** ASP.NET Core + C#
@@ -29,8 +30,4 @@
 - **Mikibot.Crawler** - Crawler相关，包括HTTP API和Websocket相关
 - **Mikibot.BuildingBlocks** - 通用组件
 
-## 数据处理Roadmap(TODO 挪到github project)
-- 舰长群体采集和分析：分析舰长上舰和流失情况
-- 弹幕采集和分析：哪些一直在看主播，但是没点关注
-- 直播间红包流向分析：抽到红包的人都关注了哪些主播
 
