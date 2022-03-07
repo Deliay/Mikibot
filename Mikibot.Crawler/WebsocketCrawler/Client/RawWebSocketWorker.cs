@@ -72,7 +72,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
                 ValueWebSocketReceiveResult result;
                 do
                 {
-                    var buffer = new Memory<byte>(new byte[4096]);
+                    var buffer = new Memory<byte>(new byte[16384]);
                     result = await ws.ReceiveAsync(buffer, token);
 #if DEBUG
                     var length = BinaryPrimitives.ReadUInt32BigEndian(buffer[..4].Span);
