@@ -74,7 +74,7 @@ namespace Mikibot.Analyze.Notification
         {
             var memoryStream = new MemoryStream();
             var workbook = new XSSFWorkbook();
-            var sheet = workbook.CreateSheet("舰长名单");
+            var sheet = workbook.CreateSheet("guards");
 
             int rowIdx = 1;
             foreach (var row in GenerateExcel(guards))
@@ -89,7 +89,8 @@ namespace Mikibot.Analyze.Notification
                 rowIdx++;
             }
             
-            workbook.Write(memoryStream, true);
+            workbook.Write(memoryStream, leaveOpen: true);
+            workbook.Close();
             return memoryStream;
         }
 
