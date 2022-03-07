@@ -121,7 +121,7 @@ namespace Mikibot.Analyze.Notification
                     textContent: text,
                     htmlContent: html,
                     filename: filename,
-                    base64content: Convert.ToBase64String(excel.GetBuffer()));
+                    base64content: Convert.ToBase64String(excel.ToArray()));
 
                 Logger.LogInformation("舰长名单发送完成");
             }
