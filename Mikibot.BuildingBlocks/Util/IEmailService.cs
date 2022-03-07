@@ -7,14 +7,8 @@ using System.Threading.Tasks;
 
 namespace Mikibot.BuildingBlocks.Util
 {
-    public interface IEmailService<TMsg, TAttachment>
+    public interface IEmailService
     {
-        TAttachment GenerateAttachment(string filename, string base64content);
-
-        TMsg CreateEmail(string to, string subject, string textContent, string htmlContent);
-
-        void AppendAttachment(TMsg msg, TAttachment attachment);
-
-        ValueTask SendEmail(TMsg msg, CancellationToken token = default);
+        ValueTask SendEmail(string to, string subject, string textContent, string htmlContent, string filename, string base64content, CancellationToken token = default);
     }
 }

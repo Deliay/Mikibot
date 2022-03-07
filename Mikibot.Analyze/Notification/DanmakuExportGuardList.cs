@@ -15,7 +15,7 @@ namespace Mikibot.Analyze.Notification
 {
     public class DanmakuExportGuardList
     {
-        public DanmakuExportGuardList(ILogger<DanmakuExportGuardList> logger, TecentEmailService mailer, BiliLiveCrawler crawler)
+        public DanmakuExportGuardList(ILogger<DanmakuExportGuardList> logger, IEmailService mailer, BiliLiveCrawler crawler)
         {
             Logger = logger;
             Mailer = mailer;
@@ -23,7 +23,7 @@ namespace Mikibot.Analyze.Notification
         }
 
         public ILogger<DanmakuExportGuardList> Logger { get; }
-        public TecentEmailService Mailer { get; }
+        public IEmailService Mailer { get; }
         public BiliLiveCrawler Crawler { get; }
 
         private async Task<HashSet<GuardUserInfo>> GetGuards()
@@ -94,7 +94,7 @@ namespace Mikibot.Analyze.Notification
         }
 
         private static readonly HashSet<int> allowList = new() { 477317922, 403496 };
-        private static readonly string mxmke = "admin@remiliascarlet.com";
+        private static readonly string mxmke = "1154727918@qq.com";
         public async Task HandleDanmaku(DanmuMsg msg)
         {
             if (!msg.Msg.StartsWith("#导出舰长名单")) return;
@@ -107,15 +107,21 @@ namespace Mikibot.Analyze.Notification
             var subject = $"(Mikibot) 舰长list";
             var text = $"弥希Miki: \n 你请求的舰长list已经生成完毕";
             var html = $"<p>{text.Replace("\n", "<br>")}</p>";
-            var email = Mailer.CreateEmail(mxmke, subject, text, html);
 
             var filename = $"guards-{msg.SentAt.LocalDateTime:yyyy-MM-dd-HH-mm-ss}.xlsx";
             using var excel = GenerateExcelFromGuardList(guardList);
 
-            Mailer.AppendAttachment(email, Mailer.GenerateAttachment(filename, Convert.ToBase64String(excel.GetBuffer())));
             try
             {
-                await Mailer.SendEmail(email);
+                Logger.LogInformation("正在发送邮件");
+                await Mailer.SendEmail(
+                    to: mxmke,
+                    subject: subject,
+                    textContent: text,
+                    htmlContent: html,
+                    filename: filename,
+                    base64content: Convert.ToBase64String(excel.GetBuffer()));
+
                 Logger.LogInformation("舰长名单发送完成");
             }
             catch (Exception ex)

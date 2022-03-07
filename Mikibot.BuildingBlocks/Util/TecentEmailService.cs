@@ -10,7 +10,7 @@ using TencentCloud.Ses.V20201002.Models;
 
 namespace Mikibot.BuildingBlocks.Util
 {
-    public class TecentEmailService : IEmailService<SendEmailRequest, Attachment>
+    public class TecentEmailService : IEmailService
     {
         public TecentEmailService()
         {
@@ -27,10 +27,12 @@ namespace Mikibot.BuildingBlocks.Util
             HttpProfile httpProfile = new();
             httpProfile.Endpoint = ("ses.tencentcloudapi.com");
             clientProfile.HttpProfile = httpProfile;
+            this.SenderEmail = Environment.GetEnvironmentVariable("SENDGRID_SENDER_EMAIL") ?? "mikibot@mail.remiliascarlet.com";
 
             this.Client = new SesClient(cred, "ap-hongkong", clientProfile);
         }
 
+        private string SenderEmail { get; }
         private SesClient Client { get; }
         private string SecretId { get; }
         private string SecretKey { get; }
@@ -40,18 +42,19 @@ namespace Mikibot.BuildingBlocks.Util
             msg.Attachments = new Attachment[] { attachment };
         }
 
+        private static readonly Template Template = new()
+        {
+            TemplateData = string.Empty,
+            TemplateID = 24413,
+        };
         public SendEmailRequest CreateEmail(string to, string subject, string textContent, string htmlContent)
         {
             return new SendEmailRequest()
             {
                 Subject = subject,
                 Destination = new[] { to },
-                FromEmailAddress = "mikibot@mail.remiliascarlet.com",
-                Simple = new Simple
-                {
-                    Html = htmlContent,
-                    Text = textContent,
-                }
+                FromEmailAddress = SenderEmail,
+                Template = Template,
             };
         }
 
@@ -67,6 +70,14 @@ namespace Mikibot.BuildingBlocks.Util
         public async ValueTask SendEmail(SendEmailRequest msg, CancellationToken token = default)
         {
             await Client.SendEmail(msg);
+        }
+
+        public ValueTask SendEmail(string to, string subject, string textContent, string htmlContent, string filename, string base64content, CancellationToken token = default)
+        {
+            var email = CreateEmail(to, subject, textContent, htmlContent);
+            AppendAttachment(email, GenerateAttachment(filename, base64content));
+
+            return SendEmail(email, token);
         }
     }
 }

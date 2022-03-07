@@ -22,11 +22,11 @@ appBuilder.Register<MiraiBotConfig>((_) => MiraiBotConfig.FromEnviroment());
 #if DEBUG
 appBuilder.RegisterType<ConsoleMiraiService>().As<IMiraiService>().SingleInstance();
 appBuilder.RegisterType<LocalOssService>().As<IOssService>().SingleInstance();
-appBuilder.RegisterType<TecentEmailService>().AsSelf().SingleInstance();
+appBuilder.RegisterType<TecentEmailService>().As<IEmailService>().SingleInstance();
 #else
 appBuilder.RegisterType<MiraiService>().As<IMiraiService>().SingleInstance();
 appBuilder.RegisterType<OssService>().As<IOssService>().SingleInstance();
-appBuilder.RegisterType<EmailService>().AsSelf().SingleInstance();
+appBuilder.RegisterType<TecentEmailService>().As<IEmailService>().SingleInstance();
 #endif
 
 appBuilder.RegisterType<LiveStreamEventService>().AsSelf().SingleInstance();
