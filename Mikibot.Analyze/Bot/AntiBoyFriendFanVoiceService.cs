@@ -76,7 +76,7 @@ namespace Mikibot.Analyze.Bot
                 {
                     if (rawMsg is PlainMessage plain)
                     {
-                        if (plain.Text.Contains('弥') && Regex.IsMatch(plain.Text, "女朋友|女友|结婚|男友|恋爱|老婆|二胎|三胎|孩子名字|想我"))
+                        if (plain.Text.Contains('弥') && Regex.IsMatch(plain.Text, "女朋友|女友|结婚|男友|恋爱|老婆|二胎|三胎|孩子名字|想我|好喜欢你"))
                         {
                             Logger.LogInformation("检测到男友粉 {}({}) 发言：{}", msg.Sender.Name, msg.Sender.Id, plain.Text);
                             await MiraiService.SendMessageToGroup(msg.Sender.Group, token, notYourGrilFriend);
