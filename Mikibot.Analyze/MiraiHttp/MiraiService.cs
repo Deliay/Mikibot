@@ -1,12 +1,16 @@
 ﻿using Microsoft.Extensions.Logging;
 using Mirai.Net.Data.Messages;
+using Mirai.Net.Data.Messages.Receivers;
+using Mirai.Net.Data.Shared;
 using Mirai.Net.Sessions;
 using Mirai.Net.Sessions.Http.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reactive;
 using System.Threading.Tasks;
+using System.Reactive.Linq;
 
 namespace Mikibot.Analyze.MiraiHttp
 {
@@ -14,6 +18,7 @@ namespace Mikibot.Analyze.MiraiHttp
     {
         private MiraiBot Bot { get; }
         public ILogger<MiraiService> Logger { get; }
+        private readonly SemaphoreSlim _lock = new(1);
 
         public MiraiService(MiraiBotConfig config, ILogger<MiraiService> logger)
         {
@@ -24,6 +29,13 @@ namespace Mikibot.Analyze.MiraiHttp
                 VerifyKey = config.VerifyKey,
             };
             Logger = logger;
+        }
+
+        public void SubscribeMessage(Action<GroupMessageReceiver> next, CancellationToken token)
+        {
+            Bot.MessageReceived
+                .OfType<GroupMessageReceiver>()
+                .Subscribe(next, token);
         }
 
         public async ValueTask Run()
@@ -38,6 +50,15 @@ namespace Mikibot.Analyze.MiraiHttp
             {
                 if (group.Id != "139528984") continue;
                 if (token.IsCancellationRequested) break;
+                await SendMessageToGroup(group, token, messages);
+            }
+        }
+
+        public async ValueTask SendMessageToGroup(Group group, CancellationToken token, params MessageBase[] messages)
+        {
+            await _lock.WaitAsync(token);
+            try
+            {
                 if (DateTimeOffset.Now - latestSentAt < TimeSpan.FromSeconds(3))
                 {
                     Logger.LogInformation("推送频率限制 3秒后再进行下一次推送");
@@ -47,6 +68,10 @@ namespace Mikibot.Analyze.MiraiHttp
                 Logger.LogInformation("即将推送信息 ({})", group.Id);
                 var result = await group.SendGroupMessageAsync(messages);
                 Logger.LogInformation("发送消息回执:{}", result);
+            }
+            finally
+            {
+                _lock.Release();
             }
         }
 
@@ -58,15 +83,7 @@ namespace Mikibot.Analyze.MiraiHttp
                 if (group.Id != "139528984") continue;
 #endif
                 if (token.IsCancellationRequested) break;
-                if (DateTimeOffset.Now - latestSentAt < TimeSpan.FromSeconds(3))
-                {
-                    Logger.LogInformation("推送频率限制 3秒后再进行下一次推送");
-                    await Task.Delay(3000);
-                    latestSentAt = DateTimeOffset.Now;
-                }
-                Logger.LogInformation("即将推送信息 ({})", group.Id);
-                var result = await group.SendGroupMessageAsync(messages);
-                Logger.LogInformation("发送消息回执:{}", result);
+                await SendMessageToGroup(group, token, messages);
             }
         }
 
@@ -74,6 +91,7 @@ namespace Mikibot.Analyze.MiraiHttp
         {
             GC.SuppressFinalize(this);
             Bot.Dispose();
+            _lock.Dispose();
         }
     }
 }

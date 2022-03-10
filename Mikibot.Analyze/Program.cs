@@ -11,6 +11,7 @@ using Mikibot.Crawler.Http.Bilibili;
 using Mikibot.Crawler.WebsocketCrawler;
 using Mikibot.Crawler.WebsocketCrawler.Client;
 using Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
+using Mikibot.Analyze.Bot;
 
 var appBuilder = ContainerInitializer.Create();
 
@@ -22,7 +23,7 @@ appBuilder.Register<MiraiBotConfig>((_) => MiraiBotConfig.FromEnviroment());
 #if DEBUG
 appBuilder.RegisterType<ConsoleMiraiService>().As<IMiraiService>().SingleInstance();
 appBuilder.RegisterType<LocalOssService>().As<IOssService>().SingleInstance();
-appBuilder.RegisterType<TecentEmailService>().As<IEmailService>().SingleInstance();
+appBuilder.RegisterType<ConsoleEmailService>().As<IEmailService>().SingleInstance();
 #else
 appBuilder.RegisterType<MiraiService>().As<IMiraiService>().SingleInstance();
 appBuilder.RegisterType<OssService>().As<IOssService>().SingleInstance();
@@ -37,6 +38,7 @@ appBuilder.RegisterType<DanmakuCollectorService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<DanmakuRecordControlService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<DanmakuExportGuardList>().AsSelf().SingleInstance();
 
+appBuilder.RegisterType<AntiBoyFriendFanVoiceService>().AsSelf().SingleInstance();
 
 var appContainer = appBuilder.Build();
 
@@ -68,11 +70,13 @@ using (var app = appContainer.BeginLifetimeScope())
     var danmakuCrawler = app.Resolve<DanmakuCollectorService>();
     var danmakuExportGuard = app.Resolve<DanmakuExportGuardList>();
 
+    var bffAnti = app.Resolve<AntiBoyFriendFanVoiceService>();
+
     eventService.CmdHandler.Register(danmakuCrawler);
 
     eventService.CmdHandler.Subscribe<DanmuMsg>(danmakuClip.HandleDanmu);
     eventService.CmdHandler.Subscribe<DanmuMsg>(danmakuExportGuard.HandleDanmaku);
 
     logger.LogInformation("Starting schedule module...");
-    await Task.WhenAll(statusCrawler.Run(token), followerStat.Run(token), eventService.Run(token));
+    await Task.WhenAll(statusCrawler.Run(token), followerStat.Run(token), eventService.Run(token), bffAnti.Run(token));
 }
