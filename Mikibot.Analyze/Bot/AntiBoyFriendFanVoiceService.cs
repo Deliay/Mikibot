@@ -18,16 +18,29 @@ namespace Mikibot.Analyze.Bot
         private readonly static Regex[] notYourGrilFriendRegex = new Regex[]
         {
             new Regex("弥|mxmk|毛线毛裤"),
-            new Regex("女朋友|女友|结婚|男友|恋爱|老婆|二胎|三胎|孩子名字|想我|好喜欢你|🤤|😍|🥰|我的弥|爱了|爱你|嘿嘿嘿")
+            new Regex("女朋友|女友|结婚|男友|恋爱|老婆|二胎|三胎|孩子名字|想我|好喜欢你|🤤|😍|🥰|我的弥|爱了|爱你|嘿嘿嘿|超私|超我|超死|脚香|闻脚|舔脚")
         };
         private readonly MessageBase[] notYourGrilFriend;
+
+        private readonly static Regex[] laughHetunRegex = new Regex[]
+        {
+            new Regex("mihiru|mhr|hsmk|和mhr|和真真"),
+            new Regex("do|复辟|结婚|二胎|三胎|四胎|联动|连体|磨")
+        };
+        private readonly MessageBase[] laughHetun;
 
         private readonly static Regex[] always16YearsOldRegex = new Regex[]
         {
             new Regex("弥|mxmk|毛线毛裤"),
-            new Regex("年龄|姨|弥哥哥|debu|肥lo"),
+            new Regex("年龄|姨|弥哥哥|姐"),
         };
         private readonly MessageBase[] always16YearsOld;
+
+        private readonly static Regex[] kimoRegex = new Regex[]
+        {
+            new Regex("露点|18g|带g|太gn了|呃呃|恶心|屎尿屁|snp|酸奶片|排放环节|摄入环节|银趴|淫趴"),
+        };
+        private readonly MessageBase[] kimo;
 
         public AntiBoyFriendFanVoiceService(
             IMiraiService miraiService,
@@ -41,6 +54,7 @@ namespace Mikibot.Analyze.Bot
 
             notYourGrilFriend = LoadVoice("mxmk_is_not_your_gf.amr");
             always16YearsOld = LoadVoice("mxmk_16yrs_old.amr");
+            laughHetun = LoadVoice("mxmk_laugh_hetun.amr");
         }
 
         private IMiraiService MiraiService { get; }
@@ -113,6 +127,7 @@ namespace Mikibot.Analyze.Bot
                         Logger.LogInformation("[QQ群] {}({}) 发言：{}", msg.Sender.Name, msg.Sender.Id, plain.Text);
                         if (!await MatchMessage(group, plain, notYourGrilFriend, notYourGrilFriendRegex, token))
                         if (!await MatchMessage(group, plain, always16YearsOld, always16YearsOldRegex, token))
+                        if (!await MatchMessage(group, plain, laughHetun, laughHetunRegex, token))
                             { }
                     }
                 }
