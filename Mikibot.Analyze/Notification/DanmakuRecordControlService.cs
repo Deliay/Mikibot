@@ -143,7 +143,7 @@ namespace Mikibot.Analyze.Notification
                     {
                         await Mirai.SendMessageToSliceManGroup(default, new MessageBase[]
                         {
-                            new PlainMessage($"用户: {msg.FansTagUserName} 停止切片，切片将会继续录制10秒。")
+                            new PlainMessage($"用户: {msg.UserName} 停止切片，切片将会继续录制10秒。")
                         });
                     }
                     _ = StopRecording();
@@ -152,7 +152,7 @@ namespace Mikibot.Analyze.Notification
                 {
                     await Mirai.SendMessageToSliceManGroup(default, new MessageBase[]
                     {
-                        new PlainMessage($"用户: {msg.FansTagUserName} 开始切片")
+                        new PlainMessage($"用户: {msg.UserName} 开始切片")
                     });
                     _ = StartRecording();
                 }
