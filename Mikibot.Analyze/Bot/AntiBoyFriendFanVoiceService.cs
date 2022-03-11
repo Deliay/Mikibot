@@ -64,13 +64,6 @@ namespace Mikibot.Analyze.Bot
             await foreach (var msg in this.messageQueue.Reader.ReadAllAsync(token))
             {
                 var gId = msg.Sender.Group.Id;
-                if (lastSentAt.ContainsKey(gId))
-                {
-                    if (DateTimeOffset.Now - lastSentAt[gId] < TimeSpan.FromMinutes(2))
-                    {
-                        continue;
-                    }
-                }
 
                 foreach (var rawMsg in msg.MessageChain)
                 {
@@ -79,6 +72,14 @@ namespace Mikibot.Analyze.Bot
                         if (Regex.IsMatch(plain.Text, "弥|mxmk|毛线毛裤") && Regex.IsMatch(plain.Text, "女朋友|女友|结婚|男友|恋爱|老婆|二胎|三胎|孩子名字|想我|好喜欢你|🤤|😍|🥰|我的弥"))
                         {
                             Logger.LogInformation("检测到男友粉 {}({}) 发言：{}", msg.Sender.Name, msg.Sender.Id, plain.Text);
+
+                            if (lastSentAt.ContainsKey(gId))
+                            {
+                                if (DateTimeOffset.Now - lastSentAt[gId] < TimeSpan.FromMinutes(2))
+                                {
+                                    continue;
+                                }
+                            }
                             await MiraiService.SendMessageToGroup(msg.Sender.Group, token, notYourGrilFriend);
                             lastSentAt.Add(gId, DateTimeOffset.Now);
                             continue;
@@ -96,6 +97,7 @@ namespace Mikibot.Analyze.Bot
             while (!token.IsCancellationRequested)
             {
                 await messageQueue.Reader.WaitToReadAsync(token);
+                Logger.LogInformation("开始消费男友粉发言...");
                 await Dequeue(token);
             }
         }
