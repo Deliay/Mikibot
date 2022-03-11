@@ -95,6 +95,7 @@ namespace Mikibot.Analyze.Bot
                 if (!regex.IsMatch(msg.Text)) return false;
             }
 
+            Logger.LogInformation("文本 {} 匹配 {} 发送语音 {}", msg.Text, regices, messages);
             await SendVoiceMessage(group, token, messages);
             return true;
         }
