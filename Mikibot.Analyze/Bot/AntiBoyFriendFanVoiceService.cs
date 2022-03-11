@@ -25,7 +25,7 @@ namespace Mikibot.Analyze.Bot
         private readonly static Regex[] laughHetunRegex = new Regex[]
         {
             new Regex("mihiru|mhr|hsmk|和mhr|和真真"),
-            new Regex("do|复辟|结婚|二胎|三胎|四胎|联动|连体|磨|不灭|夹")
+            new Regex("do|复辟|结婚|二胎|三胎|四胎|联动|连体|磨|不灭")
         };
         private readonly MessageBase[] laughHetun;
 
@@ -74,7 +74,7 @@ namespace Mikibot.Analyze.Bot
             _ = messageQueue.Writer.WriteAsync(message);
         }
 
-        private Dictionary<string, DateTimeOffset> lastSentAt = new();
+        private readonly Dictionary<string, DateTimeOffset> lastSentAt = new();
 
         private MessageBase[] LoadVoice(string filename)
         {
@@ -93,7 +93,9 @@ namespace Mikibot.Analyze.Bot
         {
             if (lastSentAt.ContainsKey(group.Id))
             {
-                if (DateTimeOffset.Now - lastSentAt[group.Id] < TimeSpan.FromMinutes(2))
+                var time = DateTimeOffset.Now - lastSentAt[group.Id];
+                Logger.LogInformation("上次发送间隔：{}s", time.TotalSeconds);
+                if (time < TimeSpan.FromMinutes(2))
                 {
                     return;
                 }
@@ -110,7 +112,7 @@ namespace Mikibot.Analyze.Bot
                 if (!regex.IsMatch(msg.Text)) return false;
             }
 
-            Logger.LogInformation("文本 {} 匹配 {} 发送语音 {}", msg.Text, regices, messages);
+            Logger.LogInformation("群 {} 文本 {} 匹配 {} 发送语音 {}", group.Id, msg.Text, regices, messages);
             await SendVoiceMessage(group, token, messages);
             return true;
         }
