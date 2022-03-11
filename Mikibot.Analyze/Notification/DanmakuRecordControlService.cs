@@ -71,7 +71,7 @@ namespace Mikibot.Analyze.Notification
             var record = await JsonSerializer.DeserializeAsync<LiveStreamRecord>(result.Content.ReadAsStream());
             if (record != null)
             {
-                await Mirai.SendMessageToAllGroup(default, new MessageBase[]
+                await Mirai.SendMessageToSliceManGroup(default, new MessageBase[]
                 {
                     new PlainMessage($"刚才触发的切片: {record.LocalFileName} 已经完成，正在上传中...")
                 });
