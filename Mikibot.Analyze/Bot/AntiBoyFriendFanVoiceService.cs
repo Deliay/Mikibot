@@ -55,6 +55,7 @@ namespace Mikibot.Analyze.Bot
             notYourGrilFriend = LoadVoice("mxmk_is_not_your_gf.amr");
             always16YearsOld = LoadVoice("mxmk_16yrs_old.amr");
             laughHetun = LoadVoice("mxmk_laugh_hetun.amr");
+            kimo = LoadVoice("mxmk_laugh_hetun.amr");
         }
 
         private IMiraiService MiraiService { get; }
@@ -128,6 +129,7 @@ namespace Mikibot.Analyze.Bot
                         if (!await MatchMessage(group, plain, notYourGrilFriend, notYourGrilFriendRegex, token))
                         if (!await MatchMessage(group, plain, always16YearsOld, always16YearsOldRegex, token))
                         if (!await MatchMessage(group, plain, laughHetun, laughHetunRegex, token))
+                        if (!await MatchMessage(group, plain, kimo, kimoRegex, token))
                             { }
                     }
                 }
