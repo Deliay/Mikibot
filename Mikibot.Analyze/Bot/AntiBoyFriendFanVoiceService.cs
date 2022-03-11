@@ -101,7 +101,7 @@ namespace Mikibot.Analyze.Bot
                 }
             }
             await MiraiService.SendMessageToGroup(group, token, messages);
-            lastSentAt.Add(group.Id, DateTimeOffset.Now);
+            lastSentAt[group.Id] = DateTimeOffset.Now;
             return;
         }
 
