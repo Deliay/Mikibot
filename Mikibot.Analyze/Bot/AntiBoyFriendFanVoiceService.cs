@@ -25,7 +25,7 @@ namespace Mikibot.Analyze.Bot
 
             Logger.LogInformation("弥弥语音包位置：{}", VoiceBaseDir);
 
-            notYourGrilFriend = LoadVoice("mxmk_is_not_your_gf.wav");
+            notYourGrilFriend = LoadVoice("mxmk_is_not_your_gf.aac");
         }
 
         private IMiraiService MiraiService { get; }
@@ -49,6 +49,7 @@ namespace Mikibot.Analyze.Bot
         private MessageBase[] LoadVoice(string filename)
         {
             var path = Path.Combine(VoiceBaseDir, filename);
+            Logger.LogInformation("加载语音：{}", path);
             return new MessageBase[]
             {
                 new VoiceMessage()
