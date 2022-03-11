@@ -25,7 +25,7 @@ namespace Mikibot.Analyze.Bot
         private readonly static Regex[] laughHetunRegex = new Regex[]
         {
             new Regex("mihiru|mhr|hsmk|和mhr|和真真"),
-            new Regex("do|复辟|结婚|二胎|三胎|四胎|联动|连体|磨|不灭")
+            new Regex("do|复辟|结婚|二胎|三胎|四胎|联动|连体|磨|不灭|夹")
         };
         private readonly MessageBase[] laughHetun;
 
