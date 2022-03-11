@@ -15,6 +15,20 @@ namespace Mikibot.Analyze.Bot
 {
     public class AntiBoyFriendFanVoiceService
     {
+        private readonly static Regex[] notYourGrilFriendRegex = new Regex[]
+        {
+            new Regex("弥|mxmk|毛线毛裤"),
+            new Regex("女朋友|女友|结婚|男友|恋爱|老婆|二胎|三胎|孩子名字|想我|好喜欢你|🤤|😍|🥰|我的弥|爱了|爱你|嘿嘿嘿")
+        };
+        private readonly MessageBase[] notYourGrilFriend;
+
+        private readonly static Regex[] always16YearsOldRegex = new Regex[]
+        {
+            new Regex("弥|mxmk|毛线毛裤"),
+            new Regex("年龄|姨|弥哥哥|debu|肥lo"),
+        };
+        private readonly MessageBase[] always16YearsOld;
+
         public AntiBoyFriendFanVoiceService(
             IMiraiService miraiService,
             ILogger<AntiBoyFriendFanVoiceService> logger)
@@ -25,7 +39,8 @@ namespace Mikibot.Analyze.Bot
 
             Logger.LogInformation("弥弥语音包位置：{}", VoiceBaseDir);
 
-            notYourGrilFriend = LoadVoice("mxmk_is_not_your_gf.aac");
+            notYourGrilFriend = LoadVoice("mxmk_is_not_your_gf.amr");
+            always16YearsOld = LoadVoice("mxmk_16yrs_old.amr");
         }
 
         private IMiraiService MiraiService { get; }
@@ -58,34 +73,46 @@ namespace Mikibot.Analyze.Bot
                 }
             };
         }
-        private readonly MessageBase[] notYourGrilFriend;
+
+        private async ValueTask SendVoiceMessage(Mirai.Net.Data.Shared.Group group, CancellationToken token, params MessageBase[] messages)
+        {
+            if (lastSentAt.ContainsKey(group.Id))
+            {
+                if (DateTimeOffset.Now - lastSentAt[group.Id] < TimeSpan.FromMinutes(2))
+                {
+                    return;
+                }
+            }
+            await MiraiService.SendMessageToGroup(group, token, messages);
+            lastSentAt.Add(group.Id, DateTimeOffset.Now);
+            return;
+        }
+
+        private async ValueTask<bool> MatchMessage(Mirai.Net.Data.Shared.Group group, PlainMessage msg, MessageBase[] messages, Regex[] regices, CancellationToken token)
+        {
+            foreach (var regex in regices)
+            {
+                if (!regex.IsMatch(msg.Text)) return false;
+            }
+
+            await SendVoiceMessage(group, token, messages);
+            return true;
+        }
 
         private async ValueTask Dequeue(CancellationToken token)
         {
             await foreach (var msg in this.messageQueue.Reader.ReadAllAsync(token))
             {
-                var gId = msg.Sender.Group.Id;
+                var group = msg.Sender.Group;
 
                 foreach (var rawMsg in msg.MessageChain)
                 {
                     if (rawMsg is PlainMessage plain)
                     {
                         Logger.LogInformation("[QQ群] {}({}) 发言：{}", msg.Sender.Name, msg.Sender.Id, plain.Text);
-                        if (Regex.IsMatch(plain.Text, "弥|mxmk|毛线毛裤") && Regex.IsMatch(plain.Text, "女朋友|女友|结婚|男友|恋爱|老婆|二胎|三胎|孩子名字|想我|好喜欢你|🤤|😍|🥰|我的弥"))
-                        {
-                            Logger.LogInformation("检测到男友粉 {}({})", msg.Sender.Name, msg.Sender.Id);
-
-                            if (lastSentAt.ContainsKey(gId))
-                            {
-                                if (DateTimeOffset.Now - lastSentAt[gId] < TimeSpan.FromMinutes(2))
-                                {
-                                    continue;
-                                }
-                            }
-                            await MiraiService.SendMessageToGroup(msg.Sender.Group, token, notYourGrilFriend);
-                            lastSentAt.Add(gId, DateTimeOffset.Now);
-                            continue;
-                        }
+                        if (!await MatchMessage(group, plain, notYourGrilFriend, notYourGrilFriendRegex, token))
+                        if (!await MatchMessage(group, plain, always16YearsOld, always16YearsOldRegex, token))
+                            { }
                     }
                 }
 
