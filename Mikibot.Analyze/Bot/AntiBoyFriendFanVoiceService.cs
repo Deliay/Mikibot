@@ -96,9 +96,16 @@ namespace Mikibot.Analyze.Bot
             MiraiService.SubscribeMessage(FilterMessage, token);
             while (!token.IsCancellationRequested)
             {
-                await messageQueue.Reader.WaitToReadAsync(token);
-                Logger.LogInformation("开始消费男友粉发言...");
-                await Dequeue(token);
+                try
+                {
+                    await messageQueue.Reader.WaitToReadAsync(token);
+                    Logger.LogInformation("开始消费男友粉发言...");
+                    await Dequeue(token);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError("男友粉anit出错！", ex);
+                }
             }
         }
     }
