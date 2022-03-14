@@ -27,6 +27,10 @@ namespace Mikibot.Analyze.Bot
             new Regex("mihiru|mhr|hsmk|和mhr|和真真"),
             new Regex("do|复辟|结婚|二胎|三胎|四胎|联动|连体|磨|不灭|夹")
         };
+        private readonly static Regex[] laughHetun2Regex = new Regex[]
+        {
+            new Regex(":河豚|:百合|:女同|:铝铜"),
+        };
         private readonly MessageBase[] laughHetun;
 
         private readonly static Regex[] always16YearsOldRegex = new Regex[]
@@ -38,7 +42,7 @@ namespace Mikibot.Analyze.Bot
 
         private readonly static Regex[] kimoRegex = new Regex[]
         {
-            new Regex("露点|18g|带g|太gn了|呃呃|恶心|屎尿屁|snp|酸奶片|排放环节|摄入环节|银趴|淫趴"),
+            new Regex("露点|18g|带g|太gn了|恶心|屎尿屁|snp|酸奶片|排放环节|摄入环节|银趴|淫趴|:恶心"),
         };
         private readonly MessageBase[] kimo;
 
@@ -93,7 +97,7 @@ namespace Mikibot.Analyze.Bot
         {
             if (lastSentAt.ContainsKey(group.Id))
             {
-                if (DateTimeOffset.Now - lastSentAt[group.Id] < TimeSpan.FromMinutes(2))
+                if (DateTimeOffset.Now - lastSentAt[group.Id] < TimeSpan.FromMinutes(3))
                 {
                     return;
                 }
@@ -129,6 +133,7 @@ namespace Mikibot.Analyze.Bot
                         if (!await MatchMessage(group, plain, notYourGrilFriend, notYourGrilFriendRegex, token))
                         if (!await MatchMessage(group, plain, always16YearsOld, always16YearsOldRegex, token))
                         if (!await MatchMessage(group, plain, laughHetun, laughHetunRegex, token))
+                        if (!await MatchMessage(group, plain, laughHetun, laughHetun2Regex, token))
                         if (!await MatchMessage(group, plain, kimo, kimoRegex, token))
                             { }
                     }
