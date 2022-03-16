@@ -13,39 +13,23 @@ using System.Threading.Tasks;
 
 namespace Mikibot.Analyze.Bot
 {
+    public struct QVoice
+    {
+        public Regex[] MatchRegices { get; set; }
+        public MessageBase[] Messages { get; set; }
+
+        public static QVoice Of(MessageBase[] messageBases, params Regex[] regices)
+        {
+            return new()
+            {
+                MatchRegices = regices,
+                Messages = messageBases,
+            };
+        }
+    }
+
     public class AntiBoyFriendFanVoiceService
     {
-        private readonly static Regex[] notYourGrilFriendRegex = new Regex[]
-        {
-            new Regex("弥|mxmk|毛线毛裤"),
-            new Regex("女朋友|女友|结婚|男友|恋爱|老婆|二胎|三胎|孩子名字|想我|好喜欢你|🤤|😍|🥰|我的弥|爱了|爱你|嘿嘿嘿|超私|超我|超死|脚香|闻脚|舔脚")
-        };
-        private readonly MessageBase[] notYourGrilFriend;
-
-        private readonly static Regex[] laughHetunRegex = new Regex[]
-        {
-            new Regex("mihiru|mhr|hsmk|和mhr|和真真"),
-            new Regex("do|复辟|结婚|二胎|三胎|四胎|联动|连体|磨|不灭|夹")
-        };
-        private readonly static Regex[] laughHetun2Regex = new Regex[]
-        {
-            new Regex(":河豚|:百合|:女同|:铝铜"),
-        };
-        private readonly MessageBase[] laughHetun;
-
-        private readonly static Regex[] always16YearsOldRegex = new Regex[]
-        {
-            new Regex("弥|mxmk|毛线毛裤"),
-            new Regex("年龄|姨|弥哥哥|姐"),
-        };
-        private readonly MessageBase[] always16YearsOld;
-
-        private readonly static Regex[] kimoRegex = new Regex[]
-        {
-            new Regex("露点|18g|带g|太gn了|恶心|屎尿屁|snp|酸奶片|排放环节|摄入环节|银趴|淫趴|:恶心"),
-        };
-        private readonly MessageBase[] kimo;
-
         public AntiBoyFriendFanVoiceService(
             IMiraiService miraiService,
             ILogger<AntiBoyFriendFanVoiceService> logger)
@@ -56,12 +40,24 @@ namespace Mikibot.Analyze.Bot
 
             Logger.LogInformation("弥弥语音包位置：{}", VoiceBaseDir);
 
-            notYourGrilFriend = LoadVoice("mxmk_is_not_your_gf.amr");
-            always16YearsOld = LoadVoice("mxmk_16yrs_old.amr");
-            laughHetun = LoadVoice("mxmk_laugh_hetun.amr");
-            kimo = LoadVoice("mxmk_kimo.amr");
+            voices = new()
+            {
+                QVoice.Of(LoadVoice("mxmk_is_not_your_gf.amr"), new Regex(":女朋友|:女友")),
+                QVoice.Of(LoadVoice("mxmk_laugh_hetun.amr"), new Regex(":河豚")),
+                QVoice.Of(LoadVoice("mxmk_16yrs_old.amr"), new Regex(":16岁")),
+                QVoice.Of(LoadVoice("mxmk_kimo.amr"), new Regex(":恶心")),
+                QVoice.Of(LoadVoice("mxmk_hso.amr"), new Regex(":好色哦")),
+                QVoice.Of(LoadVoice("mxmk_hurt.amr"), new Regex(":伤心")),
+                QVoice.Of(LoadVoice("mxmk_baka.amr"), new Regex(":笨蛋")),
+                QVoice.Of(LoadVoice("mxmk_r18.amr"), new Regex(":男同")),
+                QVoice.Of(LoadVoice("mxmk_jj_cutted.amr"), new Regex(":阉割|:性转")),
+                QVoice.Of(LoadVoice("mxmk_awsl.amr"), new Regex(":awsl", RegexOptions.IgnoreCase)),
+                QVoice.Of(LoadVoice("mxmk_dog.amr"), new Regex(":🐕|:🐶|:狗|:dog", RegexOptions.IgnoreCase)),
+                QVoice.Of(LoadVoice("mxmk_loss.amr"), new Regex(":为什么|:为甚么")),
+            };
         }
 
+        private List<QVoice> voices { get; }
         private IMiraiService MiraiService { get; }
         private ILogger<AntiBoyFriendFanVoiceService> Logger { get; }
         public string VoiceBaseDir { get; }
@@ -78,7 +74,8 @@ namespace Mikibot.Analyze.Bot
             _ = messageQueue.Writer.WriteAsync(message);
         }
 
-        private Dictionary<string, DateTimeOffset> lastSentAt = new();
+        private readonly Dictionary<string, DateTimeOffset> lastSentAt = new();
+        private readonly Dictionary<QVoice, DateTimeOffset> lastVoiceSentAt = new();
 
         private MessageBase[] LoadVoice(string filename)
         {
@@ -93,31 +90,49 @@ namespace Mikibot.Analyze.Bot
             };
         }
 
-        private async ValueTask SendVoiceMessage(Mirai.Net.Data.Shared.Group group, CancellationToken token, params MessageBase[] messages)
+        private bool CheckTime<T>(Dictionary<T, DateTimeOffset> set, T id, TimeSpan duration) where T : notnull
         {
-            if (lastSentAt.ContainsKey(group.Id))
+            if (set.ContainsKey(id))
             {
-                if (DateTimeOffset.Now - lastSentAt[group.Id] < TimeSpan.FromMinutes(3))
+                var time = DateTimeOffset.Now - set[id];
+                Logger.LogInformation("上次发送间隔：{}s", time.TotalSeconds);
+                if (time < duration)
                 {
-                    return;
+                    return false;
                 }
             }
-            await MiraiService.SendMessageToGroup(group, token, messages);
-            lastSentAt[group.Id] = DateTimeOffset.Now;
-            return;
+            set[id] = DateTimeOffset.Now;
+            return true;
         }
 
-        private async ValueTask<bool> MatchMessage(Mirai.Net.Data.Shared.Group group, PlainMessage msg, MessageBase[] messages, Regex[] regices, CancellationToken token)
+        private async ValueTask SendVoiceMessage(Mirai.Net.Data.Shared.Group group, CancellationToken token, params MessageBase[] messages)
         {
+            if (CheckTime(lastSentAt, group.Id, TimeSpan.FromSeconds(5)))
+            {
+                await MiraiService.SendMessageToGroup(group, token, messages);
+            }
+        }
+
+        private async ValueTask<bool> MatchMessage(Mirai.Net.Data.Shared.Group group, PlainMessage msg, QVoice voice, CancellationToken token)
+        {
+            var messages = voice.Messages;
+            var regices = voice.MatchRegices;
             foreach (var regex in regices)
             {
                 if (!regex.IsMatch(msg.Text)) return false;
             }
 
-            Logger.LogInformation("文本 {} 匹配 {} 发送语音 {}", msg.Text, regices, messages);
+            if (!CheckTime(lastVoiceSentAt, voice, TimeSpan.FromSeconds(30)))
+            {
+                Logger.LogInformation("[CD] 群 {} 文本 {} 匹配 {} 发送语音 {}", group.Id, msg.Text, regices, messages);
+                return false;
+            }
+
+            Logger.LogInformation("群 {} 文本 {} 匹配 {} 发送语音 {}", group.Id, msg.Text, regices, messages);
             await SendVoiceMessage(group, token, messages);
             return true;
         }
+
 
         private async ValueTask Dequeue(CancellationToken token)
         {
@@ -130,12 +145,10 @@ namespace Mikibot.Analyze.Bot
                     if (rawMsg is PlainMessage plain)
                     {
                         Logger.LogInformation("[QQ群] {}({}) 发言：{}", msg.Sender.Name, msg.Sender.Id, plain.Text);
-                        if (!await MatchMessage(group, plain, notYourGrilFriend, notYourGrilFriendRegex, token))
-                        if (!await MatchMessage(group, plain, always16YearsOld, always16YearsOldRegex, token))
-                        if (!await MatchMessage(group, plain, laughHetun, laughHetunRegex, token))
-                        if (!await MatchMessage(group, plain, laughHetun, laughHetun2Regex, token))
-                        if (!await MatchMessage(group, plain, kimo, kimoRegex, token))
-                            { }
+                        foreach (var item in voices)
+                        {
+                            if (await MatchMessage(group, plain, item, token)) return;
+                        }
                     }
                 }
 
