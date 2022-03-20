@@ -54,6 +54,7 @@ namespace Mikibot.Analyze.Bot
                 QVoice.Of(LoadVoice("mxmk_awsl.amr"), new Regex(":awsl", RegexOptions.IgnoreCase)),
                 QVoice.Of(LoadVoice("mxmk_dog.amr"), new Regex(":🐕|:🐶|:狗|:dog", RegexOptions.IgnoreCase)),
                 QVoice.Of(LoadVoice("mxmk_loss.amr"), new Regex(":为什么|:为甚么")),
+                QVoice.Of(LoadVoice("mxmk_hentai.amr"), new Regex(":变态")),
             };
         }
 
