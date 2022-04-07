@@ -39,23 +39,36 @@ namespace Mikibot.Analyze.Bot
             VoiceBaseDir = Environment.GetEnvironmentVariable("MIKI_VOICE_DIR") ?? Path.GetTempPath();
 
             Logger.LogInformation("弥弥语音包位置：{}", VoiceBaseDir);
-
-            voices = new()
+            try
             {
-                QVoice.Of(LoadVoice("mxmk_is_not_your_gf.amr"), new Regex(":女朋友|:女友")),
-                QVoice.Of(LoadVoice("mxmk_laugh_hetun.amr"), new Regex(":河豚")),
-                QVoice.Of(LoadVoice("mxmk_16yrs_old.amr"), new Regex(":16岁")),
-                QVoice.Of(LoadVoice("mxmk_kimo.amr"), new Regex(":恶心")),
-                QVoice.Of(LoadVoice("mxmk_hso.amr"), new Regex(":好色哦")),
-                QVoice.Of(LoadVoice("mxmk_hurt.amr"), new Regex(":伤心")),
-                QVoice.Of(LoadVoice("mxmk_baka.amr"), new Regex(":笨蛋")),
-                QVoice.Of(LoadVoice("mxmk_r18.amr"), new Regex(":男同")),
-                QVoice.Of(LoadVoice("mxmk_jj_cutted.amr"), new Regex(":阉割|:性转")),
-                QVoice.Of(LoadVoice("mxmk_awsl.amr"), new Regex(":awsl", RegexOptions.IgnoreCase)),
-                QVoice.Of(LoadVoice("mxmk_dog.amr"), new Regex(":🐕|:🐶|:狗|:dog", RegexOptions.IgnoreCase)),
-                QVoice.Of(LoadVoice("mxmk_loss.amr"), new Regex(":为什么|:为甚么")),
-                QVoice.Of(LoadVoice("mxmk_hentai.amr"), new Regex(":变态")),
-            };
+                voices = new()
+                {
+                    QVoice.Of(LoadVoice("mxmk_is_not_your_gf.amr"), new Regex(":女朋友|:女友")),
+                    QVoice.Of(LoadVoice("mxmk_laugh_hetun.amr"), new Regex(":河豚")),
+                    QVoice.Of(LoadVoice("mxmk_16yrs_old.amr"), new Regex(":岁")),
+                    QVoice.Of(LoadVoice("mxmk_kimo.amr"), new Regex(":恶")),
+                    QVoice.Of(LoadVoice("mxmk_hso.amr"), new Regex(":色")),
+                    QVoice.Of(LoadVoice("mxmk_hurt.amr"), new Regex(":伤心")),
+                    QVoice.Of(LoadVoice("mxmk_baka.amr"), new Regex(":笨蛋")),
+                    QVoice.Of(LoadVoice("mxmk_r18.amr"), new Regex(":男同")),
+                    QVoice.Of(LoadVoice("mxmk_jj_cutted.amr"), new Regex(":阉割|:性转")),
+                    QVoice.Of(LoadVoice("mxmk_awsl.amr"), new Regex(":awsl", RegexOptions.IgnoreCase)),
+                    QVoice.Of(LoadVoice("mxmk_dog.amr"), new Regex(":🐕|:🐶|:狗|:dog", RegexOptions.IgnoreCase)),
+                    QVoice.Of(LoadVoice("mxmk_loss.amr"), new Regex(":为什么|:为甚么")),
+                    QVoice.Of(LoadVoice("mxmk_hentai.amr"), new Regex(":变态")),
+                    QVoice.Of(LoadVoice("mxmk_ybb.amr"), new Regex(":病")),
+                    QVoice.Of(LoadVoice("mxmk_xhs.amr"), new Regex(":小红书")),
+                    QVoice.Of(LoadVoice("mxmk_shangdang.amr"), new Regex(":上当")),
+                    QVoice.Of(LoadVoice("mxmk_g.amr"), new Regex(":寄")),
+                    QVoice.Of(LoadVoice("mxmk_jb.amr"), new Regex(":jb", RegexOptions.IgnoreCase)),
+                    QVoice.Of(LoadVoice("mxmk_lazy.amr"), new Regex(":懒")),
+                    QVoice.Of(LoadVoice("mxmk_laugh.amr"), new Regex(":笑")),
+                    QVoice.Of(LoadVoice("mxmk_xtdf.amr"), new Regex("::夏天的风")),
+                };
+            } catch (Exception e)
+            {
+                logger.LogWarning(e, "语音包加载失败");
+            }
         }
 
         private List<QVoice> voices { get; }

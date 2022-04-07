@@ -60,8 +60,9 @@ namespace Mikibot.Analyze.Notification
         {
             return (await db.FollowerStatistic
                     .Where(s => s.Bid == BiliLiveCrawler.mxmks)
+                    .Where(s => s.CreatedAt > min)
                     .OrderBy(s => s.CreatedAt)
-                    .FirstOrDefaultAsync(s => s.CreatedAt > min, token))?.FollowerCount ?? 0;
+                    .FirstOrDefaultAsync(token))?.FollowerCount ?? 0;
         }
         private async Task<int> GetRangeEndFollowerCount(DateTimeOffset max, CancellationToken token)
         {
@@ -69,6 +70,15 @@ namespace Mikibot.Analyze.Notification
                     .Where(s => s.Bid == BiliLiveCrawler.mxmks)
                     .OrderBy(s => s.CreatedAt)
                     .LastOrDefaultAsync(s => s.CreatedAt < max , token))?.FollowerCount ?? 0;
+        }
+        private async Task<int> GetRangeEndFollowerCount(DateTimeOffset max, DateTimeOffset min, CancellationToken token)
+        {
+            return (await db.FollowerStatistic
+                    .Where(s => s.Bid == BiliLiveCrawler.mxmks)
+                    .Where(s => s.CreatedAt > min)
+                    .Where(s => s.CreatedAt < max)
+                    .OrderByDescending(s => s.CreatedAt)
+                    .FirstOrDefaultAsync(token))?.FollowerCount ?? 0;
         }
 
         private async Task<string> GetRecentlyLiveStreamStatus(DateTimeOffset start, CancellationToken token)
@@ -124,9 +134,68 @@ namespace Mikibot.Analyze.Notification
             }
         }
 
+        public async Task WeeklyReport(CancellationToken token)
+        {
+            var now = DateTimeOffset.Now;
+            var end = now.Subtract(now.TimeOfDay);
+            var start = end.Subtract(TimeSpan.FromDays(7));
+
+            var startFollowerCount = await GetRangeStartFollowerCount(start, token);
+            var endFollowerCount = await GetRangeEndFollowerCount(end, start, token);
+
+            var increase = endFollowerCount - startFollowerCount;
+            var sliverEstimate = (100000d - endFollowerCount) / increase;
+            var estimateText = sliverEstimate > 0 ? $"按此涨粉速度,距离100000粉剩余{sliverEstimate:##}天" : "本周掉大粉咯！10万遥遥无期。";
+
+            var status = await GetRecentlyLiveStreamStatus(start, token);
+            var msg = $"涨粉周报\n{Format(start)} ~{Format(end)} 关注:{endFollowerCount}\n涨粉 {increase}人\n直播场次详细:\n{status}\n{estimateText}"; Logger.LogInformation("{}", msg);
+            await Mirai.SendMessageToAllGroup(token, new MessageBase[]
+            {
+                new PlainMessage(msg)
+            });
+        }
+
+        public async Task WeeklyReportSchedule(CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
+            {
+                try
+                {
+#if DEBUG
+                    await WeeklyReport(token);
+                    return;
+#else
+                    while (DateTimeOffset.Now.DayOfWeek != DayOfWeek.Monday)
+                    {
+                        await Task.Delay(TimeSpan.FromMinutes(30), token);
+                    }
+#endif
+                    // 周一早 10:00AM 发
+                    while (DateTimeOffset.Now.Hour != 10)
+                    {
+                        await Task.Delay(TimeSpan.FromMinutes(1), token);
+                    }
+
+                    await WeeklyReport(token);
+                    await Task.Delay(TimeSpan.FromDays(1), token);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning(ex, "周报报错啦");
+                }
+            }
+
+
+        }
+
+        public Task SendAllReport(CancellationToken token)
+        {
+            return Task.WhenAll(DailyReport(token), WeeklyReportSchedule(token));
+        }
+
         public async Task Run(CancellationToken token)
         {
-            await Task.WhenAll(IntervalCollectStatistics(token), DailyReport(token));
+            await Task.WhenAll(IntervalCollectStatistics(token), SendAllReport(token));
         }
     }
 }

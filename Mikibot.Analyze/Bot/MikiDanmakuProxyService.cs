@@ -1,0 +1,39 @@
+﻿using Microsoft.Extensions.Logging;
+using Mikibot.Analyze.MiraiHttp;
+using Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
+using Mirai.Net.Data.Messages;
+using Mirai.Net.Data.Messages.Concretes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mikibot.Analyze.Bot
+{
+    public class MikiDanmakuProxyService
+    {
+        public MikiDanmakuProxyService(IMiraiService miraiService)
+        {
+            MiraiService = miraiService;
+        }
+
+        private ILogger<MikiDanmakuProxyService> Logger { get; }
+        private IMiraiService MiraiService { get; }
+
+        public async Task HandleDanmaku(DanmuMsg msg)
+        {
+            if (msg.UserId == 477317922)
+            {
+                await MiraiService.SendMessageToAllGroup(default, new MessageBase[]
+                {
+                    new PlainMessage()
+                    {
+                        Text = $"(直播弹幕) {msg.UserName}: {msg.Msg}",
+                    }
+                });
+            }
+        }
+    }
+
+}
