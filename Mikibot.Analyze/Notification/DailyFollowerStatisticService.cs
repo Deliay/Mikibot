@@ -145,7 +145,7 @@ namespace Mikibot.Analyze.Notification
 
             var increase = endFollowerCount - startFollowerCount;
             var sliverEstimate = (100000d - endFollowerCount) / increase;
-            var estimateText = sliverEstimate > 0 ? $"按此涨粉速度,距离100000粉剩余{sliverEstimate:##}天" : "本周掉大粉咯！10万遥遥无期。";
+            var estimateText = sliverEstimate > 0 ? $"按此涨粉速度,距离100000粉剩余{sliverEstimate:##.##}天" : "本周掉大粉咯！10万遥遥无期。";
 
             var status = await GetRecentlyLiveStreamStatus(start, token);
             var msg = $"涨粉周报\n{Format(start)} ~{Format(end)} 关注:{endFollowerCount}\n涨粉 {increase}人\n直播场次详细:\n{status}\n{estimateText}"; Logger.LogInformation("{}", msg);
