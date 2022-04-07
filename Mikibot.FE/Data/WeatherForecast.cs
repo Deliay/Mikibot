@@ -1,4 +1,4 @@
-namespace Mikibot.API
+namespace Mikibot.FE.Data
 {
     public class WeatherForecast
     {
