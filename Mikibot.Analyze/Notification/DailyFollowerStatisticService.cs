@@ -144,7 +144,7 @@ namespace Mikibot.Analyze.Notification
             var endFollowerCount = await GetRangeEndFollowerCount(end, start, token);
 
             var increase = endFollowerCount - startFollowerCount;
-            var sliverEstimate = (100000d - endFollowerCount) / increase;
+            var sliverEstimate = (100000d - endFollowerCount) / increase * 7;
             var estimateText = sliverEstimate > 0 ? $"按此涨粉速度,距离100000粉剩余{sliverEstimate:##.##}天" : "本周掉大粉咯！10万遥遥无期。";
 
             var status = await GetRecentlyLiveStreamStatus(start, token);
