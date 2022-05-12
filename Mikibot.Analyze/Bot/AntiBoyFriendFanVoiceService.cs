@@ -65,8 +65,14 @@ namespace Mikibot.Analyze.Bot
                     QVoice.Of(LoadVoice("mxmk_laugh.amr"), new Regex(":笑")),
                     QVoice.Of(LoadVoice("mxmk_fullfilled.amr"), new Regex(":填满")),
                     QVoice.Of(LoadVoice("mxmk_waimai.amr"), new Regex(":外卖")),
+                    QVoice.Of(new MessageBase[] {
+                        new PlainMessage("mxmk歌单：夏天的风、心墙、下雨天、求佛、メンヘラじゃないもん/地雷（使用::歌名点歌，如果有/，可以用/后面的简写点歌）"),
+                    }, new Regex("::歌单")),
                     QVoice.Of(LoadVoice("mxmk_xtdf.amr"), new Regex("::夏天的风")),
                     QVoice.Of(LoadVoice("mxmk_xinqiang.amr"), new Regex("::心墙")),
+                    QVoice.Of(LoadVoice("mxmk_xiayutian.amr"), new Regex("::下雨天")),
+                    QVoice.Of(LoadVoice("mxmk_qiufo.amr"), new Regex("::求佛")),
+                    QVoice.Of(LoadVoice("mxmk_menhera_ja_nai_mon.amr"), new Regex("::メンヘラじゃないもん|::地雷")),
                 };
             } catch (Exception e)
             {
