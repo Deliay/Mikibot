@@ -63,7 +63,10 @@ namespace Mikibot.Analyze.Bot
                     QVoice.Of(LoadVoice("mxmk_jb.amr"), new Regex(":jb", RegexOptions.IgnoreCase)),
                     QVoice.Of(LoadVoice("mxmk_lazy.amr"), new Regex(":懒")),
                     QVoice.Of(LoadVoice("mxmk_laugh.amr"), new Regex(":笑")),
+                    QVoice.Of(LoadVoice("mxmk_fullfilled.amr"), new Regex(":填满")),
+                    QVoice.Of(LoadVoice("mxmk_waimai.amr"), new Regex(":外卖")),
                     QVoice.Of(LoadVoice("mxmk_xtdf.amr"), new Regex("::夏天的风")),
+                    QVoice.Of(LoadVoice("mxmk_xinqiang.amr"), new Regex("::心墙")),
                 };
             } catch (Exception e)
             {
