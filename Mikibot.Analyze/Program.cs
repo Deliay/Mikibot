@@ -16,6 +16,8 @@ using Mikibot.Analyze.Bot;
 var appBuilder = ContainerInitializer.Create();
 
 appBuilder.RegisterType<BiliLiveCrawler>().AsSelf().SingleInstance();
+appBuilder.RegisterType<BiliVideoCrawler>().AsSelf().SingleInstance();
+
 appBuilder.Register<MySqlConfiguration>((_) => MySqlConfiguration.FromEnviroment());
 appBuilder.RegisterType<MikibotDatabaseContext>().AsSelf().InstancePerDependency();
 
@@ -39,6 +41,7 @@ appBuilder.RegisterType<DanmakuRecordControlService>().AsSelf().SingleInstance()
 appBuilder.RegisterType<DanmakuExportGuardList>().AsSelf().SingleInstance();
 appBuilder.RegisterType<MikiDanmakuProxyService>().AsSelf().SingleInstance();
 
+appBuilder.RegisterType<BiliBiliVideoLinkShareProxerService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<AntiBoyFriendFanVoiceService>().AsSelf().SingleInstance();
 
 var appContainer = appBuilder.Build();
@@ -73,6 +76,7 @@ using (var app = appContainer.BeginLifetimeScope())
 
     var bffAnti = app.Resolve<AntiBoyFriendFanVoiceService>();
     var mxmkProxy = app.Resolve<MikiDanmakuProxyService>();
+    var biliParser = app.Resolve<BiliBiliVideoLinkShareProxerService>();
 
     eventService.CmdHandler.Register(danmakuCrawler);
 
@@ -81,5 +85,5 @@ using (var app = appContainer.BeginLifetimeScope())
     eventService.CmdHandler.Subscribe<DanmuMsg>(mxmkProxy.HandleDanmaku);
 
     logger.LogInformation("Starting schedule module...");
-    await Task.WhenAll(statusCrawler.Run(token), followerStat.Run(token), eventService.Run(token), bffAnti.Run(token));
+    await Task.WhenAll(statusCrawler.Run(token), followerStat.Run(token), eventService.Run(token), bffAnti.Run(token), biliParser.Run(token));
 }

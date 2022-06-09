@@ -91,6 +91,7 @@ namespace Mikibot.Crawler.Http.Bilibili
             return result.Data;
         }
 
+
         private static string GetDevId()
         {
             var array = Guid.NewGuid().ToByteArray();

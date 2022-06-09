@@ -9,15 +9,21 @@ using Mikibot.Crawler.WebsocketCrawler.Data.Commands;
 using Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 using Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils;
 using Mikibot.Crawler.WebsocketCrawler.Packet;
+using System.Text.Json;
 
 var serviceBuilder = new ServiceCollection();
 serviceBuilder.AddLogging(b => b.AddConsole());
 serviceBuilder.AddSingleton<BiliLiveCrawler>();
+serviceBuilder.AddSingleton<BiliVideoCrawler>();
 serviceBuilder.AddTransient<WebsocketClient>();
 
 using var services = serviceBuilder.BuildServiceProvider();
 using var csc = new CancellationTokenSource();
 
+var vCrawler = services.GetRequiredService<BiliVideoCrawler>();
+
+var rr = await vCrawler.GetVideoInfo("BV1kq4y1u7WL", null, csc.Token);
+Console.WriteLine(JsonSerializer.Serialize(rr));
 var logger = services.GetRequiredService<ILogger<Program>>();
 var crawler = services.GetRequiredService<BiliLiveCrawler>();
 var wsClient = services.GetRequiredService<WebsocketClient>();
