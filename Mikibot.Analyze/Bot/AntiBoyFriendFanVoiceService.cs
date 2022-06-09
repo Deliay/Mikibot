@@ -65,6 +65,21 @@ namespace Mikibot.Analyze.Bot
                     QVoice.Of(LoadVoice("mxmk_laugh.amr"), new Regex(":笑")),
                     QVoice.Of(LoadVoice("mxmk_fullfilled.amr"), new Regex(":填满")),
                     QVoice.Of(LoadVoice("mxmk_waimai.amr"), new Regex(":外卖")),
+                    QVoice.Of(LoadVoice("mxmk_eatme.amr"), new Regex(":吃我")),
+                    QVoice.Of(LoadVoice("mxmk_crazy.amr"), new Regex(":发病")),
+                    QVoice.Of(LoadVoice("mxmk_nignth.amr"), new Regex(":晚安")),
+                    QVoice.Of(LoadVoice("mxmk_morning.amr"), new Regex(":早安")),
+                    QVoice.Of(LoadVoice("mxmk_huabei.amr"), new Regex(":花呗")),
+                    QVoice.Of(LoadVoice("mxmk_fly.amr"), new Regex(":飞扑")),
+                    QVoice.Of(LoadVoice("mxmk_ghost.amr"), new Regex(":女鬼")),
+                    QVoice.Of(LoadVoice("mxmk_star_fallen.amr"), new Regex(":星降")),
+                    QVoice.Of(LoadVoice("mxmk_loule.amr"), new Regex(":漏了")),
+                    QVoice.Of(new MessageBase[] {
+                        new PlainMessage("弥BOT按钮" +
+                        ":女朋友|:女友,:河豚,:岁,:恶,:色,:伤心,:笨蛋,:男同,:阉割|:性转," +
+                        ":awsl,:🐕|:🐶|:狗|:dog,:为什么|:为甚么,:变态,:病,:小红书,:上当,:寄,:jb,:懒,:笑,:填满,:外卖" +
+                        ":吃我,:发病,:晚安,:早安,:花呗,:飞扑,:女鬼,:星降,:漏了"),
+                    }, new Regex(":help")),
                     QVoice.Of(new MessageBase[] {
                         new PlainMessage("mxmk歌单：夏天的风、心墙、下雨天、求佛、メンヘラじゃないもん/地雷（使用::歌名点歌，如果有/，可以用/后面的简写点歌）"),
                     }, new Regex("::歌单")),
