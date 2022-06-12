@@ -36,6 +36,8 @@ namespace Mikibot.Analyze.Notification
         public async Task<LiveStatus> GetCurrentStatus(CancellationToken token)
         => await db.LiveStatuses.OrderBy(s => s.Id).LastOrDefaultAsync(token);
 
+        private readonly Random random = new();
+
         private async ValueTask<LiveStatus> GenerateStatus(PersonalInfo.LiveRoomDetail info, CancellationToken token)
             => new()
             {
@@ -74,6 +76,10 @@ namespace Mikibot.Analyze.Notification
         {
             while (!token.IsCancellationRequested)
             {
+                var next = random.Next(15, 30);
+                Logger.LogInformation("{} 秒后开始同步状态", next);
+                // 每15~30秒收集一次数据
+                await Task.Delay(TimeSpan.FromSeconds(next), token);
                 Logger.LogInformation("开始同步状态");
                 try
                 {
@@ -100,7 +106,6 @@ namespace Mikibot.Analyze.Notification
                 {
                     Logger.LogError(ex, "状态同步失败");
                 }
-                await Task.Delay(TimeSpan.FromSeconds(15), token);
             }
         }
     }

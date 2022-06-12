@@ -30,6 +30,7 @@ namespace Mikibot.Analyze.Notification
         public BiliLiveCrawler Crawler { get; }
         public IMiraiService Mirai { get; }
         public ILogger<DailyFollowerStatisticService> Logger { get; }
+        private readonly Random random = new();
 
         public async Task IntervalCollectStatistics(CancellationToken token)
         {
@@ -37,7 +38,10 @@ namespace Mikibot.Analyze.Notification
             {
                 try
                 {
-                    // 每15秒收集一下数据
+                    var next = random.Next(15, 30);
+                    Logger.LogInformation("{} 秒后开始统计 你弥粉丝数量", next);
+                    // 每15~30秒收集一下数据
+                    await Task.Delay(TimeSpan.FromSeconds(next), token);
                     var count = await Crawler.GetFollowerCount(BiliLiveCrawler.mxmk, token);
                     await db.FollowerStatistic.AddAsync(new()
                     {
@@ -47,7 +51,6 @@ namespace Mikibot.Analyze.Notification
                     }, token);
                     await db.SaveChangesAsync(token);
                     Logger.LogInformation("当前你弥粉丝数量 {}", count);
-                    await Task.Delay(TimeSpan.FromSeconds(15), token);
                 }
                 catch (Exception ex)
                 {

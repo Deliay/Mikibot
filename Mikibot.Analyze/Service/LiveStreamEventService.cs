@@ -29,34 +29,50 @@ namespace Mikibot.Analyze.Service
 
         private async Task ConnectAsync(CancellationToken token)
         {
-            using var wsClient = new WebsocketClient();
-
             Logger.LogInformation("准备连接到房间: {}....", mxmk);
             var realRoomId = await Crawler.GetRealRoomId(mxmk, token);
             var spectatorEndpoint = await Crawler.GetLiveToken(realRoomId, token);
-            var spectatorHost = spectatorEndpoint.Hosts[0];
+            var rand = new Random();
 
-            Logger.LogInformation("准备连接到服务器: ws://{}:{}....", spectatorHost.Host, spectatorHost.Port);
-            await wsClient.ConnectAsync(spectatorHost.Host, spectatorHost.WsPort, realRoomId, spectatorEndpoint.Token, cancellationToken: token);
-
-            Logger.LogInformation("准备连接到房间: ws://{}:{}....连接成功", spectatorHost.Host, spectatorHost.Port);
-            await foreach (var @event in wsClient.Events(token))
+            foreach (var spectatorHost in spectatorEndpoint.Hosts)
             {
-                await CmdHandler.Handle(@event);
+                var next = rand.Next(2, 10);
+
+                Logger.LogInformation("{} 秒后 准备连接到弹幕服务器: ws://{}:{}....", next, spectatorHost.Host, spectatorHost.Port);
+                try
+                {
+                    using var wsClient = new WebsocketClient();
+
+                    await wsClient.ConnectAsync(spectatorHost.Host, spectatorHost.WsPort, realRoomId, spectatorEndpoint.Token, cancellationToken: token);
+                    Logger.LogInformation("弹幕连接到房间: ws://{}:{}....连接成功", spectatorHost.Host, spectatorHost.Port);
+
+                    await foreach (var @event in wsClient.Events(token))
+                    {
+                        await CmdHandler.Handle(@event);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogInformation(ex, "弹幕服务器: ws://{}:{}....处理时发生错误！将尝试下一个房间", spectatorHost.Host, spectatorHost.Port);
+                }
             }
         }
 
         public async Task Run(CancellationToken token)
         {
-            while (!token.IsCancellationRequested && failedRetry++ < 5)
+            while (!token.IsCancellationRequested)
             {
                 try
                 {
                     await ConnectAsync(token);
-                    failedRetry -= 1;
                 }
                 catch (Exception ex)
                 {
+                    // 每次间隔 失败次数 * 3 秒再尝试下一次连接弹幕
+                    await Task.Delay(++failedRetry * TimeSpan.FromSeconds(3), token);
+                    // 这里失败25次会清空重试次数，最长等待时间是 75秒
+                    if (failedRetry >= 25) failedRetry = 0;
+
                     Logger.LogError(ex, "在抓弹幕的时候发生异常");
                 }
             }
