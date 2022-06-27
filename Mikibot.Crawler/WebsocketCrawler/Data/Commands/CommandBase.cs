@@ -36,7 +36,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
         public static bool IsKnown(Type type) => KnownCommandMapping.ContainsKey(type);
 
         private static readonly Type PartialCommandBase = typeof(CommandBase<>);
-        private static readonly Dictionary<KnownCommands, Type> CommandMapping = 
+        private static readonly Dictionary<KnownCommands, Type> CommandMapping =
             CommandTypeMapping.ToDictionary(p => p.Key, p => PartialCommandBase.MakeGenericType(p.Value));
 
         private static readonly JsonSerializerOptions JsonSerializerOptions = new()

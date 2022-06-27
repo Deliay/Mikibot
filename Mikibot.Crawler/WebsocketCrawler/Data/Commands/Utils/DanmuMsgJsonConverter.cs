@@ -18,6 +18,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
                 throw new InvalidDataException($"Invalid character in pos {reader.Position}");
             }
             var sentAt = 0L;
+            Uri? emoticonLink = null;
             while (reader.Read())
             {
                 if (reader.TokenType == JsonTokenType.StartArray)
@@ -27,6 +28,25 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
                     reader.Read(); reader.GetInt32();
                     reader.Read(); reader.GetInt32();
                     reader.Read(); sentAt = reader.GetInt64();
+                    for (int i = 0; i < 9; i++) { reader.Read(); }
+                    // 直播间表情，示例：
+                    // {
+                    //     "bulge_display": 1,
+                    //     "emoticon_unique": "room_21672023_9256",
+                    //     "height": 162,
+                    //     "in_player_area": 1,
+                    //     "is_dynamic": 0,
+                    //     "url": "http://i0.hdslb.com/bfs/live/b4a03738e0705b0df2ce8475687610c28077ce13.png",
+                    //     "width": 162
+                    // },
+                    if (reader.TokenType == JsonTokenType.StartObject)
+                    {
+                        var obj = JsonSerializer.Deserialize<System.Text.Json.Nodes.JsonObject>(ref reader, options);
+                        if (obj != null && obj.ContainsKey("url"))
+                        {
+                            emoticonLink = new Uri(obj["url"]!.GetValue<string>());
+                        }
+                    }
                 }
                 if (reader.TokenType == JsonTokenType.EndArray)
                     break;
@@ -104,6 +124,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
                 FansTag = fansTag!,
                 FansTagUserId = fansUserId,
                 FansTagUserName = fansUserName!,
+                EmoticonLink = emoticonLink,
             };
         }
 

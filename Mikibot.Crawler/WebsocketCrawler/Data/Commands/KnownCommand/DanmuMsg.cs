@@ -18,5 +18,6 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand
         public int FansTagUserId { get; set; }
         public string FansTagUserName { get; set; }
         public DateTimeOffset SentAt { get; set; }
+        public Uri? EmoticonLink { get; set; }
     }
 }

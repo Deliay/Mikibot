@@ -10,18 +10,21 @@ namespace Mikibot.Crawler.WebsocketCrawler.Packet
 {
     public struct BasePacket
     {
-        public uint Size;
+        public BasePacket()
+        {
+        }
+        public uint Size = 0;
 
-        public ushort HeadSize;
+        public ushort HeadSize = 0;
 
         public ProtocolVersion Version = ProtocolVersion.Heartbeat;
 
-        public PacketType Type;
+        public PacketType Type = PacketType.Heartbeat;
 
         public uint Sequence = 1;
 
         [NonSerialized]
-        public byte[] Data;
+        public byte[] Data = null!;
 
         private const int DefaultHeadSize = sizeof(uint) * 3 + sizeof(ushort) * 2;
         private static readonly byte[] KeepliveContent = Encoding.UTF8.GetBytes("[Object asswecan]");

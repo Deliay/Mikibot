@@ -25,13 +25,29 @@ namespace Mikibot.Analyze.Bot
         {
             if (msg.UserId == 477317922)
             {
-                await MiraiService.SendMessageToAllGroup(default, new MessageBase[]
+                if (msg.EmoticonLink == null)
                 {
-                    new PlainMessage()
+                    await MiraiService.SendMessageToAllGroup(default, new MessageBase[]
                     {
-                        Text = $"(直播弹幕) {msg.UserName}: {msg.Msg}",
-                    }
-                });
+                        new PlainMessage()
+                        {
+                            Text = $"(直播弹幕) {msg.UserName}: {msg.Msg}",
+                        }
+                    });
+                }
+                else
+                {
+                    await MiraiService.SendMessageToAllGroup(default, new MessageBase[] {
+                        new PlainMessage()
+                        {
+                            Text = $"(直播弹幕) {msg.UserName}: "
+                        },
+                        new ImageMessage()
+                        {
+                            Url = msg.EmoticonLink.ToString(),
+                        }
+                    });
+                }
             }
         }
     }
