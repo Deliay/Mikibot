@@ -18,6 +18,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
                 throw new InvalidDataException($"Invalid character in pos {reader.Position}");
             }
             var sentAt = 0L;
+            string memeUrl = string.Empty;
             while (reader.Read())
             {
                 if (reader.TokenType == JsonTokenType.StartArray)
@@ -27,6 +28,34 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
                     reader.Read(); reader.GetInt32();
                     reader.Read(); reader.GetInt32();
                     reader.Read(); sentAt = reader.GetInt64();
+
+                    while (reader.TokenType != JsonTokenType.StartObject
+                        && reader.TokenType != JsonTokenType.EndArray)
+                    {
+                        reader.Read();
+                    }
+                    if (reader.TokenType == JsonTokenType.StartObject)
+                    {
+                        reader.Read();
+                        while (reader.TokenType != JsonTokenType.EndObject)
+                        {
+                            while (reader.TokenType != JsonTokenType.PropertyName
+                                && reader.TokenType != JsonTokenType.EndObject)
+                            {
+                                reader.Read();
+                            }
+                            if (reader.TokenType == JsonTokenType.PropertyName)
+                            {
+                                if (reader.GetString() == "url")
+                                {
+                                    reader.Read();
+                                    memeUrl = reader.GetString()!;
+                                    break;
+                                }
+                                reader.Read();
+                            }
+                        }
+                    }
                 }
                 if (reader.TokenType == JsonTokenType.EndArray)
                     break;
@@ -104,6 +133,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
                 FansTag = fansTag!,
                 FansTagUserId = fansUserId,
                 FansTagUserName = fansUserName!,
+                MemeUrl = memeUrl,
             };
         }
 

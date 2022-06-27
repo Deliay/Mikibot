@@ -44,7 +44,13 @@ namespace Mikibot.Analyze.Notification
 
         public async Task HandleDanmu(DanmuMsg msg)
         {
-            Logger.LogInformation("[弹幕] (Lv.{} {}){}: {}", msg.FansLevel, msg.FansTag, msg.UserName, msg.Msg);
+            Logger.LogInformation(
+                "[弹幕] (Lv.{} {}){}: {} {}",
+                msg.FansLevel,
+                msg.FansTag,
+                msg.UserName,
+                msg.Msg,
+                msg.MemeUrl);
             await db.LiveDanmakus.AddAsync(new LiveDanmaku()
             {
                 Bid = LiveStreamEventService.mxmk,
