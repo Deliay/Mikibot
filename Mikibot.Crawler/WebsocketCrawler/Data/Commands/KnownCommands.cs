@@ -75,6 +75,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
         PK_BATTLE_SETTLE_V2,
         PK_LOTTERY_START,
         PK_BEST_UNAME,
+        PK_BATTLE_PROCESS_NEW,
         CALL_ON_OPPOSITE,
         ATTENTION_OPPOSITE,
         SHARE_OPPOSITE,
@@ -91,5 +92,8 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
         WATCHED_CHANGE,
         HOT_RANK_CHANGED_V2,
         POPULARITY_RED_POCKET_WINNER_LIST,
+        DANMU_AGGREGATION,
+        COMMON_NOTICE_DANMAKU,
+        POPULARITY_RED_POCKET_START,
     }
 }

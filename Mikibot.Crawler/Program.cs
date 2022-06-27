@@ -65,6 +65,6 @@ await foreach (var @event in wsClient.Events(csc.Token))
     if (@event is Normal normal)
     {
         var cmd = ICommandBase.Parse(normal.RawContent);
-        await cmdHandler.Handle(@event);
+        await cmdHandler.Handle(cmd);
     }
 }
