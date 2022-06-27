@@ -18,7 +18,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
                 throw new InvalidDataException($"Invalid character in pos {reader.Position}");
             }
             var sentAt = 0L;
-            Uri? emoticonLink = null;
+            string memeUrl = string.Empty;
             while (reader.Read())
             {
                 if (reader.TokenType == JsonTokenType.StartArray)
@@ -28,23 +28,32 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
                     reader.Read(); reader.GetInt32();
                     reader.Read(); reader.GetInt32();
                     reader.Read(); sentAt = reader.GetInt64();
-                    for (int i = 0; i < 9; i++) { reader.Read(); }
-                    // 直播间表情，示例：
-                    // {
-                    //     "bulge_display": 1,
-                    //     "emoticon_unique": "room_21672023_9256",
-                    //     "height": 162,
-                    //     "in_player_area": 1,
-                    //     "is_dynamic": 0,
-                    //     "url": "http://i0.hdslb.com/bfs/live/b4a03738e0705b0df2ce8475687610c28077ce13.png",
-                    //     "width": 162
-                    // },
+
+                    while (reader.TokenType != JsonTokenType.StartObject
+                        && reader.TokenType != JsonTokenType.EndArray)
+                    {
+                        reader.Read();
+                    }
                     if (reader.TokenType == JsonTokenType.StartObject)
                     {
-                        var obj = JsonSerializer.Deserialize<System.Text.Json.Nodes.JsonObject>(ref reader, options);
-                        if (obj != null && obj.ContainsKey("url"))
+                        reader.Read();
+                        while (reader.TokenType != JsonTokenType.EndObject)
                         {
-                            emoticonLink = new Uri(obj["url"]!.GetValue<string>());
+                            while (reader.TokenType != JsonTokenType.PropertyName
+                                && reader.TokenType != JsonTokenType.EndObject)
+                            {
+                                reader.Read();
+                            }
+                            if (reader.TokenType == JsonTokenType.PropertyName)
+                            {
+                                if (reader.GetString() == "url")
+                                {
+                                    reader.Read();
+                                    memeUrl = reader.GetString()!;
+                                    break;
+                                }
+                                reader.Read();
+                            }
                         }
                     }
                 }
@@ -124,7 +133,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
                 FansTag = fansTag!,
                 FansTagUserId = fansUserId,
                 FansTagUserName = fansUserName!,
-                EmoticonLink = emoticonLink,
+                MemeUrl = memeUrl,
             };
         }
 
