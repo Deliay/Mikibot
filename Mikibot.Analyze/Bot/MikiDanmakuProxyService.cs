@@ -18,7 +18,6 @@ namespace Mikibot.Analyze.Bot
             MiraiService = miraiService;
         }
 
-        private ILogger<MikiDanmakuProxyService> Logger { get; }
         private IMiraiService MiraiService { get; }
 
         public async Task HandleDanmaku(DanmuMsg msg)
@@ -35,5 +34,4 @@ namespace Mikibot.Analyze.Bot
             }
         }
     }
-
 }
