@@ -25,7 +25,7 @@ namespace Mikibot.Analyze.Bot
         {
             if (msg.UserId == 477317922)
             {
-                if (msg.EmoticonLink == null)
+                if (msg.MemeUrl == string.Empty)
                 {
                     await MiraiService.SendMessageToAllGroup(default, new MessageBase[]
                     {
@@ -44,7 +44,7 @@ namespace Mikibot.Analyze.Bot
                         },
                         new ImageMessage()
                         {
-                            Url = msg.EmoticonLink.ToString(),
+                            Url = msg.MemeUrl,
                         }
                     });
                 }

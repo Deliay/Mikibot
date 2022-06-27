@@ -50,7 +50,7 @@ namespace Mikibot.Analyze.Notification
                 msg.FansTag,
                 msg.UserName,
                 msg.Msg,
-                msg.EmoticonLink?.ToString() ?? "");
+                msg.MemeUrl?.ToString() ?? "");
             await db.LiveDanmakus.AddAsync(new LiveDanmaku()
             {
                 Bid = LiveStreamEventService.mxmk,
