@@ -32,7 +32,7 @@ public struct PopularityRedPocketStart
     public int EndTimestampSeconds { get; set; }
 
     [JsonPropertyName("last_time")]
-    public int LastSeconds { get; set; }
+    public int DurationSeconds { get; set; }
 
     [JsonPropertyName("remove_time")]
     public int RemoveTimestampSeconds { get; set; }

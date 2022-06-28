@@ -40,6 +40,7 @@ appBuilder.RegisterType<DanmakuCollectorService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<DanmakuRecordControlService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<DanmakuExportGuardList>().AsSelf().SingleInstance();
 appBuilder.RegisterType<MikiDanmakuProxyService>().AsSelf().SingleInstance();
+appBuilder.RegisterType<MikiLiveEventProxyService>().AsSelf().SingleInstance();
 
 appBuilder.RegisterType<BiliBiliVideoLinkShareProxerService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<AntiBoyFriendFanVoiceService>().AsSelf().SingleInstance();
@@ -75,14 +76,16 @@ using (var app = appContainer.BeginLifetimeScope())
     var danmakuExportGuard = app.Resolve<DanmakuExportGuardList>();
 
     var bffAnti = app.Resolve<AntiBoyFriendFanVoiceService>();
-    var mxmkProxy = app.Resolve<MikiDanmakuProxyService>();
+    var mxmkDanmakuProxy = app.Resolve<MikiDanmakuProxyService>();
+    var mxmkLiveEventProxy = app.Resolve<MikiLiveEventProxyService>();
     var biliParser = app.Resolve<BiliBiliVideoLinkShareProxerService>();
 
     eventService.CmdHandler.Register(danmakuCrawler);
+    eventService.CmdHandler.Register(mxmkLiveEventProxy);
 
     eventService.CmdHandler.Subscribe<DanmuMsg>(danmakuClip.HandleDanmu);
     eventService.CmdHandler.Subscribe<DanmuMsg>(danmakuExportGuard.HandleDanmaku);
-    eventService.CmdHandler.Subscribe<DanmuMsg>(mxmkProxy.HandleDanmaku);
+    eventService.CmdHandler.Subscribe<DanmuMsg>(mxmkDanmakuProxy.HandleDanmaku);
 
     logger.LogInformation("Starting schedule module...");
     await Task.WhenAll(statusCrawler.Run(token), followerStat.Run(token), eventService.Run(token), bffAnti.Run(token), biliParser.Run(token));
