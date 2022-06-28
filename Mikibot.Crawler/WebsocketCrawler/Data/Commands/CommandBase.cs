@@ -26,6 +26,8 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
             { KnownCommands.ONLINE_RANK_COUNT, typeof(OnlineRankCount) },
             { KnownCommands.ONLINE_RANK_V2, typeof(OnlineRankV2) },
             { KnownCommands.ENTRY_EFFECT, typeof(EntryEffect) },
+            { KnownCommands.ANCHOR_LOT_START, typeof(AnchorLotStart) },
+            { KnownCommands.ANCHOR_LOT_AWARD, typeof(AnchorLotAward) },
         };
         private static readonly Dictionary<Type, KnownCommands> KnownCommandMapping =
             CommandTypeMapping.ToDictionary(p => p.Value, p => p.Key);
@@ -50,6 +52,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
             try
             {
                 var cmd = JsonSerializer.Deserialize<CommandBase<JsonElement>>(raw, JsonSerializerOptions);
+                // Console.WriteLine($"Command: {cmd.Command}");
                 if (CommandMapping.ContainsKey(cmd.Command))
                 {
                     var type = CommandMapping[cmd.Command];
