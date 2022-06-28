@@ -1,4 +1,4 @@
-﻿using Mikibot.Crawler.Http.Bilibili.Model;
+using Mikibot.Crawler.Http.Bilibili.Model;
 using Mikibot.Crawler.Http.Bilibili.Model.LiveServer;
 using System;
 using System.Collections.Generic;
@@ -108,7 +108,7 @@ namespace Mikibot.Crawler.Http.Bilibili
 
             var csrf = cookie[indexOfCsrf..cookie.IndexOf(';', indexOfCsrf)];
 
-            var body = new FormUrlEncodedContent(new Dictionary<string ,string>()
+            var body = new FormUrlEncodedContent(new Dictionary<string, string>()
             {
                 { "msg[sender_uid]", $"{senderBid}" },
                 { "msg[receiver_id]", $"{targetBid}" },

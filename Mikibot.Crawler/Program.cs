@@ -60,6 +60,7 @@ cmdHandler.Subscribe<SuperChatMessage>((msg) => Console.WriteLine($"[SC] {msg.Us
 cmdHandler.Subscribe<SendGift>((msg) => Console.WriteLine($"[礼物] {msg.SenderName} ({msg.CoinType} {msg.DiscountPrice}): {msg.Action}{msg.GiftName}"));
 cmdHandler.Subscribe<AnchorLotStart>(msg => Console.WriteLine($"(天选开始) {msg.AwardName} 条件为{msg.RequireText} 发送弹幕{msg.Danmu}"));
 cmdHandler.Subscribe<AnchorLotAward>(msg => Console.WriteLine($"(天选结束) {msg.AwardName} {string.Join(",", msg.AwardUsers.Select(u => u.UserName))}"));
+cmdHandler.Subscribe<PopularityRedPocketStart>(msg => Console.WriteLine($"(红包开始) {msg.SenderName} 价值{msg.TotalPrice / 100}电池 发送弹幕{msg.Danmu}"));
 cmdHandler.Subscribe<HotRankSettlementV2>(msg => Console.WriteLine($"(热门) {msg.Message}"));
 
 await foreach (var @event in wsClient.Events(csc.Token))

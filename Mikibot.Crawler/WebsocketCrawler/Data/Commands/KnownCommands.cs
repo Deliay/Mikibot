@@ -95,7 +95,6 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
         POPULARITY_RED_POCKET_WINNER_LIST,
         DANMU_AGGREGATION,
         COMMON_NOTICE_DANMAKU,
-        POPULARITY_RED_POCKET_START,
         PK_BATTLE_PRE_NEW,
         HOT_RANK_SETTLEMENT_V2,
     }

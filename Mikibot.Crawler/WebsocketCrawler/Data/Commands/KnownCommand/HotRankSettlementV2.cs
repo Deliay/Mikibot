@@ -14,7 +14,7 @@ public struct HotRankSettlementV2
     public string FaceUrl { get; set; }
 
     [JsonPropertyName("timestamp")]
-    public string TimestampSeconds { get; set; }
+    public int TimestampSeconds { get; set; }
 
     [JsonPropertyName("icon")]
     public string IconUrl { get; set; }

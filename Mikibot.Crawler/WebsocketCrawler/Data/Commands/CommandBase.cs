@@ -28,6 +28,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
             { KnownCommands.ENTRY_EFFECT, typeof(EntryEffect) },
             { KnownCommands.ANCHOR_LOT_START, typeof(AnchorLotStart) },
             { KnownCommands.ANCHOR_LOT_AWARD, typeof(AnchorLotAward) },
+            { KnownCommands.POPULARITY_RED_POCKET_START, typeof(PopularityRedPocketStart) },
             { KnownCommands.HOT_RANK_SETTLEMENT_V2, typeof(HotRankSettlementV2) },
         };
         private static readonly Dictionary<Type, KnownCommands> KnownCommandMapping =
