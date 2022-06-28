@@ -1,4 +1,4 @@
-﻿using Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
+using Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,6 +28,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
             { KnownCommands.ENTRY_EFFECT, typeof(EntryEffect) },
             { KnownCommands.ANCHOR_LOT_START, typeof(AnchorLotStart) },
             { KnownCommands.ANCHOR_LOT_AWARD, typeof(AnchorLotAward) },
+            { KnownCommands.HOT_RANK_SETTLEMENT_V2, typeof(HotRankSettlementV2) },
         };
         private static readonly Dictionary<Type, KnownCommands> KnownCommandMapping =
             CommandTypeMapping.ToDictionary(p => p.Value, p => p.Key);

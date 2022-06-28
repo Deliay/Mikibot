@@ -58,8 +58,9 @@ cmdHandler.Subscribe<GuardBuy>((msg) => Console.WriteLine($"[上舰] {msg.UserNa
 cmdHandler.Subscribe<InteractWord>((msg) => Console.WriteLine($"[进入] {msg.UserName} 直播间"));
 cmdHandler.Subscribe<SuperChatMessage>((msg) => Console.WriteLine($"[SC] {msg.User.UserName} ({msg.Price}): {msg.Message}"));
 cmdHandler.Subscribe<SendGift>((msg) => Console.WriteLine($"[礼物] {msg.SenderName} ({msg.CoinType} {msg.DiscountPrice}): {msg.Action}{msg.GiftName}"));
-cmdHandler.Subscribe<AnchorLotStart>(msg => Console.WriteLine($"直播间开始抽奖 {msg.AwardName}，条件为 {msg.RequireText} 并发送弹幕 {msg.Danmu}"));
+cmdHandler.Subscribe<AnchorLotStart>(msg => Console.WriteLine($"(天选开始) {msg.AwardName} 条件为{msg.RequireText} 发送弹幕{msg.Danmu}"));
 cmdHandler.Subscribe<AnchorLotAward>(msg => Console.WriteLine($"(天选结束) {msg.AwardName} {string.Join(",", msg.AwardUsers.Select(u => u.UserName))}"));
+cmdHandler.Subscribe<HotRankSettlementV2>(msg => Console.WriteLine($"(热门) {msg.Message}"));
 
 await foreach (var @event in wsClient.Events(csc.Token))
 {
