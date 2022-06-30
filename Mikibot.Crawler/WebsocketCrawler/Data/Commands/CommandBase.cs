@@ -71,7 +71,6 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
 
                     return (ICommandBase)instance;
                 }
-                Console.WriteLine($"cmd: {cmd.Command}, data: {cmd.Data}");
                 return cmd;
             }
             catch (Exception ex)
