@@ -29,6 +29,7 @@ namespace Mikibot.Database
         public DbSet<LiveGiftCombo> LiveGiftCombos { get; set; }
         public DbSet<LiveSuperChat> LiveSuperChats { get; set; }
         public DbSet<LiveStreamRecord> LiveStreamRecords { get; set; }
+        public DbSet<VoxList> VoxList { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -130,6 +131,12 @@ namespace Mikibot.Database
             {
                 model.HasKey(m => m.Id);
                 model.HasIndex(m => new { m.Bid, m.CreatedAt, m.RecordStoppedAt });
+            });
+
+            modelBuilder.Entity<VoxList>(model =>
+            {
+                model.ToTable("暗杀名单");
+                model.HasKey(m => m.Id);
             });
         }
     }
