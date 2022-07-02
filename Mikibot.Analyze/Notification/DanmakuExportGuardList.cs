@@ -221,9 +221,9 @@ namespace Mikibot.Analyze.Notification
             {
                 await ExportGuardList(msg);
             }
-            else if (msg.Msg.StartsWith("#导出音声历史名单"))
+            else if (msg.Msg.StartsWith("#导出音声历史中奖名单"))
             {
-
+                await ExportVoxList(msg);
             }
         }
     }
