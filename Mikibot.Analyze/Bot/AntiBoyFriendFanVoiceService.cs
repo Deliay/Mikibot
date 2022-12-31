@@ -95,7 +95,7 @@ namespace Mikibot.Analyze.Bot
             }
         }
 
-        private List<QVoice> voices { get; }
+        private List<QVoice> voices { get; } = new();
         private IMiraiService MiraiService { get; }
         private ILogger<AntiBoyFriendFanVoiceService> Logger { get; }
         public string VoiceBaseDir { get; }

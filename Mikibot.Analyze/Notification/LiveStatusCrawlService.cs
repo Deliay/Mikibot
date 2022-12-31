@@ -38,10 +38,10 @@ namespace Mikibot.Analyze.Notification
 
         private readonly Random random = new();
 
-        private async ValueTask<LiveStatus> GenerateStatus(PersonalInfo.LiveRoomDetail info, CancellationToken token)
+        private async ValueTask<LiveStatus> GenerateStatus(LiveRoomInfo info, CancellationToken token)
             => new()
             {
-                Cover = info.Cover,
+                Cover = info.Background,
                 Notified = false,
                 Status = info.LiveStatus,
                 FollowerCount = await Crawler.GetFollowerCount(BiliLiveCrawler.mxmk, token),
@@ -58,16 +58,16 @@ namespace Mikibot.Analyze.Notification
             await db.SaveChangesAsync(token);
         }
 
-        private MessageBase[] ComposeMessage(PersonalInfo.LiveRoomDetail info, LiveStatus? latest, LiveStatus newly)
+        private MessageBase[] ComposeMessage(LiveRoomInfo info, LiveStatus? latest, LiveStatus newly)
         {
             string status() => info.LiveStatus == 1 ? "开" : "下";
             string fans() => newly.Status == 0 && latest != null ? $"本次直播涨粉: {newly.FollowerCount - latest.FollowerCount}" : "";
-            string url() => newly.Status == 1 ? info.Url : "";
+            string url() => newly.Status == 1 ? $"https://live.bilibili.com/{info.RoomId}" : "";
             var msg = $"{status()}啦~ {info.Title}\n{url()}{fans()}";
             Logger.LogInformation("Message composed {}", msg);
             return new MessageBase[]
             {
-                new ImageMessage() { Url = info.Cover },
+                new ImageMessage() { Url = info.Background },
                 new PlainMessage(msg),
             };
         }
@@ -84,7 +84,7 @@ namespace Mikibot.Analyze.Notification
                 try
                 {
                     var latest = await db.LiveStatuses.OrderBy(s => s.Id).LastOrDefaultAsync(token);
-                    var info = (await Crawler.GetPersonalInfo(BiliLiveCrawler.mxmk, token)).LiveRoom;
+                    var info = (await Crawler.GetLiveRoomInfo(BiliLiveCrawler.mxmk, token));
                     // 发通知咯！
                     if (latest == null || (latest.Status != info.LiveStatus))
                     {

@@ -15,6 +15,7 @@ namespace Mikibot.Crawler.Http.Bilibili
         public const int mxmk = 477317922;
         public const string mxmks = "477317922";
 
+        [Obsolete("不让抓了")]
         public async ValueTask<PersonalInfo> GetPersonalInfo(int uid, CancellationToken token = default)
         {
             var result = await GetAsync<BilibiliApiResponse<PersonalInfo>>($"https://api.bilibili.com/x/space/acc/info?mid={uid}", token);
@@ -29,6 +30,16 @@ namespace Mikibot.Crawler.Http.Bilibili
             result.AssertCode();
 
             return result.Data.Follower;
+        }
+
+        [Obsolete("不让抓了")]
+        public async ValueTask<PersonalInfo.LiveRoomDetail> GetPersonalLiveRoomDetail(int uid, CancellationToken token = default)
+        {
+            var result = await GetAsync<BilibiliApiResponse<PersonalInfo.LiveRoomDetail>>(
+                $"https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid={uid}", token);
+            result.AssertCode();
+
+            return result.Data;
         }
 
         public async ValueTask<LiveInitInfo> GetRealRoomInfo(int roomId, CancellationToken token = default)
@@ -50,11 +61,12 @@ namespace Mikibot.Crawler.Http.Bilibili
             return (await GetRealRoomInfo(roomId, token)).RoomId;
         }
 
+        [Obsolete("不让抓了")]
         public async ValueTask<LiveToken> GetLiveTokenByUid(int uid, CancellationToken token = default)
         {
-            var personal = await GetPersonalInfo(uid, token);
+            var liveRoom = await GetPersonalLiveRoomDetail(uid, token);
 
-            return await GetLiveToken(personal.LiveRoom.RoomId, token);
+            return await GetLiveToken(liveRoom.RoomId, token);
         }
 
         public async ValueTask<LiveToken> GetLiveToken(int roomId, CancellationToken token = default)
@@ -91,6 +103,14 @@ namespace Mikibot.Crawler.Http.Bilibili
             return result.Data;
         }
 
+        public async ValueTask<LiveRoomInfo> GetLiveRoomInfo(int roomId, CancellationToken token = default)
+        {
+            var url = $"http://api.live.bilibili.com/room/v1/Room/get_info?room_id={roomId}";
+            var result = await GetAsync<BilibiliApiResponse<LiveRoomInfo>>(url, token);
+            result.AssertCode();
+
+            return result.Data;
+        }
 
         private static string GetDevId()
         {

@@ -72,7 +72,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
                     return (ICommandBase)instance;
                 }
 #if DEBUG
-                Console.WriteLine($"cmd: {cmd.Command}, data: {cmd.Data}");
+                //Console.WriteLine($"cmd: {cmd.Command}, data: {cmd.Data}");
 #endif
                 return cmd;
             }

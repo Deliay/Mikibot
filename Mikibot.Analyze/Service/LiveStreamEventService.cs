@@ -38,13 +38,13 @@ namespace Mikibot.Analyze.Service
             {
                 var next = rand.Next(2, 10);
 
-                Logger.LogInformation("{} 秒后 准备连接到弹幕服务器: ws://{}:{}....", next, spectatorHost.Host, spectatorHost.Port);
+                Logger.LogInformation("{} 秒后 准备连接到弹幕服务器: wss://{}:{}....", next, spectatorHost.Host, spectatorHost.Port);
                 try
                 {
                     using var wsClient = new WebsocketClient();
 
-                    await wsClient.ConnectAsync(spectatorHost.Host, spectatorHost.WsPort, realRoomId, spectatorEndpoint.Token, cancellationToken: token);
-                    Logger.LogInformation("弹幕连接到房间: ws://{}:{}....连接成功", spectatorHost.Host, spectatorHost.Port);
+                    await wsClient.ConnectAsync(spectatorHost.Host, spectatorHost.WssPort, realRoomId, spectatorEndpoint.Token, "wss", cancellationToken: token);
+                    Logger.LogInformation("弹幕连接到房间: wss://{}:{}....连接成功", spectatorHost.Host, spectatorHost.Port);
 
                     await foreach (var @event in wsClient.Events(token))
                     {
@@ -53,7 +53,7 @@ namespace Mikibot.Analyze.Service
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogInformation(ex, "弹幕服务器: ws://{}:{}....处理时发生错误！将尝试下一个房间", spectatorHost.Host, spectatorHost.Port);
+                    Logger.LogInformation(ex, "弹幕服务器: wss://{}:{}....处理时发生错误！将尝试下一个房间", spectatorHost.Host, spectatorHost.Port);
                 }
             }
         }

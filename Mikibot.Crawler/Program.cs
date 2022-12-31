@@ -36,6 +36,7 @@ var realRoomId = await crawler.GetRealRoomId(roomId, csc.Token);
 var spectatorEndpoint = await crawler.GetLiveToken(realRoomId, csc.Token);
 var spectatorHost = spectatorEndpoint.Hosts[0];
 
+var personal = await crawler.GetLiveRoomInfo(21672023, csc.Token);
 var allGuards = new HashSet<GuardUserInfo>();
 var init = await crawler.GetRoomGuardList(21672023, token: csc.Token);
 allGuards.UnionWith(init.List);
@@ -49,7 +50,7 @@ while (init.List.Count > 0
 }
 Console.WriteLine($"弥人舰长在线数量:{allGuards.Where(n => n.Online != 0).Count()}");
 
-await wsClient.ConnectAsync(spectatorHost.Host, spectatorHost.WsPort, realRoomId, spectatorEndpoint.Token, cancellationToken: csc.Token);
+await wsClient.ConnectAsync(spectatorHost.Host, spectatorHost.WssPort, realRoomId, spectatorEndpoint.Token, "wss", cancellationToken: csc.Token);
 
 var cmdHandler = new CommandSubscriber();
 cmdHandler.Subscribe<DanmuMsg>((msg) => Console.WriteLine($"[弹幕] {msg.UserName}: {msg.Msg}"));

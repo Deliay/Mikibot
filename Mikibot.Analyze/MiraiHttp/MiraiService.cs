@@ -83,6 +83,7 @@ namespace Mikibot.Analyze.MiraiHttp
                 if (group.Id != "139528984") continue;
 #endif
                 if (group.Id == "1001856303") continue;
+                if (group.Id == "972488523") continue;
                 if (token.IsCancellationRequested) break;
                 await SendMessageToGroup(group, token, messages);
             }
