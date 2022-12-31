@@ -22,7 +22,16 @@ namespace Mikibot.Crawler.Http
         {
             var raw = await client.GetAsync(url, token);
             var stream = raw.Content.ReadAsStream(token);
-            return await JsonSerializer.DeserializeAsync<T>(stream, JsonParseOptions, token);
+            try
+            {
+                return await JsonSerializer.DeserializeAsync<T>(stream, JsonParseOptions, token);
+            }
+            catch (JsonException jsonException)
+            {
+                var failedStr = await raw.Content.ReadAsStringAsync(token);
+                Console.WriteLine(failedStr);
+                throw jsonException;
+            }
         }
 
         protected async ValueTask<T?> PostFormAsync<T>(string url, FormUrlEncodedContent ctx, CancellationToken token)

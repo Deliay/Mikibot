@@ -27,6 +27,8 @@ var logger = services.GetRequiredService<ILogger<Program>>();
 var crawler = services.GetRequiredService<BiliLiveCrawler>();
 var wsClient = services.GetRequiredService<WebsocketClient>();
 
+var personal = await crawler.GetLiveRoomInfo(21672023, csc.Token);
+
 var original = BasePacket.Auth(114514, "1919810");
 var bytes = original.ToByte();
 var restored = BasePacket.ToPacket(bytes);
@@ -36,7 +38,6 @@ var realRoomId = await crawler.GetRealRoomId(roomId, csc.Token);
 var spectatorEndpoint = await crawler.GetLiveToken(realRoomId, csc.Token);
 var spectatorHost = spectatorEndpoint.Hosts[0];
 
-var personal = await crawler.GetLiveRoomInfo(21672023, csc.Token);
 var allGuards = new HashSet<GuardUserInfo>();
 var init = await crawler.GetRoomGuardList(21672023, token: csc.Token);
 allGuards.UnionWith(init.List);
