@@ -84,7 +84,7 @@ namespace Mikibot.Analyze.Notification
                 try
                 {
                     var latest = await db.LiveStatuses.OrderBy(s => s.Id).LastOrDefaultAsync(token);
-                    var info = (await Crawler.GetLiveRoomInfo(BiliLiveCrawler.mxmk, token));
+                    var info = (await Crawler.GetLiveRoomInfo(BiliLiveCrawler.mxmkr, token));
                     // 发通知咯！
                     if (latest == null || (latest.Status != info.LiveStatus))
                     {
