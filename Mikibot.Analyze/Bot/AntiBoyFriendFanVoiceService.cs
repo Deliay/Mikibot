@@ -75,6 +75,8 @@ namespace Mikibot.Analyze.Bot
                     QVoice.Of(LoadVoice("mxmk_star_fallen.amr"), new Regex(":星降")),
                     QVoice.Of(LoadVoice("mxmk_loule.amr"), new Regex(":漏了")),
                     QVoice.Of(LoadVoice("mxmk_happy_new_year.amr"), new Regex(":2023")),
+                    QVoice.Of(LoadVoice("mxmk_countdown.amr"), new Regex(":倒数")),
+                    QVoice.Of(LoadVoice("mxmk_countdown2.amr"), new Regex(":管理")),
                     QVoice.Of(new MessageBase[] {
                         new PlainMessage("弥BOT按钮" +
                         ":女朋友|:女友,:河豚,:岁,:恶,:色,:伤心,:笨蛋,:男同,:阉割|:性转," +
