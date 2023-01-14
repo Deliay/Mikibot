@@ -13,12 +13,12 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-	<PackageReference Include="Autofac" Version="6.3.0" />
-	<PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.2.0" />
-	<PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
-	<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
+	<PackageReference Include="Autofac" Version="6.5.0" />
+	<PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
+	<PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
+	<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
     <PackageReference Include="EmberSimpleHttpServer" Version="1.0.0" />
-    <PackageReference Include="Xabe.FFmpeg" Version="5.1.0" />
+    <PackageReference Include="Xabe.FFmpeg" Version="5.2.3" />
   </ItemGroup>
 
   <ItemGroup>
