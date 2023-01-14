@@ -39,17 +39,18 @@ var spectatorEndpoint = await crawler.GetLiveToken(realRoomId, csc.Token);
 var spectatorHost = spectatorEndpoint.Hosts[0];
 
 var allGuards = new HashSet<GuardUserInfo>();
-var init = await crawler.GetRoomGuardList(21672023, token: csc.Token);
+var init = await crawler.GetRoomGuardList(23015128, token: csc.Token);
 allGuards.UnionWith(init.List);
 allGuards.UnionWith(init.Top3);
 while (init.List.Count > 0
     && init.Info.Count > allGuards.Count
     && init.Info.PageCount > init.Info.Current)
 {
-    init = await crawler.GetRoomGuardList(21672023, init.Info.Current + 1, csc.Token);
+    init = await crawler.GetRoomGuardList(23015128, init.Info.Current + 1, csc.Token);
     allGuards.UnionWith(init.List);
 }
-Console.WriteLine($"弥人舰长在线数量:{allGuards.Where(n => n.Online != 0).Count()}");
+var count = allGuards.Where(n => n.Online != 0).Count();
+Console.WriteLine($"舰长在线数量:{count}");
 
 await wsClient.ConnectAsync(spectatorHost.Host, spectatorHost.WssPort, realRoomId, spectatorEndpoint.Token, "wss", cancellationToken: csc.Token);
 
