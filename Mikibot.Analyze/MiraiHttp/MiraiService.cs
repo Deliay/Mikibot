@@ -66,7 +66,7 @@ namespace Mikibot.Analyze.MiraiHttp
                     latestSentAt = DateTimeOffset.Now;
                 }
                 Logger.LogInformation("即将推送信息 ({})", group.Id);
-                var result = await group.SendGroupMessageAsync(messages);
+                var result = await group.SendGroupMessageAsync(new MessageChain(messages));
                 Logger.LogInformation("发送消息回执:{}", result);
             }
             finally
