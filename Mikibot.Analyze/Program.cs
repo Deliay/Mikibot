@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Mikibot.Database;
 using Mikibot.Analyze.MiraiHttp;
@@ -8,8 +7,6 @@ using Mikibot.Analyze.Notification;
 using Mikibot.Analyze.Service;
 using Mikibot.BuildingBlocks.Util;
 using Mikibot.Crawler.Http.Bilibili;
-using Mikibot.Crawler.WebsocketCrawler;
-using Mikibot.Crawler.WebsocketCrawler.Client;
 using Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 using Mikibot.Analyze.Bot;
 
@@ -78,7 +75,7 @@ using (var app = appContainer.BeginLifetimeScope())
     var bffAnti = app.Resolve<AntiBoyFriendFanVoiceService>();
     var mxmkDanmakuProxy = app.Resolve<MikiDanmakuProxyService>();
     var mxmkLiveEventProxy = app.Resolve<MikiLiveEventProxyService>();
-    var biliParser = app.Resolve<BiliBiliVideoLinkShareProxerService>();
+    // var biliParser = app.Resolve<BiliBiliVideoLinkShareProxerService>();
 
     eventService.CmdHandler.Register(danmakuCrawler);
     eventService.CmdHandler.Register(mxmkLiveEventProxy);
@@ -88,5 +85,5 @@ using (var app = appContainer.BeginLifetimeScope())
     eventService.CmdHandler.Subscribe<DanmuMsg>(mxmkDanmakuProxy.HandleDanmaku);
 
     logger.LogInformation("Starting schedule module...");
-    await Task.WhenAll(statusCrawler.Run(token), followerStat.Run(token), eventService.Run(token), bffAnti.Run(token), biliParser.Run(token));
+    await Task.WhenAll(statusCrawler.Run(token), followerStat.Run(token), eventService.Run(token), bffAnti.Run(token));
 }
