@@ -59,7 +59,6 @@ namespace Mikibot.Analyze.Bot
             "<lora:hipoly3DModelLora_v10:0.3>," +
             "masterpiece, best quality, 1girl, solo, purple eyes, black long hair, [purple streaked hair], small breast, ";
 
-        private const string PromptSuffix = "<lora:miki-v2+v3:0.6>";
 
         private static readonly Dictionary<string, List<string>> promptMap = new()
         {
@@ -100,6 +99,8 @@ namespace Mikibot.Analyze.Bot
             } }
         };
 
+        private const int CD = 180;
+
         private static bool HasCategory(string category)
         {
             return promptMap.ContainsKey(category);
@@ -120,6 +121,20 @@ namespace Mikibot.Analyze.Bot
             "top-down bottom-up","kneeling","straddle","squatting","on stomach","lying","looking back","upside-down"
         };
 
+        private static readonly List<string> hairStyles = new()
+        {
+            "wavy hair", "payot", "twin braids", "messy hair", "side ponytail", "double bun", "hair bun",
+            "drill hair", "curly hair", "blunt bangs", "bangs", "wet hair", "handled hair", "holding hair", "hair spread out",
+            "hair dryer", "floating hair", "adjusting hair", "wavy hair", "very short hair", "very long hair", "twintails",
+            "twin braids", "tri braids", "spiked hair", "side ponytail", "side braid", "short ponytail", "short hair",
+            "scrunchie", "quad braids", "ponytail", "pixie cut", "parted bangs", "messy hair", "medium hair",
+            "low-braided long hair", "long hair", "lone nape hair", "huge ahoge", "hime cut", "high ponytail", "headband",
+            "half updo", "hairpin", "hair slicked back", "hair over one eyes", "hair clip", "hair bun", "hair bobbles",
+            "hair between eyes", "french braid", "dreadlocks", "double bun", "braided bun", "braided bangs", "braid",
+            "bobcut", "blunt bangs", "big hair", "asymmetrical bangs", "antenna hair", "ahoge", "absurdly long hair",
+            "bun cover", "ringlets", "comb over", "hair over eyes", "doughnut hair bun", "crown braid", "buzz cut"
+        };
+
 
         private static readonly Random random = new();
 
@@ -133,7 +148,7 @@ namespace Mikibot.Analyze.Bot
         private static MessageChain GetCdMessage()
         {
             return new MessageChainBuilder()
-                .Plain($"正在生成或冷却中~ 请稍等! CD: ${300 - (DateTimeOffset.Now - latestGenerateAt).TotalSeconds}秒")
+                .Plain($"正在生成或冷却中~ 请稍等! CD: {CD - (DateTimeOffset.Now - latestGenerateAt).TotalSeconds}秒")
                 .Build();
         }
 
@@ -154,8 +169,9 @@ namespace Mikibot.Analyze.Bot
             {
                 var behaviour = RandomOf(behaviours);
                 var action = RandomOf(actions);
+                var hair = RandomOf(hairStyles);
 
-                return $"{BasicPrompt}{scene}{behaviour}, {action}, ";
+                return $"{BasicPrompt}{scene}{behaviour}, {action}, {hair}, ";
             }
 
             return $"{BasicPrompt}{scene}";
@@ -165,7 +181,7 @@ namespace Mikibot.Analyze.Bot
 
         private static bool IsColdingDown()
         {
-            return (DateTimeOffset.Now - latestGenerateAt).TotalSeconds < 300;
+            return (DateTimeOffset.Now - latestGenerateAt).TotalSeconds < CD;
         }
 
         private struct Info
@@ -215,13 +231,15 @@ namespace Mikibot.Analyze.Bot
                                     height = 432,
                                     negative_prompt = NegativePrompt,
                                 }), token);
-                                var body = await res.Content.ReadFromJsonAsync<Ret>(cancellationToken: token);
-                                var info = JsonSerializer.Deserialize<Info>(body.info);
-
-                                if (body.images.Count != 0)
+                                try
                                 {
-                                    await miraiService.SendMessageToGroup(group, token, new MessageBase[]
+                                    var body = await res.Content.ReadFromJsonAsync<Ret>(cancellationToken: token);
+                                    var info = JsonSerializer.Deserialize<Info>(body.info);
+                                    logger.LogInformation("生成成功，种子:{}", info.seed);
+                                    if (body.images.Count != 0)
                                     {
+                                        await miraiService.SendMessageToGroup(group, token, new MessageBase[]
+                                        {
                                         new PlainMessage()
                                         {
                                             Text = $"生成成功，种子:{info.seed}"
@@ -230,7 +248,13 @@ namespace Mikibot.Analyze.Bot
                                         {
                                             Base64 = body.images[0],
                                         },
-                                    });
+                                        });
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    logger.LogError(ex, "catched after access AI!");
+                                    return;
                                 }
                             }
                         }
@@ -257,7 +281,7 @@ namespace Mikibot.Analyze.Bot
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError("弥图生成失败");
+                    logger.LogError(ex, "弥图生成失败, error=");
                 }
             }
         }
