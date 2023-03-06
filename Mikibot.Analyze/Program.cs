@@ -88,9 +88,9 @@ using (var app = appContainer.BeginLifetimeScope())
 
     logger.LogInformation("Starting schedule module...");
     await Task.WhenAll(
-        //statusCrawler.Run(token),
-        //followerStat.Run(token),
-        //eventService.Run(token),
-        //bffAnti.Run(token),
+        statusCrawler.Run(token),
+        followerStat.Run(token),
+        eventService.Run(token),
+        bffAnti.Run(token),
         aiImage.Run(token));
 }
