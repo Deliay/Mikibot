@@ -44,6 +44,7 @@ appBuilder.RegisterType<MikiLiveEventProxyService>().AsSelf().SingleInstance();
 
 appBuilder.RegisterType<BiliBiliVideoLinkShareProxerService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<AntiBoyFriendFanVoiceService>().AsSelf().SingleInstance();
+appBuilder.RegisterType<AiImageGenerationService>().AsSelf().SingleInstance();
 
 var appContainer = appBuilder.Build();
 
@@ -75,6 +76,7 @@ using (var app = appContainer.BeginLifetimeScope())
     var danmakuCrawler = app.Resolve<DanmakuCollectorService>();
     var danmakuExportGuard = app.Resolve<DanmakuExportGuardList>();
 
+    var aiImage = app.Resolve<BiliBiliVideoLinkShareProxerService>();
     var bffAnti = app.Resolve<AntiBoyFriendFanVoiceService>();
     var mxmkDanmakuProxy = app.Resolve<MikiDanmakuProxyService>();
     var mxmkLiveEventProxy = app.Resolve<MikiLiveEventProxyService>();
