@@ -34,7 +34,7 @@ namespace Mikibot.Analyze.Bot
         {
             this.logger = logger;
             this.miraiService = miraiService;
-            WebUiEndpoint = Environment.GetEnvironmentVariable("WEB_UI_ENDPOINT") ?? "http://127.0.0.1:7860";
+            WebUiEndpoint = Environment.GetEnvironmentVariable("WEB_UI_ENDPOINT") ?? "http://127.0.0.1:7860/sdapi/v1/txt2img";
         }
 
         private readonly Channel<GroupMessageReceiver> messageQueue = Channel
@@ -133,7 +133,7 @@ namespace Mikibot.Analyze.Bot
         private static MessageChain GetCdMessage()
         {
             return new MessageChainBuilder()
-                .Plain($"正在生成或冷却中~ 请稍等! CD: ${300 - (DateTimeOffset.Now - latestGenerateAt).Seconds}秒")
+                .Plain($"正在生成或冷却中~ 请稍等! CD: ${300 - (DateTimeOffset.Now - latestGenerateAt).TotalSeconds}秒")
                 .Build();
         }
 
@@ -155,13 +155,13 @@ namespace Mikibot.Analyze.Bot
                 var behaviour = RandomOf(behaviours);
                 var action = RandomOf(actions);
 
-                return $"{scene}{behaviour}, {action}, ";
+                return $"{BasicPrompt}{scene}{behaviour}, {action}, ";
             }
 
-            return $"{scene}";
+            return $"{BasicPrompt}{scene}";
         }
 
-        private static DateTimeOffset latestGenerateAt = DateTimeOffset.Now;
+        private static DateTimeOffset latestGenerateAt = DateTimeOffset.Now.Subtract(TimeSpan.FromMinutes(5));
 
         private static bool IsColdingDown()
         {
@@ -198,7 +198,9 @@ namespace Mikibot.Analyze.Bot
                             {
                                 latestGenerateAt = DateTimeOffset.Now;
                                 var prompt = GetPrompt(plain.Text);
-                                var res = await httpClient.PostAsync(WebUiEndpoint, JsonContent.Create(new
+                                await miraiService.SendMessageToGroup(group, token, generateMsg.ToArray());
+                                logger.LogInformation("prompt: {}", prompt);
+                                var res = await httpClient.PostAsync($"{WebUiEndpoint}", JsonContent.Create(new
                                 {
                                     prompt,
                                     enable_hr = true,
@@ -251,7 +253,7 @@ namespace Mikibot.Analyze.Bot
                 try
                 {
                     await messageQueue.Reader.WaitToReadAsync(token);
-                    Dequeue(token);
+                    await Dequeue(token);
                 }
                 catch (Exception ex)
                 {

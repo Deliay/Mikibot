@@ -73,7 +73,7 @@ using (var app = appContainer.BeginLifetimeScope())
     var danmakuCrawler = app.Resolve<DanmakuCollectorService>();
     var danmakuExportGuard = app.Resolve<DanmakuExportGuardList>();
 
-    var aiImage = app.Resolve<BiliBiliVideoLinkShareProxerService>();
+    var aiImage = app.Resolve<AiImageGenerationService>();
     var bffAnti = app.Resolve<AntiBoyFriendFanVoiceService>();
     var mxmkDanmakuProxy = app.Resolve<MikiDanmakuProxyService>();
     var mxmkLiveEventProxy = app.Resolve<MikiLiveEventProxyService>();
@@ -87,5 +87,10 @@ using (var app = appContainer.BeginLifetimeScope())
     eventService.CmdHandler.Subscribe<DanmuMsg>(mxmkDanmakuProxy.HandleDanmaku);
 
     logger.LogInformation("Starting schedule module...");
-    await Task.WhenAll(statusCrawler.Run(token), followerStat.Run(token), eventService.Run(token), bffAnti.Run(token));
+    await Task.WhenAll(
+        //statusCrawler.Run(token),
+        //followerStat.Run(token),
+        //eventService.Run(token),
+        //bffAnti.Run(token),
+        aiImage.Run(token));
 }
