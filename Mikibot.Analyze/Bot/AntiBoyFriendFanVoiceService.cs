@@ -77,20 +77,28 @@ namespace Mikibot.Analyze.Bot
                     QVoice.Of(LoadVoice("mxmk_happy_new_year.amr"), new Regex(":2023")),
                     QVoice.Of(LoadVoice("mxmk_countdown.amr"), new Regex(":倒数")),
                     QVoice.Of(LoadVoice("mxmk_countdown2.amr"), new Regex(":管理")),
+                    QVoice.Of(LoadVoice("mxmk_tiangou.amr"), new Regex(":舔狗|:舔(🐶|🐕|🐩)")),
+                    QVoice.Of(LoadVoice("mxmk_like_milk.amr"), new Regex(":奶")),
+                    QVoice.Of(LoadVoice("mxmk_love_mi_ren.amr"), new Regex(":喜欢弥人")),
+                    QVoice.Of(LoadVoice("mxmk_mi_ren_baka.amr"), new Regex(":大坏蛋")),
+                    QVoice.Of(LoadVoice("mxmk_mi_ren_yasaxi.amr"), new Regex(":亚撒西")),
                     QVoice.Of(new MessageBase[] {
                         new PlainMessage("弥BOT按钮" +
                         ":女朋友|:女友,:河豚,:岁,:恶,:色,:伤心,:笨蛋,:男同,:阉割|:性转," +
                         ":awsl,:🐕|:🐶|:狗|:dog,:为什么|:为甚么,:变态,:病,:小红书,:上当,:寄,:jb,:懒,:笑,:填满,:外卖" +
-                        ":吃我,:发病,:晚安,:早安,:花呗,:飞扑,:女鬼,:星降,:漏了"),
+                        ":吃我,:发病,:晚安,:早安,:花呗,:飞扑,:女鬼,:星降,:漏了,:奶,:喜欢弥人,:大坏蛋,:亚撒西"),
                     }, new Regex(":help")),
                     QVoice.Of(new MessageBase[] {
-                        new PlainMessage("mxmk歌单：夏天的风、心墙、下雨天、求佛、メンヘラじゃないもん/地雷（使用::歌名点歌，如果有/，可以用/后面的简写点歌）"),
+                        new PlainMessage("mxmk歌单：夏天的风、心墙、下雨天、求佛、メンヘラじゃないもん/地雷、十月表、陀螺人、勇者王（使用::歌名点歌，如果有/，可以用/后面的简写点歌）"),
                     }, new Regex("::歌单")),
                     QVoice.Of(LoadVoice("mxmk_xtdf.amr"), new Regex("::夏天的风")),
                     QVoice.Of(LoadVoice("mxmk_xinqiang.amr"), new Regex("::心墙")),
                     QVoice.Of(LoadVoice("mxmk_xiayutian.amr"), new Regex("::下雨天")),
                     QVoice.Of(LoadVoice("mxmk_qiufo.amr"), new Regex("::求佛")),
                     QVoice.Of(LoadVoice("mxmk_menhera_ja_nai_mon.amr"), new Regex("::メンヘラじゃないもん|::地雷")),
+                    QVoice.Of(LoadVoice("mxmk_songs_shi_yue_biao.amr"), new Regex("::十月表")),
+                    QVoice.Of(LoadVoice("mxmk_songs_tuoluo_ren_huanxiang.amr"), new Regex("::陀螺人")),
+                    QVoice.Of(LoadVoice("mxmk_songs_yong_zhe_wang.amr"), new Regex("::勇者王")),
                 };
             } catch (Exception e)
             {

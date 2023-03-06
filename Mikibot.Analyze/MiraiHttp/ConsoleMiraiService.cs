@@ -66,13 +66,13 @@ namespace Mikibot.Analyze.MiraiHttp
                                 Name = "Mikibot内测群",
                             }
                         },
-                        MessageChain = new MessageBase[]
+                        MessageChain = new MessageChain(new List<MessageBase>
                         {
                                 new PlainMessage()
                                 {
                                     Text = text,
                                 }
-                        }
+                        }),
                     });
                     await Task.Delay(1000, token);
                 }
