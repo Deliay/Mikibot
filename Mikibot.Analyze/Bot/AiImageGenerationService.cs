@@ -112,6 +112,10 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:0.6>, street, china dress, ",
                 "<lora:miki-v2+v3:0.6>, mountain, china dress, ",
                 "<lora:miki-v2+v3:0.6>, forest, lake, china dress, ",
+                "<lora:miki-v2+v3:0.6>, dormitory, chinese clothes, ",
+                "<lora:miki-v2+v3:0.6>, street, chinese clothes, ",
+                "<lora:miki-v2+v3:0.6>, mountain, chinese clothes, ",
+                "<lora:miki-v2+v3:0.6>, forest, lake, chinese clothes, ",
             } }
         };
 
