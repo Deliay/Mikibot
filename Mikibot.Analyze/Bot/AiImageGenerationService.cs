@@ -99,7 +99,7 @@ namespace Mikibot.Analyze.Bot
             } }
         };
 
-        private const int CD = 180;
+        private const int CD = 120;
 
         private static bool HasCategory(string category)
         {
