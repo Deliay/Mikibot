@@ -88,17 +88,30 @@ namespace Mikibot.Analyze.Bot
             } },
             { "!来张泳装弥", new () {
                 "<lora:miki-v2+v3:0.4>, school swimsuit, poolside, ",
-                "<lora:miki-v2+v3:0.4>, school swimsuit, beach, ocean, "
+                "<lora:miki-v2+v3:0.4>, school swimsuit, beach, ocean, ",
+                "<lora:miki-v2+v3:0.4>, one-piece swimsuit, poolside, ",
+                "<lora:miki-v2+v3:0.4>, one-piece swimsuit, beach, ocean, ",
+                "<lora:miki-v2+v3:0.4>, side-tie bikini bottom, beach, ocean, ",
             } },
             { "!来张ol弥", new () {
                 "<lora:miki-v2+v3:0.6>, mountain in window, office, office lady",
-                "<lora:miki-v2+v3:0.6>, laboratory, office lady",
+                "<lora:miki-v2+v3:0.6>, laboratory, office lady, ",
             } },
             { "!来张lo弥", new() {
-                "<lora:miki-v2+v3:0.6>, gothic lolita, lolita fashion, gothic architecture, plant"
+                "<lora:miki-v2+v3:0.5>, gothic lolita, lolita fashion, gothic architecture, plant, ",
             } },
             { "!来张女仆弥", new() {
-                "<lora:miki-v2+v3:0.6>, dormitory, maid, maid headdress, maid apron"
+                "<lora:miki-v2+v3:0.5>, dormitory, maid, maid headdress, maid apron, ",
+                "<lora:miki-v2+v3:0.5>, street, maid, maid headdress, maid apron, ",
+                "<lora:miki-v2+v3:0.5>, castle, maid, maid headdress, maid apron, ",
+                "<lora:miki-v2+v3:0.5>, mountain, maid, maid headdress, maid apron, ",
+                "<lora:miki-v2+v3:0.5>, forest, maid, maid headdress, maid apron, ",
+            } },
+            { "!来张旗袍弥", new() {
+                "<lora:miki-v2+v3:0.5>, dormitory, china dress, ",
+                "<lora:miki-v2+v3:0.5>, street, china dress, ",
+                "<lora:miki-v2+v3:0.5>, mountain, china dress, ",
+                "<lora:miki-v2+v3:0.5>, forest, lake, china dress, ",
             } }
         };
 
@@ -156,8 +169,12 @@ namespace Mikibot.Analyze.Bot
                                 .Plain($"指令有5分钟的CD，可用生成如下（英文叹号）：!来张随机弥,{string.Join(',', categories)}").Build();
 
 
-        private static readonly MessageChain generateMsg = new MessageChainBuilder()
-                                .Plain($"生成中，请稍等").Build();
+        private static MessageChain GetGenerateMsg(string extra)
+        {
+            return new MessageChainBuilder()
+                               .Plain($"生成中，请稍等")
+                               .Plain(extra).Build();
+        }
 
         private static MessageChain GetCdMessage()
         {
@@ -228,8 +245,8 @@ namespace Mikibot.Analyze.Bot
                             else
                             {
                                 latestGenerateAt = DateTimeOffset.Now;
-                                var prompt = GetPrompt(plain.Text);
-                                await miraiService.SendMessageToGroup(group, token, generateMsg.ToArray());
+                                var (prompt, extra) = GetPrompt(plain.Text);
+                                await miraiService.SendMessageToGroup(group, token, GetGenerateMsg(extra).ToArray());
                                 logger.LogInformation("prompt: {}", prompt);
                                 var res = await httpClient.PostAsync($"{WebUiEndpoint}", JsonContent.Create(new
                                 {
