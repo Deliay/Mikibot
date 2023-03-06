@@ -63,19 +63,19 @@ namespace Mikibot.Analyze.Bot
         private static readonly Dictionary<string, List<string>> promptMap = new()
         {
             { "!来张jk弥弥", new () {
-                "<lora:miki-v2+v3:0.6>, school, skirt, plant, jk, school uniform, ",
-                "<lora:miki-v2+v3:0.6>, engine room, skirt, plant, jk, school uniform, ",
-                "<lora:miki-v2+v3:0.6>, laboratory, skirt, jk, school uniform, ",
-                "<lora:miki-v2+v3:0.6>, street, skirt, plant, jk, school uniform, ",
-                "<lora:miki-v2+v3:0.6>, stairs, skirt, plant, jk, school uniform, ",
+                "<lora:miki-v2+v3:0.6>, school, plant, jk, school uniform, ",
+                "<lora:miki-v2+v3:0.6>, engine room, plant, jk, school uniform, ",
+                "<lora:miki-v2+v3:0.6>, laboratory, jk, school uniform, ",
+                "<lora:miki-v2+v3:0.6>, street, plant, jk, school uniform, ",
+                "<lora:miki-v2+v3:0.6>, stairs, plant, jk, school uniform, ",
             } },
             { "!来张衬衫弥", new () {
                 "<lora:miki-v2+v3:0.6>, lake, forest, skirt, plant, ",
-                "<lora:miki-v2+v3:0.6>, laboratory, forest, skirt, ",
+                "<lora:miki-v2+v3:0.6>, laboratory, skirt, ",
                 "<lora:miki-v2+v3:0.6>, mountain, forest, skirt, plant, ",
-                "<lora:miki-v2+v3:0.6>, castle, forest, skirt, plant, ",
-                "<lora:miki-v2+v3:0.6>, street, forest, skirt, plant, ",
-                "<lora:miki-v2+v3:0.6>, dormitory, forest, skirt, plant, ",
+                "<lora:miki-v2+v3:0.6>, castle, skirt, plant, ",
+                "<lora:miki-v2+v3:0.6>, street, skirt, plant, ",
+                "<lora:miki-v2+v3:0.6>, dormitory, skirt, plant, ",
             } },
             { "!来张白裙弥", new () {
                 "<lora:miki-v2+v3:0.6>, mountain, white dress, off-shoulder dress, bare shoulders, miki bag summer, miki v2, ",
@@ -94,8 +94,11 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:0.6>, mountain in window, office, office lady",
                 "<lora:miki-v2+v3:0.6>, laboratory, office lady",
             } },
-            { "!来张女仆弥", new() {
+            { "!来张lo弥", new() {
                 "<lora:miki-v2+v3:0.6>, gothic lolita, lolita fashion, gothic architecture, plant"
+            } },
+            { "!来张女仆弥", new() {
+                "<lora:miki-v2+v3:0.6>, dormitory, maid, maid headdress, maid apron"
             } }
         };
 
@@ -186,7 +189,7 @@ namespace Mikibot.Analyze.Bot
 
         private struct Info
         {
-            public int seed { get; set; }
+            public long seed { get; set; }
         }
         private struct Ret
         {
