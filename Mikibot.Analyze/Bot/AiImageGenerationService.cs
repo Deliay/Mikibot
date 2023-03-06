@@ -138,6 +138,17 @@ namespace Mikibot.Analyze.Bot
             "bun cover", "ringlets", "comb over", "hair over eyes", "doughnut hair bun", "crown braid", "buzz cut"
         };
 
+        private static readonly List<string> emotions = new()
+        {
+            ":>","rectangular mouth",":<>",":c","o3o","x3",":o",":>",":>",":<",":<",":p",">:(",">:)",":d","angry",
+            "blush","bored","depressed","despair","disdain","evil grin","grin","horrified","nose blush","sleepy",
+            "sobbing","turn pale","torogao","tongue","teeth","tears","surprised","smile","skin fang","singing sang",
+            "sigh","shaded face","serious","screaming","scared","sad","round teeth","raised eyebrow","pout","pain",
+            "orgasm","open mouth","nervous","naughty face","light smile","licking","gloom depressed","fucked silly",
+            "frown","fang","expressionless","embarrassed","drunk","drooling","disgust","confused","clenched teeth",
+            "annoyed","ahegao","looking at viewer","open mouth","clenched teeth","lips","eyeball","eyelid pull",
+            "food on face","wink","dark persona","shy"
+        };
 
         private static readonly Random random = new();
 
@@ -160,7 +171,7 @@ namespace Mikibot.Analyze.Bot
             return list[random.Next(list.Count)];
         }
 
-        private static string GetPrompt(string category)
+        private static (string, string) GetPrompt(string category)
         {
             if (!promptMap.TryGetValue(category, out var prompts))
             {
@@ -173,11 +184,12 @@ namespace Mikibot.Analyze.Bot
                 var behaviour = RandomOf(behaviours);
                 var action = RandomOf(actions);
                 var hair = RandomOf(hairStyles);
+                var emo = RandomOf(emotions);
 
-                return $"{BasicPrompt}{scene}{behaviour}, {action}, {hair}, ";
+                return ($"{BasicPrompt}{scene}{behaviour}, {action}, {hair}, {emo}, ", $"抽中了附加词 {behaviour}, {action}, {hair}, {emo}");
             }
 
-            return $"{BasicPrompt}{scene}";
+            return ($"{BasicPrompt}{scene}", "没有抽中附加词");
         }
 
         private static DateTimeOffset latestGenerateAt = DateTimeOffset.Now.Subtract(TimeSpan.FromMinutes(5));
