@@ -108,10 +108,10 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:0.5>, forest, maid, maid headdress, maid apron, ",
             } },
             { "!来张旗袍弥", new() {
-                "<lora:miki-v2+v3:0.5>, dormitory, china dress, ",
-                "<lora:miki-v2+v3:0.5>, street, china dress, ",
-                "<lora:miki-v2+v3:0.5>, mountain, china dress, ",
-                "<lora:miki-v2+v3:0.5>, forest, lake, china dress, ",
+                "<lora:miki-v2+v3:0.6>, dormitory, china dress, ",
+                "<lora:miki-v2+v3:0.6>, street, china dress, ",
+                "<lora:miki-v2+v3:0.6>, mountain, china dress, ",
+                "<lora:miki-v2+v3:0.6>, forest, lake, china dress, ",
             } }
         };
 
@@ -154,7 +154,7 @@ namespace Mikibot.Analyze.Bot
         private static readonly List<string> emotions = new()
         {
             ":>","rectangular mouth",":<>",":c","o3o","x3",":o",":>",":>",":<",":<",":p",">:(",">:)",":d","angry",
-            "blush","bored","depressed","despair","disdain","evil grin","grin","horrified","nose blush","sleepy",
+            "blush","bored","depressed","despair","disdain", "nose blush","sleepy",
             "sobbing","turn pale","torogao","tongue","teeth","tears","surprised","smile","skin fang","singing sang",
             "sigh","shaded face","serious","screaming","scared","sad","round teeth","raised eyebrow","pout","pain",
             "orgasm","open mouth","nervous","naughty face","light smile","licking","gloom depressed","fucked silly",
@@ -166,7 +166,7 @@ namespace Mikibot.Analyze.Bot
         private static readonly Random random = new();
 
         private static readonly MessageChain helpMsg = new MessageChainBuilder()
-                                .Plain($"指令有5分钟的CD，可用生成如下（英文叹号）：!来张随机弥,{string.Join(',', categories)}").Build();
+                                .Plain($"指令有2分钟的CD，可用生成如下（英文叹号）：!来张随机弥,{string.Join(',', categories)}").Build();
 
 
         private static MessageChain GetGenerateMsg(string extra)
