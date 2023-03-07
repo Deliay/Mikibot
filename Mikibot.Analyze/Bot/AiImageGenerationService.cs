@@ -57,7 +57,7 @@ namespace Mikibot.Analyze.Bot
 
         private const string BasicPrompt = "<lora:pastelMixStylizedAnime_pastelMixLoraVersion:0.3>, " +
             "<lora:roluaStyleLora_r:0.2>,<lora:shadedface_2r16d16e:0.2>,<lora:V11ForegroundPlant_V11:0.3>, " +
-            "masterpiece, best quality, 1girl, solo, purple eyes, black long hair, [purple streaked hair], small breast, ";
+            "masterpiece, best quality, 1girl, solo, ";
 
 
         private static readonly Dictionary<string, List<string>> promptMap = new()
@@ -261,6 +261,9 @@ namespace Mikibot.Analyze.Bot
             var emo = RandomOf(emotions);
             var fullbody = random.Next(100) > 50 ? "full body" : "";
             var extra = "";
+
+            var prefix = characterPrefix.GetValueOrDefault(character) ?? "";
+
             if (random.Next(2) == 1)
             {
                 var scene = RandomOf(scenes);
@@ -271,7 +274,7 @@ namespace Mikibot.Analyze.Bot
                 extra = $"{behaviour}, {action}, {rp}, {scene}, ";
             }
 
-            return ($"{BasicPrompt}{main}({emo}), {hair}, {extra}, {fullbody}", $"生成词：{main}{fullbody}\n发型:{hair}\n表情:{emo}\n附加词 {extra}");
+            return ($"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {fullbody}", $"生成词：{main}{fullbody}\n发型:{hair}\n表情:{emo}\n附加词 {extra}");
         }
 
         private static DateTimeOffset latestGenerateAt = DateTimeOffset.Now.Subtract(TimeSpan.FromMinutes(5));
@@ -308,6 +311,14 @@ namespace Mikibot.Analyze.Bot
             { "侑", "KiyuuVirtuareal_v20" },
         };
 
+        private static readonly Dictionary<string, string> characterPrefix = new()
+        {
+            { "弥", "purple eyes, black hair, [purple streaked hair], small breast, " },
+            { "真", "yellow eyes, red hair, small breast, " },
+            { "悠", "blue eyes, black hair ribbon, silver hair, blue inner hair, colored inner hair, " },
+            { "侑", "(white pink hair), (blue streaked hair), (cat_ear_headphone), " },
+        };
+
         private static readonly MessageChain helpMsg = new MessageChainBuilder()
                                 .Plain($"指令有2分钟的CD，使用'!来张[风格][人物]'生成，如，!来张随机弥\n可用人物:{string.Join(',', characterLore.Keys)}\n可用风格\n：随机,{string.Join(',', categories)}").Build();
 
@@ -330,6 +341,10 @@ namespace Mikibot.Analyze.Bot
                 {
                     if (rawMsg is PlainMessage plain)
                     {
+                        if (plain.Text == "!help")
+                        {
+                            await miraiService.SendMessageToGroup(group, token, helpMsg.ToArray());
+                        }
                         var (style, character) = parseCommand(plain.Text);
                         if (character == "" )
                         {
@@ -400,10 +415,6 @@ namespace Mikibot.Analyze.Bot
                                     return;
                                 }
                             }
-                        }
-                        else if (plain.Text == "!help")
-                        {
-                            await miraiService.SendMessageToGroup(group, token, helpMsg.ToArray());
                         }
                     }
                 }
