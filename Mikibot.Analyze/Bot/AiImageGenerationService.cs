@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Json;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Text.Json;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -61,14 +62,14 @@ namespace Mikibot.Analyze.Bot
 
         private static readonly Dictionary<string, List<string>> promptMap = new()
         {
-            { "!来张jk弥", new () {
+            { "jk", new () {
                 "<lora:miki-v2+v3:0.6>, school, plant, jk, school uniform, ",
                 "<lora:miki-v2+v3:0.6>, engine room, plant, jk, school uniform, ",
                 "<lora:miki-v2+v3:0.6>, laboratory, jk, school uniform, ",
                 "<lora:miki-v2+v3:0.6>, street, plant, jk, school uniform, ",
                 "<lora:miki-v2+v3:0.6>, stairs, plant, jk, school uniform, ",
             } },
-            { "!来张萝莉弥", new () {
+            { "萝莉", new () {
                 "(loli), <lora:miki-v2+v3:0.6>, school, plant, loli, ",
                 "(loli), <lora:miki-v2+v3:0.6>, laboratory, js, loli, ",
                 "(loli), <lora:miki-v2+v3:0.6>, street, plant, js, loli, ",
@@ -78,7 +79,7 @@ namespace Mikibot.Analyze.Bot
                 "(loli), <lora:miki-v2+v3:0.6>, street, plant, js, mesugaki, loli, ",
                 "(loli), <lora:miki-v2+v3:0.6>, stairs, plant, js, mesugaki, loli, ",
             } },
-            { "!来张Q版弥", new () {
+            { "Q版", new () {
                 "(loli), <lora:miki-v2+v3:0.6>, school, plant, (chibi), loli, ",
                 "(loli), <lora:miki-v2+v3:0.6>, laboratory, js, (chibi), loli, ",
                 "(loli), <lora:miki-v2+v3:0.6>, street, plant, js, (chibi), loli, ",
@@ -88,7 +89,7 @@ namespace Mikibot.Analyze.Bot
                 "(loli), <lora:miki-v2+v3:0.6>, street, plant, js, mesugaki, (chibi), loli, ",
                 "(loli), <lora:miki-v2+v3:0.6>, stairs, plant, js, mesugaki, (chibi), loli, ",
             } },
-            { "!来张衬衫弥", new () {
+            { "衬衫", new () {
                 "<lora:miki-v2+v3:0.6>, lake, forest, skirt, plant, ",
                 "<lora:miki-v2+v3:0.6>, laboratory, skirt, ",
                 "<lora:miki-v2+v3:0.6>, mountain, forest, skirt, plant, ",
@@ -96,7 +97,7 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:0.6>, street, skirt, plant, ",
                 "<lora:miki-v2+v3:0.6>, dormitory, skirt, plant, ",
             } },
-            { "!来张白裙弥", new () {
+            { "白裙", new () {
                 "<lora:miki-v2+v3:0.6>, mountain, white dress, off-shoulder dress, bare shoulders, miki bag summer, miki v2, ",
                 "<lora:miki-v2+v3:0.6>, castle, white dress, off-shoulder dress, bare shoulders, ",
                 "<lora:miki-v2+v3:0.6>, dormitory, white dress, off-shoulder dress, bare shoulders, ",
@@ -105,14 +106,14 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:0.6>, beach, sunshine, white dress, off-shoulder dress, bare shoulders, straw hat, ",
                 "<lora:miki-v2+v3:0.6>, flowers meadows, sunshine, white dress, off-shoulder dress, bare shoulders, straw hat, ",
             } },
-            { "!来张泳装弥", new () {
+            { "泳装", new () {
                 "<lora:miki-v2+v3:0.4>, school swimsuit, poolside, ",
                 "<lora:miki-v2+v3:0.4>, school swimsuit, beach, ocean, ",
                 "<lora:miki-v2+v3:0.4>, one-piece swimsuit, poolside, ",
                 "<lora:miki-v2+v3:0.4>, one-piece swimsuit, beach, ocean, ",
                 "<lora:miki-v2+v3:0.4>, side-tie bikini bottom, beach, ocean, ",
             } },
-            { "!来张ol弥", new () {
+            { "ol", new () {
                 "<lora:miki-v2+v3:0.6>, mountain in window, office lady",
                 "<lora:miki-v2+v3:0.6>, laboratory, office lady, ",
                 "<lora:miki-v2+v3:0.6>, dormitory, office lady, ",
@@ -120,20 +121,20 @@ namespace Mikibot.Analyze.Bot
                 "<lora:hipoly3DModelLora_v10:0.2>, <lora:miki-v2+v3:0.6>, laboratory, office lady, ",
                 "<lora:hipoly3DModelLora_v10:0.2>, <lora:miki-v2+v3:0.6>, mountain in window, office lady, ",
             } },
-            { "!来张lo弥", new() {
+            { "lo", new() {
                 "<lora:miki-v2+v3:0.5>, gothic lolita, lolita fashion, gothic architecture, plant, ",
                 "(loli), <lora:miki-v2+v3:0.5>, gothic lolita, lolita fashion, gothic architecture, plant, chibi, loli, ",
                 "(loli), <lora:miki-v2+v3:0.5>, gothic lolita, lolita fashion, gothic architecture, plant, mesugaki, loli, ",
                 "(loli), <lora:miki-v2+v3:0.5>, gothic lolita, lolita fashion, gothic architecture, plant, mesugaki, loli, ",
             } },
-            { "!来张女仆弥", new() {
+            { "女仆", new() {
                 "<lora:miki-v2+v3:0.5>, dormitory, maid, maid headdress, maid apron, ",
                 "<lora:miki-v2+v3:0.5>, street, maid, maid headdress, maid apron, ",
                 "<lora:miki-v2+v3:0.5>, castle, maid, maid headdress, maid apron, ",
                 "<lora:miki-v2+v3:0.5>, mountain, maid, maid headdress, maid apron, ",
                 "<lora:miki-v2+v3:0.5>, forest, maid, maid headdress, maid apron, ",
             } },
-            { "!来张旗袍弥", new() {
+            { "旗袍", new() {
                 "<lora:miki-v2+v3:0.6>, chinese, dormitory, (red china dress), ",
                 "<lora:miki-v2+v3:0.6>, chinese, chinese street, (red china dress), ",
                 "<lora:miki-v2+v3:0.6>, chinese, chinese mountain, (red china dress), ",
@@ -143,16 +144,16 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:0.6>, chinese, chinese mountain, (red chinese clothes), ",
                 "<lora:miki-v2+v3:0.6>, chinese, chinese forest, lake, (red chinese clothes), ",
             } },
-            { "!来张机甲弥", new() {
+            { "机甲", new() {
                 "<lora:miki-v2+v3:0.5>, cyberpunk, kabuto, japanese armor, japanese clothes, holding tantou, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, tentacles, ",
                 "<lora:miki-v2+v3:0.5>, cyberpunk, kabuto, japanese armor, japanese clothes, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, tentacles, ",
-                "<lora:miki-v2+v3:0.5>, cyberpunk, kabuto, japanese armor, holding tantou, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, ",
-                "<lora:miki-v2+v3:0.5>, cyberpunk, kabuto, japanese armor, japanese clothes, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, ",
-                "<lora:miki-v2+v3:0.5>, cyberpunk, kabuto, japanese armor, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, ",
+                "<lora:miki-v2+v3:0.5>, kabuto, japanese armor, holding tantou, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, ",
+                "<lora:miki-v2+v3:0.5>, kabuto, japanese armor, japanese clothes, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, ",
+                "<lora:miki-v2+v3:0.5>, kabuto, japanese armor, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, ",
             } },
         };
 
-        private const int CD = 120;
+        private const int CD = 30;
 
         private static bool HasCategory(string category)
         {
@@ -201,7 +202,7 @@ namespace Mikibot.Analyze.Bot
             "food on face","wink","dark persona","shy"
         };
 
-        private static readonly List<string> characters = new()
+        private static readonly List<string> rolePalys = new()
         {
             "yuri","milf","kemonomimi mode","minigirl","furry","magical girl","vampire","devil","monster","angel",
             "elf","fairy","mermaid","nun","ninja","doll","cheerleader","waitress","maid","miko","witch"
@@ -227,11 +228,6 @@ namespace Mikibot.Analyze.Bot
         };
 
         private static readonly Random random = new();
-
-        private static readonly MessageChain helpMsg = new MessageChainBuilder()
-                                .Plain($"指令有2分钟的CD，可用生成如下（英文叹号）：!来张随机弥,{string.Join(',', categories)}").Build();
-
-
         private static MessageChain GetGenerateMsg(string extra)
         {
             return new MessageChainBuilder()
@@ -251,14 +247,16 @@ namespace Mikibot.Analyze.Bot
             return list[random.Next(list.Count)];
         }
 
-        private static (string, string) GetPrompt(string category)
+        private const string DefaultLora = "miki-v2+v3";
+        private static (string, string) GetPrompt(string style, string character)
         {
-            if (!promptMap.TryGetValue(category, out var prompts))
+            if (!promptMap.TryGetValue(style, out var prompts))
             {
                 prompts = promptMap[RandomOf(categories)]!;
             }
 
-            var main = RandomOf(prompts);
+            var lora = characterLore[character];
+            var main = RandomOf(prompts).Replace(DefaultLora, lora);
             var hair = RandomOf(hairStyles);
             var emo = RandomOf(emotions);
             var fullbody = random.Next(100) > 50 ? "full body" : "";
@@ -268,9 +266,9 @@ namespace Mikibot.Analyze.Bot
                 var scene = RandomOf(scenes);
                 var behaviour = RandomOf(behaviours);
                 var action = RandomOf(actions);
-                var character = RandomOf(characters);
+                var rp = RandomOf(rolePalys);
 
-                extra = $"{behaviour}, {action}, {character}, {scene}, ";
+                extra = $"{behaviour}, {action}, {rp}, {scene}, ";
             }
 
             return ($"{BasicPrompt}{main}({emo}), {hair}, {extra}, {fullbody}", $"生成词：{main}{fullbody}\n发型:{hair}\n表情:{emo}\n附加词 {extra}");
@@ -294,6 +292,34 @@ namespace Mikibot.Analyze.Bot
             public string info { get; set; }
         }
 
+        private static readonly Dictionary<string, HashSet<string>> characterLimit = new()
+        {
+            { "弥", new() { "139528984" } },
+            { "真", new() { "139528984" } },
+            { "悠", new() { "139528984" } },
+            { "侑", new() { "139528984" } },
+        };
+
+        private static readonly Dictionary<string, string> characterLore = new()
+        {
+            { "弥", "miki-v2+v3" },
+            { "真", "mahiru-v2" },
+            { "悠", "YuaVirtuareal_v01" },
+            { "侑", "KiyuuVirtuareal_v20" },
+        };
+
+        private static readonly MessageChain helpMsg = new MessageChainBuilder()
+                                .Plain($"指令有2分钟的CD，使用'!来张[风格][人物]'生成，如，!来张随机弥\n可用人物:{string.Join(',', characterLore.Keys)}\n可用风格\n：随机,{string.Join(',', categories)}").Build();
+
+        private static (string, string) parseCommand(string raw)
+        {
+            var match = Regex.Matches(raw, "!来张(.*?)(.)$").FirstOrDefault();
+            if (match is null) {
+                return ("", "");
+            }
+            return (match.Result("$1"), match.Result("$2"));
+        }
+
         private async ValueTask Dequeue(CancellationToken token)
         {
             await foreach (var msg in this.messageQueue.Reader.ReadAllAsync(token))
@@ -304,7 +330,18 @@ namespace Mikibot.Analyze.Bot
                 {
                     if (rawMsg is PlainMessage plain)
                     {
-                        if (HasCategory(plain.Text) || plain.Text == "!来张随机弥")
+                        var (style, character) = parseCommand(plain.Text);
+                        if (character == "" )
+                        {
+                            continue;
+                        }
+                        if (!characterLimit.TryGetValue(character, out var groups)) {
+                            continue;
+                        }
+                        if (!groups.Contains(group.Id)) {
+                            continue;
+                        }
+                        if (HasCategory(style) || style == "随机")
                         {
                             if (IsColdingDown())
                             {
@@ -318,7 +355,7 @@ namespace Mikibot.Analyze.Bot
                             {
                                 latestGenerateAt = DateTimeOffset.Now;
                                 isCdHintShown = false;
-                                var (prompt, extra) = GetPrompt(plain.Text);
+                                var (prompt, extra) = GetPrompt(style, character);
                                 await miraiService.SendMessageToGroup(group, token, GetGenerateMsg(extra).ToArray());
                                 logger.LogInformation("prompt: {}", prompt);
                                 var res = await httpClient.PostAsync($"{WebUiEndpoint}", JsonContent.Create(new
@@ -336,6 +373,7 @@ namespace Mikibot.Analyze.Bot
                                     height = 432,
                                     negative_prompt = NegativePrompt,
                                 }), token);
+                                latestGenerateAt = DateTimeOffset.Now;
                                 try
                                 {
                                     var body = await res.Content.ReadFromJsonAsync<Ret>(cancellationToken: token);
