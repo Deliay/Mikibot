@@ -355,7 +355,7 @@ namespace Mikibot.Analyze.Bot
             { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, " },
             { "悠", "(light blue eyes), black hair ribbon, silver hair, blue streaked hair, " },
             { "侑", "(white pink hair), (blue streaked hair), (cat_ear_headphone), <lora:Kiyuu_:0.3>, " },
-            { "炉", "yellow eyes, (pink to cyan gradient hair), ahoge, (beret hat), underwater, " },
+            { "炉", "yellow eyes, (pink to cyan gradient hair), ahoge, (hat), " },
         };
 
         private static readonly MessageChain helpMsg = new MessageChainBuilder()
