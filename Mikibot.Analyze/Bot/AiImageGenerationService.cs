@@ -68,6 +68,16 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:0.6>, street, plant, jk, school uniform, ",
                 "<lora:miki-v2+v3:0.6>, stairs, plant, jk, school uniform, ",
             } },
+            { "!来张萝莉弥", new () {
+                "<lora:miki-v2+v3:0.6>, school, plant, chibi, loli, ",
+                "<lora:miki-v2+v3:0.6>, laboratory, js, chibi, loli, ",
+                "<lora:miki-v2+v3:0.6>, street, plant, js, chibi, loli, ",
+                "<lora:miki-v2+v3:0.6>, stairs, plant, js, chibi, loli, ",
+                "<lora:miki-v2+v3:0.6>, school, plant, mesugaki, loli, ",
+                "<lora:miki-v2+v3:0.6>, laboratory, js, mesugaki, loli, ",
+                "<lora:miki-v2+v3:0.6>, street, plant, js, mesugaki, loli, ",
+                "<lora:miki-v2+v3:0.6>, stairs, plant, js, mesugaki, loli, ",
+            } },
             { "!来张衬衫弥", new () {
                 "<lora:miki-v2+v3:0.6>, lake, forest, skirt, plant, ",
                 "<lora:miki-v2+v3:0.6>, laboratory, skirt, ",
@@ -178,6 +188,12 @@ namespace Mikibot.Analyze.Bot
             "food on face","wink","dark persona","shy"
         };
 
+        private static readonly List<string> characters = new()
+        {
+            "yuri","milf","kemonomimi mode","minigirl","furry","magical girl","vampire","devil","monster","angel",
+            "elf","fairy","mermaid","nun","ninja","doll","cheerleader","waitress","maid","miko","witch"
+        };
+
         private static readonly Random random = new();
 
         private static readonly MessageChain helpMsg = new MessageChainBuilder()
@@ -212,16 +228,19 @@ namespace Mikibot.Analyze.Bot
 
             var scene = RandomOf(prompts);
             var hair = RandomOf(hairStyles);
-            var fullbody = random.Next(100) > 50 ? "full body, " : "";
+            var emo = RandomOf(emotions);
+            var fullbody = random.Next(100) > 50 ? "full body" : "";
+            var extra = "";
             if (random.Next(2) == 1)
             {
                 var behaviour = RandomOf(behaviours);
                 var action = RandomOf(actions);
-                var emo = RandomOf(emotions);
-                return ($"{BasicPrompt}{scene}{behaviour}, {action}, {hair}, {emo}, {fullbody}", $"生成词：{scene}, {fullbody}\n发型:{hair}\n抽中了附加词 {behaviour}, {action}, {emo}");
+                var character = RandomOf(characters);
+
+                extra = $"{behaviour}, {action}, {character}, ";
             }
 
-            return ($"{BasicPrompt}{scene}, {hair}, {fullbody}", $"生成词：{scene}\n发型:{hair}\n没有抽中附加词");
+            return ($"{BasicPrompt}{scene}{emo}, {hair}, {extra}, {fullbody}", $"生成词：{scene}{fullbody}\n发型:{hair}\n表情:{emo}\n附加词 {extra}");
         }
 
         private static DateTimeOffset latestGenerateAt = DateTimeOffset.Now.Subtract(TimeSpan.FromMinutes(5));
