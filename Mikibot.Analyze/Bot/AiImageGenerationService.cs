@@ -113,7 +113,7 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, dormitory, skirt, plant, ",
             } },
             { "白裙", new () {
-                "<lora:miki-v2+v3:-w->, mountain, white dress, off-shoulder dress, bare shoulders, miki bag summer, miki v2, ",
+                "<lora:miki-v2+v3:-w->, mountain, white dress, off-shoulder dress, bare shoulders, miki bag summer, ",
                 "<lora:miki-v2+v3:-w->, castle, white dress, off-shoulder dress, bare shoulders, ",
                 "<lora:miki-v2+v3:-w->, dormitory, white dress, off-shoulder dress, bare shoulders, ",
                 "<lora:miki-v2+v3:-w->, street, plant, white dress, off-shoulder dress, bare shoulders, ",
@@ -345,7 +345,7 @@ namespace Mikibot.Analyze.Bot
             { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, " },
             { "悠", "(light blue eyes), black hair ribbon, silver hair, blue streaked hair, " },
             { "侑", "(white pink hair), (blue streaked hair), (cat_ear_headphone), <lora:Kiyuu_:0.3>, " },
-            { "炉", "loli, yellow eyes, (pink to cyan gradient hair), ahoge, (beret hat), (white eyelashes), " },
+            { "炉", "yellow eyes, (pink to cyan gradient hair), ahoge, (beret hat), underwater, " },
         };
 
         private static readonly MessageChain helpMsg = new MessageChainBuilder()
