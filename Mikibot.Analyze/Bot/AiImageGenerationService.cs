@@ -207,6 +207,25 @@ namespace Mikibot.Analyze.Bot
             "elf","fairy","mermaid","nun","ninja","doll","cheerleader","waitress","maid","miko","witch"
         };
 
+        private static readonly List<string> scenes = new()
+        {
+            "cityscape", "scenery", "loong, dragon background, loong background", "rose", "petal", "coconut tree", 
+            "pine tree", "maple tree", "cypress", "fruit tree", "treehouse", "twig", "tree stump", "tree shade", 
+            "rainy days", "night", "full moon", "on a desert", "in a meadow", "in hawaii", "in winter", "in autumn", 
+            "in summer", "in spring", "futon", "sofa", "train", "locker room", "hallway", "telephone pole", "underwater", 
+            "ruins", "magic circle", "pentagram background", "christmas tree", "cherry tree", "building", "bathtub", 
+            "starry sky", "sea", 
+            "forest,outline,fountain,shop,outdoors,east asian architecture,greco-roman architecture,restaurant,shanty town,slum", 
+            "cyberpunk, city, kowloon, rain", "starry sky,clusters of stars,starry sky,glinting stars", "floating sakura", 
+            "violet background", "glinting stars", "floating white feathers", "aurora", "snowflakes", "snowfield", "cafe", 
+            "grassland", "blue sky with clouds", "electricity", "rain", "blur background", "farm", "red moon", "battlefield", 
+            "alpine", "coffee house", "lawn", "on bed", "fireworks", "isekai cityscape", "flying butterfly", "beach background", 
+            "dungeon background", "airport background", "cityscape", "space background", "beige background", "simple pattern background", 
+            "shooting star", "cherry blossoms", "colorful startrails", "white background", "silhouette", "gradient background", 
+            "sunburst background", "starry sky,clusters of stars", "snow", "sunlight on the desk ,8K ,high definition, 8K", 
+            "building,rain,neon lights,cumulonimbus,moon"
+        };
+
         private static readonly Random random = new();
 
         private static readonly MessageChain helpMsg = new MessageChainBuilder()
@@ -239,21 +258,22 @@ namespace Mikibot.Analyze.Bot
                 prompts = promptMap[RandomOf(categories)]!;
             }
 
-            var scene = RandomOf(prompts);
+            var main = RandomOf(prompts);
             var hair = RandomOf(hairStyles);
             var emo = RandomOf(emotions);
             var fullbody = random.Next(100) > 50 ? "full body" : "";
             var extra = "";
             if (random.Next(2) == 1)
             {
+                var scene = RandomOf(scenes);
                 var behaviour = RandomOf(behaviours);
                 var action = RandomOf(actions);
                 var character = RandomOf(characters);
 
-                extra = $"{behaviour}, {action}, {character}, ";
+                extra = $"{behaviour}, {action}, {character}, {scene}, ";
             }
 
-            return ($"{BasicPrompt}{scene}({emo}), {hair}, {extra}, {fullbody}", $"生成词：{scene}{fullbody}\n发型:{hair}\n表情:{emo}\n附加词 {extra}");
+            return ($"{BasicPrompt}{main}({emo}), {hair}, {extra}, {fullbody}", $"生成词：{main}{fullbody}\n发型:{hair}\n表情:{emo}\n附加词 {extra}");
         }
 
         private static DateTimeOffset latestGenerateAt = DateTimeOffset.Now.Subtract(TimeSpan.FromMinutes(5));
