@@ -351,11 +351,11 @@ namespace Mikibot.Analyze.Bot
 
         private static readonly Dictionary<string, string> characterPrefix = new()
         {
-            { "弥", "purple eyes, black hair, [purple streaked hair], small breast, " },
-            { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, " },
+            { "弥", "purple eyes, black hair, [purple streaked hair], (small breast), " },
+            { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, (small breast), " },
             { "悠", "(light blue eyes), black hair ribbon, silver hair, blue streaked hair, " },
-            { "侑", "(white pink hair), (blue streaked hair), (cat_ear_headphone), <lora:Kiyuu_:0.2>, " },
-            { "炉", "yellow eyes, (pink to cyan gradient hair), ahoge, hat, kaoru, " },
+            { "侑", "(white pink hair), (blue streaked hair), (cat_ear_headphone), <lora:Kiyuu_:0.2>, (small breast), " },
+            { "炉", "yellow eyes, (pink to cyan gradient hair), ahoge, hat, kaoru, (small breast), " },
         };
 
         private static readonly MessageChain helpMsg = new MessageChainBuilder()
