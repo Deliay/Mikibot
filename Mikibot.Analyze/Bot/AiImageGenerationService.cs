@@ -61,7 +61,7 @@ namespace Mikibot.Analyze.Bot
 
         private static readonly Dictionary<string, List<string>> promptMap = new()
         {
-            { "!来张jk弥弥", new () {
+            { "!来张jk弥", new () {
                 "<lora:miki-v2+v3:0.6>, school, plant, jk, school uniform, ",
                 "<lora:miki-v2+v3:0.6>, engine room, plant, jk, school uniform, ",
                 "<lora:miki-v2+v3:0.6>, laboratory, jk, school uniform, ",
@@ -150,7 +150,7 @@ namespace Mikibot.Analyze.Bot
         private static readonly List<string> hairStyles = new()
         {
             "wavy hair", "payot", "twin braids", "messy hair", "side ponytail", "double bun", "hair bun",
-            "drill hair", "curly hair", "blunt bangs", "bangs", "wet hair", "handled hair", "holding hair", "hair spread out",
+            "drill hair", "curly hair", "blunt bangs", "bangs", "handled hair", "holding hair", "hair spread out",
             "hair dryer", "floating hair", "adjusting hair", "wavy hair", "very short hair", "very long hair", "twintails",
             "twin braids", "tri braids", "spiked hair", "side ponytail", "side braid", "short ponytail", "short hair",
             "scrunchie", "quad braids", "ponytail", "pixie cut", "parted bangs", "messy hair", "medium hair",
@@ -158,7 +158,8 @@ namespace Mikibot.Analyze.Bot
             "half updo", "hairpin", "hair slicked back", "hair over one eyes", "hair clip", "hair bun", "hair bobbles",
             "hair between eyes", "french braid", "dreadlocks", "double bun", "braided bun", "braided bangs", "braid",
             "bobcut", "blunt bangs", "big hair", "asymmetrical bangs", "antenna hair", "ahoge", "absurdly long hair",
-            "bun cover", "ringlets", "comb over", "hair over eyes", "doughnut hair bun", "crown braid", "buzz cut"
+            "bun cover", "ringlets", "comb over", "doughnut hair bun", "crown braid", "buzz cut",
+            "(side braid)"
         };
 
         private static readonly List<string> emotions = new()
@@ -206,17 +207,17 @@ namespace Mikibot.Analyze.Bot
             }
 
             var scene = RandomOf(prompts);
+            var hair = RandomOf(hairStyles);
             if (random.Next(2) == 1)
             {
                 var behaviour = RandomOf(behaviours);
                 var action = RandomOf(actions);
-                var hair = RandomOf(hairStyles);
                 var emo = RandomOf(emotions);
 
-                return ($"{BasicPrompt}{scene}{behaviour}, {action}, {hair}, {emo}, ", $"生成词：{scene}\n抽中了附加词 {behaviour}, {action}, {hair}, {emo}");
+                return ($"{BasicPrompt}{scene}{behaviour}, {action}, {hair}, {emo}, ", $"生成词：{scene}\n发型:{hair}\n抽中了附加词 {behaviour}, {action}, {emo}");
             }
 
-            return ($"{BasicPrompt}{scene}", $"生成词：{scene}\n没有抽中附加词");
+            return ($"{BasicPrompt}{scene}, {hair}", $"生成词：{scene}\n发型:{hair}\n没有抽中附加词");
         }
 
         private static DateTimeOffset latestGenerateAt = DateTimeOffset.Now.Subtract(TimeSpan.FromMinutes(5));
