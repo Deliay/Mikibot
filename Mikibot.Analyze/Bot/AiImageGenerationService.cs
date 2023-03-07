@@ -53,7 +53,7 @@ namespace Mikibot.Analyze.Bot
             "low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, bad feet, single color, ((((ugly)))), (((duplicate))), ((morbid)), " +
             "((mutilated)), (((tranny))), (((trans))), (((trannsexual))), (hermaphrodite),((poorly drawn face)), (((mutation))), (((deformed))), ((ugly)), blurry, " +
             "((bad anatomy)), (((bad proportions))), ((extra limbs)), (((disfigured))), (bad anatomy), gross proportions, (malformed limbs), ((missing arms)), " +
-            "(missing legs), (((extra arms))), (((extra legs))), mutated hands,(fused fingers), (too many fingers), (((long neck))), (bad body perspect:1.1), nsfw";
+            "(missing legs), (((extra arms))), (((extra legs))), mutated hands,(fused fingers), (too many fingers), (((long neck))), (bad body perspect:1.1), (((nsfw)))";
 
         private const string BasicPrompt = "<lora:pastelMixStylizedAnime_pastelMixLoraVersion:0.3>, " +
             "<lora:roluaStyleLora_r:0.2>,<lora:V11ForegroundPlant_V11:0.3>, " +
@@ -361,7 +361,7 @@ namespace Mikibot.Analyze.Bot
         private static readonly Dictionary<string, string> characterPrefix = new()
         {
             { "弥", "purple eyes, black hair, [purple streaked hair], (small breast), " },
-            { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, (small breast), " },
+            { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, small demon horns, (small breast), " },
             { "悠", "(light blue eyes), black hair ribbon, silver hair, blue streaked hair, " },
             { "侑", "(white pink hair), (blue streaked hair), (cat_ear_headphone), <lora:Kiyuu_:0.2>, (small breast), " },
             { "炉", "yellow eyes, (pink to cyan gradient hair), ahoge, hat, kaoru, (small breast), " },
