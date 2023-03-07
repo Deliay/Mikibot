@@ -107,7 +107,7 @@ namespace Mikibot.Analyze.Notification
             while (!token.IsCancellationRequested)
             {
 #if !DEBUG
-                while (DateTimeOffset.Now.Hour != 19)
+                while (DateTimeOffset.Now.Hour != 19 || DateTimeOffset.Now.Minute > 15 )
                 {
                     await Task.Delay(TimeSpan.FromMinutes(5), token);
                 }
