@@ -72,7 +72,7 @@ namespace Mikibot.Analyze.Bot
             { "女仆", 0.5 },
             { "旗袍", 0.6 },
             { "机甲", 0.5 },
-            { "原始", 0.6 },
+            { "原版", 0.6 },
         };
 
 
@@ -167,7 +167,7 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, kabuto, japanese armor, japanese clothes, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, ",
                 "<lora:miki-v2+v3:-w->, kabuto, japanese armor, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, ",
             } },
-            { "原始", new() {
+            { "原版", new() {
                 "<lora:miki-v2+v3:-w->, dormitory, ",
                 "<lora:miki-v2+v3:-w->, street, ",
                 "<lora:miki-v2+v3:-w->, castle, ",
