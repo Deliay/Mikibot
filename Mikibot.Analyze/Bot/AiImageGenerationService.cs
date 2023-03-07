@@ -238,7 +238,7 @@ namespace Mikibot.Analyze.Bot
         private static MessageChain GetCdMessage()
         {
             return new MessageChainBuilder()
-                .Plain($"正在生成或冷却中~ 请稍等! CD: {CD - (DateTimeOffset.Now - latestGenerateAt).TotalSeconds}秒")
+                .Plain($"正在生成或冷却中~ 请稍等! \n冷却时间: {CD - (DateTimeOffset.Now - latestGenerateAt).TotalSeconds}秒。\n\nTip:直到冷却时间转好为止不会再进行提示~")
                 .Build();
         }
 
