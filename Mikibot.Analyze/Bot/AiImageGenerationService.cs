@@ -301,6 +301,7 @@ namespace Mikibot.Analyze.Bot
             { "真", new() { "139528984" } },
             { "悠", new() { "139528984" } },
             { "侑", new() { "139528984" } },
+            { "炉", new() { "139528984" } },
         };
 
         private static readonly Dictionary<string, string> characterLore = new()
@@ -309,14 +310,16 @@ namespace Mikibot.Analyze.Bot
             { "真", "mahiru-v2" },
             { "悠", "YuaVirtuareal_v01" },
             { "侑", "KiyuuVirtuareal_v20" },
+            { "炉", "kaoru" },
         };
 
         private static readonly Dictionary<string, string> characterPrefix = new()
         {
             { "弥", "purple eyes, black hair, [purple streaked hair], small breast, " },
             { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, " },
-            { "悠", "blue eyes, black hair ribbon, silver hair, blue inner hair, colored inner hair, " },
-            { "侑", "(white pink hair), (blue streaked hair), (cat_ear_headphone), " },
+            { "悠", "blue eyes, black hair ribbon, silver hair, blue inner hair, colored inner hair, <lora:YuaVirtuareal_v01:0.65>, " },
+            { "侑", "(white pink hair), (blue streaked hair), (cat_ear_headphone), <lora:Kiyuu_:0.3>, " },
+            { "炉", "yellow eyes, pink to cyan gradient short hair, gradient hair, cyan bleach, " },
         };
 
         private static readonly MessageChain helpMsg = new MessageChainBuilder()
