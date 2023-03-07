@@ -107,11 +107,11 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:0.6>, flowers meadows, sunshine, white dress, off-shoulder dress, bare shoulders, straw hat, ",
             } },
             { "泳装", new () {
-                "<lora:miki-v2+v3:0.4>, school swimsuit, poolside, ",
-                "<lora:miki-v2+v3:0.4>, school swimsuit, beach, ocean, ",
-                "<lora:miki-v2+v3:0.4>, one-piece swimsuit, poolside, ",
-                "<lora:miki-v2+v3:0.4>, one-piece swimsuit, beach, ocean, ",
-                "<lora:miki-v2+v3:0.4>, side-tie bikini bottom, beach, ocean, ",
+                "<lora:miki-v2+v3:0.5>, school swimsuit, poolside, ",
+                "<lora:miki-v2+v3:0.5>, school swimsuit, beach, ocean, ",
+                "<lora:miki-v2+v3:0.5>, one-piece swimsuit, poolside, ",
+                "<lora:miki-v2+v3:0.5>, one-piece swimsuit, beach, ocean, ",
+                "<lora:miki-v2+v3:0.5>, side-tie bikini bottom, beach, ocean, ",
             } },
             { "ol", new () {
                 "<lora:miki-v2+v3:0.6>, mountain in window, office lady",
@@ -314,7 +314,7 @@ namespace Mikibot.Analyze.Bot
         private static readonly Dictionary<string, string> characterPrefix = new()
         {
             { "弥", "purple eyes, black hair, [purple streaked hair], small breast, " },
-            { "真", "yellow eyes, red hair, small breast, " },
+            { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, " },
             { "悠", "blue eyes, black hair ribbon, silver hair, blue inner hair, colored inner hair, " },
             { "侑", "(white pink hair), (blue streaked hair), (cat_ear_headphone), " },
         };
