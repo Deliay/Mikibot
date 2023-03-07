@@ -252,6 +252,23 @@ namespace Mikibot.Analyze.Bot
             "building,rain,neon lights,cumulonimbus,moon"
         };
 
+        private static readonly List<string> views = new()
+        {
+            "thigh focus", "navel focus", "breast focus", "back focus", "armpit focus", "horizontal view angle", "full-body shot",
+            "focus on face", "looking at viewer", "from below", "from above", "dynamic angle", "dynamic pose", "back", "full body",
+            "bust", "profile",
+        };
+
+        private static readonly List<string> emojis = new()
+        {
+            "🧝🏻‍♂️", "🧝🏻‍♀️", "🧙🏻‍♂️", "🧙🏻‍♀️", "🧐", "🦸🏻‍♂️", "🦸🏻‍♀️", "🥺", "🥴", "🤵🏻", "🤬", "🤡", "🤕", "🤓", "🙁", "😷", "😵", "😴",
+            "😳", "😲", "😱", "😰", "😯", "😭", "😫", "😪", "😩", "😨", "😤", "😣", "😢", "😡", "😠", "😟", "😞", "😛", "😕",
+            "😓", "😎", "😍", "😋", "😈", "😇", "🕵🏻‍♂️", "💩", "💀", "👿", "👾", "👽", "👻", "👺", "👹", "👷🏻‍♂️", "👷🏻‍♀️", "👰🏻", "👮🏻‍♂️",
+            "👮🏻‍♀️", "👩🏻‍🚒", "👩🏻‍🚀", "👩🏻‍🔬", "👩🏻‍🔧", "👩🏻‍💼", "👩🏻‍💻", "👩🏻‍🏭", "👩🏻‍🏫", "👩🏻‍🎨", "👩🏻‍🎤", "👩🏻‍🎓", "👩🏻‍🍳", "👩🏻‍🌾", "👩🏻‍⚖️",
+            "👩🏻‍⚕️", "👩🏻‍✈️", "👨🏻‍🚒", "👨🏻‍🚀", "👨🏻‍🔬", "👨🏻‍🔧", "👨🏻‍💻", "👨🏻‍🏭", "👨🏻‍🏫", "👨🏻‍🎨", "👨🏻‍🎤", "👨🏻‍🎓", "👨🏻‍🍳", "👨🏻‍🌾", "👨🏻‍⚖️",
+            "👨🏻‍⚕️", "👨🏻‍✈️", "☹️", "☠️"
+        };
+
         private static readonly Random random = new();
         private static MessageChain GetGenerateMsg(string extra)
         {
@@ -273,7 +290,7 @@ namespace Mikibot.Analyze.Bot
         }
 
         private const string DefaultLora = "miki-v2+v3";
-        private static (string, string) GetPrompt(string style, string character)
+        private static (string, string, double, int) GetPrompt(string style, string character)
         {
             if (!promptMap.TryGetValue(style, out var prompts))
             {
@@ -294,11 +311,16 @@ namespace Mikibot.Analyze.Bot
 
             var prefix = characterPrefix.GetValueOrDefault(character) ?? "";
             var emo = RandomOf(emotions);
-            var fullbody = random.Next(100) > 50 ? "full body" : "";
+            var view = random.Next(100) > 50 ? "full body" : RandomOf(views);
+            var cfgScale = random.Next(100) > 70 ? random.Next(40, 101) / 10D : 10;
+            var steps = cfgScale != 10 ? random.Next(24, 46) : 30;
 
             if (style == "原版")
             {
-                return ($"{BasicPrompt}{prefix}{main}({emo}), {fullbody}", $"生成词：{main}{fullbody}\n表情:{emo}");
+                return (
+                    $"{BasicPrompt}{prefix}{main}({emo}), {view}",
+                    $"生成词: {main}\n视角: {view}\n表情: {emo}",
+                    cfgScale, steps);
             }
 
             var hair = RandomOf(hairStyles);
@@ -310,11 +332,15 @@ namespace Mikibot.Analyze.Bot
                 var behaviour = RandomOf(behaviours);
                 var action = RandomOf(actions);
                 var rp = RandomOf(rolePalys);
+                var emoji = RandomOf(emojis);
 
-                extra = $"{behaviour}, {action}, {rp}, {scene}, ";
+                extra = $"{behaviour}, {action}, {rp}, {scene}, {emoji}, ";
             }
 
-            return ($"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {fullbody}", $"生成词：{main}{fullbody}\n发型:{hair}\n表情:{emo}\n附加词 {extra}");
+            return (
+                $"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {view}",
+                $"生成词: {main}{view}\n发型: {hair}\n表情: {emo}\n附加词: {extra}\ncfg_scale={cfgScale},step={steps}",
+                cfgScale, steps);
         }
 
         private static DateTimeOffset latestGenerateAt = DateTimeOffset.Now.Subtract(TimeSpan.FromMinutes(5));
@@ -364,7 +390,7 @@ namespace Mikibot.Analyze.Bot
             { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, small demon horns, (small breast), " },
             { "悠", "(light blue eyes), black hair ribbon, silver hair, blue streaked hair, " },
             { "侑", "(white pink hair), (blue streaked hair), (cat_ear_headphone), <lora:Kiyuu_:0.2>, (small breast), " },
-            { "炉", "yellow eyes, (pink to cyan gradient hair), ahoge, hat, kaoru, (small breast), " },
+            { "炉", "yellow eyes, (pink to cyan gradient hair), (gradient hair), ahoge, (small breast), deep blue shorts, white shirt, (white capelet), [[hat]], black tie, white long sleeves, white colored eyelashes, (+ +), " },
         };
 
         private static readonly MessageChain helpMsg = new MessageChainBuilder()
@@ -418,7 +444,7 @@ namespace Mikibot.Analyze.Bot
                             {
                                 latestGenerateAt = DateTimeOffset.Now;
                                 isCdHintShown = false;
-                                var (prompt, extra) = GetPrompt(style, character);
+                                var (prompt, extra, cfg_scale, steps) = GetPrompt(style, character);
                                 await miraiService.SendMessageToGroup(group, token, GetGenerateMsg(extra).ToArray());
                                 logger.LogInformation("prompt: {}", prompt);
                                 var res = await httpClient.PostAsync($"{WebUiEndpoint}", JsonContent.Create(new
@@ -429,8 +455,8 @@ namespace Mikibot.Analyze.Bot
                                     hr_scale = 2.0,
                                     hr_upscaler = "Latent",
                                     hr_second_pass_steps = 30,
-                                    cfg_scale = 10,
-                                    steps = 30,
+                                    cfg_scale,
+                                    steps,
                                     sampler_index = "DPM++ 2M Karras",
                                     width = 768,
                                     height = 432,
