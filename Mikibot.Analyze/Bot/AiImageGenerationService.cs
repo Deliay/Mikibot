@@ -112,6 +112,9 @@ namespace Mikibot.Analyze.Bot
             } },
             { "!来张lo弥", new() {
                 "<lora:miki-v2+v3:0.5>, gothic lolita, lolita fashion, gothic architecture, plant, ",
+                "(loli), <lora:miki-v2+v3:0.5>, gothic lolita, lolita fashion, gothic architecture, plant, chibi, loli, ",
+                "(loli), <lora:miki-v2+v3:0.5>, gothic lolita, lolita fashion, gothic architecture, plant, mesugaki, loli, ",
+                "(loli), <lora:miki-v2+v3:0.5>, gothic lolita, lolita fashion, gothic architecture, plant, mesugaki, loli, ",
             } },
             { "!来张女仆弥", new() {
                 "<lora:miki-v2+v3:0.5>, dormitory, maid, maid headdress, maid apron, ",
