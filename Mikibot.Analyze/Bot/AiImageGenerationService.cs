@@ -18,7 +18,7 @@ using Websocket.Client.Logging;
 
 namespace Mikibot.Analyze.Bot
 {
-    public class AiImageGenerationService
+    public partial class AiImageGenerationService
     {
         private static readonly HttpClient httpClient = new()
         {
@@ -72,7 +72,7 @@ namespace Mikibot.Analyze.Bot
             { "女仆", 0.5 },
             { "旗袍", 0.6 },
             { "机甲", 0.5 },
-            { "原版", 0.8 },
+            { "原版", 0.85 },
         };
 
 
@@ -230,7 +230,7 @@ namespace Mikibot.Analyze.Bot
         private static readonly List<string> rolePalys = new()
         {
             "yuri","milf","kemonomimi mode","minigirl","furry","magical girl","vampire","devil","monster","angel",
-            "elf","fairy","mermaid","nun","ninja","doll","cheerleader","waitress","maid","miko","witch"
+            "elf","fairy","mermaid","nun", "dancer, ballet dress",,"doll","cheerleader","waitress","maid","miko","witch",
         };
 
         private static readonly List<string> scenes = new()
@@ -248,7 +248,7 @@ namespace Mikibot.Analyze.Bot
             "alpine", "coffee house", "lawn", "on bed", "fireworks", "isekai cityscape", "flying butterfly", "beach background", 
             "dungeon background", "airport background", "cityscape", "space background", "beige background", "simple pattern background", 
             "shooting star", "cherry blossoms", "colorful startrails", "white background", "silhouette", "gradient background", 
-            "sunburst background", "starry sky,clusters of stars", "snow", "sunlight on the desk ,8K ,high definition, 8K", 
+            "sunburst background", "starry sky,clusters of stars", "snow", "sunlight on the desk", 
             "building,rain,neon lights,cumulonimbus,moon"
         };
 
@@ -277,7 +277,9 @@ namespace Mikibot.Analyze.Bot
         {
             if (!promptMap.TryGetValue(style, out var prompts))
             {
-                prompts = promptMap[RandomOf(categories)]!;
+                var randCategory = RandomOf(categories);
+                style = randCategory!;
+                prompts = promptMap[style]!;
             }
 
             var lora = characterLore[character];
@@ -288,12 +290,19 @@ namespace Mikibot.Analyze.Bot
             var main = RandomOf(prompts)
                 .Replace(DefaultLora, lora)
                 .Replace("-w-", $"{weight}");
-            var hair = RandomOf(hairStyles);
-            var emo = RandomOf(emotions);
-            var fullbody = random.Next(100) > 50 ? "full body" : "";
-            var extra = "";
+
 
             var prefix = characterPrefix.GetValueOrDefault(character) ?? "";
+            var emo = RandomOf(emotions);
+            var fullbody = random.Next(100) > 50 ? "full body" : "";
+
+            if (style == "原版")
+            {
+                return ($"{BasicPrompt}{prefix}{main}({emo}), {fullbody}", $"生成词：{main}{fullbody}\n表情:{emo}");
+            }
+
+            var hair = RandomOf(hairStyles);
+            var extra = "";
 
             if (random.Next(2) == 1)
             {
@@ -305,7 +314,7 @@ namespace Mikibot.Analyze.Bot
                 extra = $"{behaviour}, {action}, {rp}, {scene}, ";
             }
 
-            return ($"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {fullbody}", $"生成词：{main}{fullbody}\n发型:{hair}\n表情:{emo}\n附加词 {extra}\noffset + {offset}");
+            return ($"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {fullbody}", $"生成词：{main}{fullbody}\n发型:{hair}\n表情:{emo}\n附加词 {extra}");
         }
 
         private static DateTimeOffset latestGenerateAt = DateTimeOffset.Now.Subtract(TimeSpan.FromMinutes(5));
@@ -363,7 +372,7 @@ namespace Mikibot.Analyze.Bot
 
         private static (string, string) parseCommand(string raw)
         {
-            var match = Regex.Matches(raw, "!来张(.*?)(.)$").FirstOrDefault();
+            var match = MatchRegex().Matches(raw).FirstOrDefault();
             if (match is null) {
                 return ("", "");
             }
@@ -372,7 +381,7 @@ namespace Mikibot.Analyze.Bot
 
         private async ValueTask Dequeue(CancellationToken token)
         {
-            await foreach (var msg in this.messageQueue.Reader.ReadAllAsync(token))
+            await foreach (var msg in messageQueue.Reader.ReadAllAsync(token))
             {
                 var group = msg.Sender.Group;
 
@@ -478,5 +487,8 @@ namespace Mikibot.Analyze.Bot
                 }
             }
         }
+
+        [GeneratedRegex("!来张(.*?)(.)$")]
+        private static partial Regex MatchRegex();
     }
 }
