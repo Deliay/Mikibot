@@ -230,7 +230,7 @@ namespace Mikibot.Analyze.Bot
         private static readonly List<string> rolePalys = new()
         {
             "yuri","milf","kemonomimi mode","minigirl","furry","magical girl","vampire","devil","monster","angel",
-            "elf","fairy","mermaid","nun", "dancer, ballet dress",,"doll","cheerleader","waitress","maid","miko","witch",
+            "elf","fairy","mermaid","nun", "dancer, ballet dress","doll","cheerleader","waitress","maid","miko","witch",
         };
 
         private static readonly List<string> scenes = new()
