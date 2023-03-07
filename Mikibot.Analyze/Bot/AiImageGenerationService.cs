@@ -390,7 +390,7 @@ namespace Mikibot.Analyze.Bot
             { "真", "mahiru-v2" },
             { "悠", "YuaVirtuareal_v01" },
             { "侑", "KiyuuVirtuareal_v20" },
-            { "炉", "kaoru" },
+            { "炉", "kaoru-1.0-v4" },
         };
 
         private static readonly Dictionary<string, double> characterWeightOffset = new()
@@ -410,7 +410,7 @@ namespace Mikibot.Analyze.Bot
         private static readonly Dictionary<string, Dictionary<string, string>> characterSuffix = new()
         {
             { "弥", new() {
-                { "原版", "1girl, thighhighs,  solo, black hair, long hair, hair ornament, blush, hairclip, shoes,  black_legwear, zettai ryouiki, " }
+                { "原版", "thighhighs, black hair, long hair, fish hair ornament, blush, hairclip, shoes, black_legwear, zettai ryouiki, grey_jacket, white shirt, bowtie, " }
             } },
             { "炉", new() {
                 { "原版", "deep blue shorts, white shirt, (white capelet), [[hat]], black tie, long sleeves, " }
