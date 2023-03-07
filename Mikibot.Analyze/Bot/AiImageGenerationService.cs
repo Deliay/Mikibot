@@ -271,7 +271,7 @@ namespace Mikibot.Analyze.Bot
             }
 
             var lora = characterLore[character];
-            var weight = basicStyleWeight[character];
+            var weight = basicStyleWeight[style];
             if (characterWeightOffset.TryGetValue(character, out var offset)) {
                 weight += offset;
             }
