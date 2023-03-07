@@ -134,7 +134,7 @@ namespace Mikibot.Analyze.Bot
         private static readonly List<string> behaviours = new()
         {
             "lap pillow", "hug", "fighting stance", "princess carry",
-            "standing", "mimikaki", "sweat", "wet", "sleeping", "bathing",
+            "standing", "mimikaki", "sweat", "wet", "sleeping", "bathing", "shaded face",
         };
 
         private static readonly List<string> actions= new()
