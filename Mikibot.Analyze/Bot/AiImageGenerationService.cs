@@ -213,7 +213,7 @@ namespace Mikibot.Analyze.Bot
                 return ($"{BasicPrompt}{scene}{behaviour}, {action}, {hair}, {emo}, ", $"生成词：{scene}\n抽中了附加词 {behaviour}, {action}, {hair}, {emo}");
             }
 
-            return ($"{BasicPrompt}{scene}", "没有抽中附加词");
+            return ($"{BasicPrompt}{scene}", $"生成词：{scene}\n没有抽中附加词");
         }
 
         private static DateTimeOffset latestGenerateAt = DateTimeOffset.Now.Subtract(TimeSpan.FromMinutes(5));
@@ -222,6 +222,7 @@ namespace Mikibot.Analyze.Bot
         {
             return (DateTimeOffset.Now - latestGenerateAt).TotalSeconds < CD;
         }
+        private bool isCdHintShown = false;
 
         private struct Info
         {
@@ -247,11 +248,16 @@ namespace Mikibot.Analyze.Bot
                         {
                             if (IsColdingDown())
                             {
-                                await miraiService.SendMessageToGroup(group, token, GetCdMessage().ToArray());
+                                if (!isCdHintShown)
+                                {
+                                    await miraiService.SendMessageToGroup(group, token, GetCdMessage().ToArray());
+                                    isCdHintShown = true;
+                                }
                             }
                             else
                             {
                                 latestGenerateAt = DateTimeOffset.Now;
+                                isCdHintShown = false;
                                 var (prompt, extra) = GetPrompt(plain.Text);
                                 await miraiService.SendMessageToGroup(group, token, GetGenerateMsg(extra).ToArray());
                                 logger.LogInformation("prompt: {}", prompt);
