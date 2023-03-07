@@ -111,15 +111,18 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:0.5>, forest, maid, maid headdress, maid apron, ",
             } },
             { "!来张旗袍弥", new() {
-                "<lora:miki-v2+v3:0.6>, dormitory, china dress, ",
-                "<lora:miki-v2+v3:0.6>, street, china dress, ",
-                "<lora:miki-v2+v3:0.6>, mountain, china dress, ",
-                "<lora:miki-v2+v3:0.6>, forest, lake, china dress, ",
-                "<lora:miki-v2+v3:0.6>, dormitory, chinese clothes, ",
-                "<lora:miki-v2+v3:0.6>, street, chinese clothes, ",
-                "<lora:miki-v2+v3:0.6>, mountain, chinese clothes, ",
-                "<lora:miki-v2+v3:0.6>, forest, lake, chinese clothes, ",
-            } }
+                "<lora:miki-v2+v3:0.6>, dormitory, (china dress), ",
+                "<lora:miki-v2+v3:0.6>, chinese street, (china dress), ",
+                "<lora:miki-v2+v3:0.6>, chinese mountain, (china dress), ",
+                "<lora:miki-v2+v3:0.6>, chinese forest, lake, (china dress), ",
+                "<lora:miki-v2+v3:0.6>, dormitory, (chinese clothes), ",
+                "<lora:miki-v2+v3:0.6>, chinese street, (chinese clothes), ",
+                "<lora:miki-v2+v3:0.6>, chinese mountain, (chinese clothes), ",
+                "<lora:miki-v2+v3:0.6>, chinese , lake, (chinese clothes), ",
+            } },
+            { "!来张机甲弥", new() {
+                "<lora:miki-v2+v3:0.5>, cyberpunk, kabuto, japanese armor, japanese clothes, holding tantou, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, tentacles, ",
+            } },
         };
 
         private const int CD = 120;
