@@ -317,7 +317,7 @@ namespace Mikibot.Analyze.Bot
         {
             { "弥", "purple eyes, black hair, [purple streaked hair], small breast, " },
             { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, " },
-            { "悠", "blue eyes, black hair ribbon, silver hair, blue inner hair, colored inner hair, <lora:YuaVirtuareal_v01:0.65>, " },
+            { "悠", "blue eyes, black hair ribbon, silver hair, blue inner hair, colored inner hair, " },
             { "侑", "(white pink hair), (blue streaked hair), (cat_ear_headphone), <lora:Kiyuu_:0.3>, " },
             { "炉", "yellow eyes, pink to cyan gradient short hair, gradient hair, cyan bleach, " },
         };
