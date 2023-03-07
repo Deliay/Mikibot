@@ -212,16 +212,16 @@ namespace Mikibot.Analyze.Bot
 
             var scene = RandomOf(prompts);
             var hair = RandomOf(hairStyles);
+            var fullbody = random.Next(100) > 50 ? "full body, " : "";
             if (random.Next(2) == 1)
             {
                 var behaviour = RandomOf(behaviours);
                 var action = RandomOf(actions);
                 var emo = RandomOf(emotions);
-
-                return ($"{BasicPrompt}{scene}{behaviour}, {action}, {hair}, {emo}, ", $"生成词：{scene}\n发型:{hair}\n抽中了附加词 {behaviour}, {action}, {emo}");
+                return ($"{BasicPrompt}{scene}{behaviour}, {action}, {hair}, {emo}, {fullbody}", $"生成词：{scene}, {fullbody}\n发型:{hair}\n抽中了附加词 {behaviour}, {action}, {emo}");
             }
 
-            return ($"{BasicPrompt}{scene}, {hair}", $"生成词：{scene}\n发型:{hair}\n没有抽中附加词");
+            return ($"{BasicPrompt}{scene}, {hair}, {fullbody}", $"生成词：{scene}\n发型:{hair}\n没有抽中附加词");
         }
 
         private static DateTimeOffset latestGenerateAt = DateTimeOffset.Now.Subtract(TimeSpan.FromMinutes(5));
