@@ -122,6 +122,10 @@ namespace Mikibot.Analyze.Bot
             } },
             { "!来张机甲弥", new() {
                 "<lora:miki-v2+v3:0.5>, cyberpunk, kabuto, japanese armor, japanese clothes, holding tantou, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, tentacles, ",
+                "<lora:miki-v2+v3:0.5>, cyberpunk, kabuto, japanese armor, japanese clothes, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, tentacles, ",
+                "<lora:miki-v2+v3:0.5>, cyberpunk, kabuto, japanese armor, holding tantou, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, tentacles, ",
+                "<lora:miki-v2+v3:0.5>, cyberpunk, kabuto, japanese armor, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, tentacles, ",
+                "<lora:miki-v2+v3:0.5>, cyberpunk, kabuto, japanese armor, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, tentacles, ",
             } },
         };
 
