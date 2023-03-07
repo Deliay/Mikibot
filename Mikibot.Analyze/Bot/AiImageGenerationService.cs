@@ -56,7 +56,7 @@ namespace Mikibot.Analyze.Bot
             "(missing legs), (((extra arms))), (((extra legs))), mutated hands,(fused fingers), (too many fingers), (((long neck))), (bad body perspect:1.1), nsfw";
 
         private const string BasicPrompt = "<lora:pastelMixStylizedAnime_pastelMixLoraVersion:0.3>, " +
-            "<lora:roluaStyleLora_r:0.2>,<lora:shadedface_2r16d16e:0.2>,<lora:V11ForegroundPlant_V11:0.3>, " +
+            "<lora:roluaStyleLora_r:0.2>,<lora:V11ForegroundPlant_V11:0.3>, " +
             "masterpiece, best quality, 1girl, solo, ";
 
 
@@ -165,7 +165,7 @@ namespace Mikibot.Analyze.Bot
         private static readonly List<string> behaviours = new()
         {
             "lap pillow", "hug", "fighting stance", "princess carry",
-            "standing", "mimikaki", "sweat", "wet", "sleeping", "bathing", "shaded face",
+            "standing", "mimikaki", "sweat", "wet", "sleeping", "bathing",
         };
 
         private static readonly List<string> actions= new()
@@ -195,7 +195,7 @@ namespace Mikibot.Analyze.Bot
             ":>","rectangular mouth",":<>",":c","o3o","x3",":o",":>",":>",":<",":<",":p",">:(",">:)",":d","angry",
             "blush","bored","depressed","despair","disdain", "nose blush","sleepy",
             "sobbing","turn pale","torogao","tongue","teeth","tears","surprised","smile","skin fang","singing sang",
-            "sigh","shaded face","serious","screaming","scared","sad","round teeth","raised eyebrow","pout","pain",
+            "sigh","serious","screaming","scared","sad","round teeth","raised eyebrow","pout","pain",
             "orgasm","open mouth","nervous","naughty face","light smile","licking","gloom depressed","fucked silly",
             "frown","fang","expressionless","embarrassed","drunk","drooling","disgust","confused","clenched teeth",
             "annoyed","ahegao","looking at viewer","open mouth","clenched teeth","lips","eyeball","eyelid pull",
