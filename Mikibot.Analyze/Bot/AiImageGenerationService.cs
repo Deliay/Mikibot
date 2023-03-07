@@ -72,7 +72,7 @@ namespace Mikibot.Analyze.Bot
             { "女仆", 0.5 },
             { "旗袍", 0.6 },
             { "机甲", 0.5 },
-            { "原版", 0.85 },
+            { "原版", 0.7 },
         };
 
 
@@ -290,6 +290,19 @@ namespace Mikibot.Analyze.Bot
         }
 
         private const string DefaultLora = "miki-v2+v3";
+
+        private static string suffixOf(string style, string character)
+        {
+            if (characterSuffix.TryGetValue(character, out var styleSuffix))
+            {
+                if (styleSuffix.TryGetValue(style, out var suffix))
+                {
+                    return suffix;
+                }
+            }
+            return "";
+        }
+
         private static (string, string, double, int) GetPrompt(string style, string character)
         {
             if (!promptMap.TryGetValue(style, out var prompts))
@@ -314,11 +327,12 @@ namespace Mikibot.Analyze.Bot
             var view = random.Next(100) > 50 ? "full body" : RandomOf(views);
             var cfgScale = random.Next(100) > 70 ? random.Next(40, 101) / 10D : 10;
             var steps = cfgScale != 10 ? random.Next(24, 46) : 30;
+            var suffix = suffixOf(style, character);
 
             if (style == "原版")
             {
                 return (
-                    $"{BasicPrompt}{prefix}{main}({emo}), {view}",
+                    $"{BasicPrompt}{prefix}{main}({emo}), {view}, {suffix}",
                     $"生成词: {main}\n视角: {view}\n表情: {emo}",
                     cfgScale, steps);
             }
@@ -338,7 +352,7 @@ namespace Mikibot.Analyze.Bot
             }
 
             return (
-                $"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {view}",
+                $"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {view}, {suffix}",
                 $"生成词: {main}{view}\n发型: {hair}\n表情: {emo}\n附加词: {extra}\ncfg_scale={cfgScale},step={steps}",
                 cfgScale, steps);
         }
@@ -381,16 +395,26 @@ namespace Mikibot.Analyze.Bot
 
         private static readonly Dictionary<string, double> characterWeightOffset = new()
         {
-            { "炉", 0.05 },
+            { "炉", -0.1 },
         };
 
         private static readonly Dictionary<string, string> characterPrefix = new()
         {
             { "弥", "purple eyes, black hair, [purple streaked hair], (small breast), " },
-            { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, small demon horns, (small breast), " },
+            { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, small demon horns, (small breast), (flat chest), " },
             { "悠", "(light blue eyes), black hair ribbon, silver hair, blue streaked hair, " },
             { "侑", "(white pink hair), (blue streaked hair), (cat_ear_headphone), <lora:Kiyuu_:0.2>, (small breast), " },
-            { "炉", "yellow eyes, (pink to cyan gradient hair), (gradient hair), ahoge, (small breast), deep blue shorts, white shirt, (white capelet), [[hat]], black tie, white long sleeves, white colored eyelashes, (+ +), " },
+            { "炉", "yellow eyes, (pink to cyan gradient hair), (gradient hair), ahoge, (small breast), (flat chest), white colored eyelashes, (+ +), " },
+        };
+
+        private static readonly Dictionary<string, Dictionary<string, string>> characterSuffix = new()
+        {
+            { "弥", new() {
+                { "原版", "1girl, thighhighs,  solo, black hair, long hair, hair ornament, blush, hairclip, shoes,  black_legwear, zettai ryouiki, " }
+            } },
+            { "炉", new() {
+                { "原版", "deep blue shorts, white shirt, (white capelet), [[hat]], black tie, long sleeves, " }
+            } },
         };
 
         private static readonly MessageChain helpMsg = new MessageChainBuilder()
