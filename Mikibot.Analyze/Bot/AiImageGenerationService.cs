@@ -69,14 +69,24 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:0.6>, stairs, plant, jk, school uniform, ",
             } },
             { "!来张萝莉弥", new () {
-                "(loli), <lora:miki-v2+v3:0.6>, school, plant, chibi, loli, ",
-                "(loli), <lora:miki-v2+v3:0.6>, laboratory, js, chibi, loli, ",
-                "(loli), <lora:miki-v2+v3:0.6>, street, plant, js, chibi, loli, ",
-                "(loli), <lora:miki-v2+v3:0.6>, stairs, plant, js, chibi, loli, ",
+                "(loli), <lora:miki-v2+v3:0.6>, school, plant, loli, ",
+                "(loli), <lora:miki-v2+v3:0.6>, laboratory, js, loli, ",
+                "(loli), <lora:miki-v2+v3:0.6>, street, plant, js, loli, ",
+                "(loli), <lora:miki-v2+v3:0.6>, stairs, plant, js, loli, ",
                 "(loli), <lora:miki-v2+v3:0.6>, school, plant, mesugaki, loli, ",
                 "(loli), <lora:miki-v2+v3:0.6>, laboratory, js, mesugaki, loli, ",
                 "(loli), <lora:miki-v2+v3:0.6>, street, plant, js, mesugaki, loli, ",
                 "(loli), <lora:miki-v2+v3:0.6>, stairs, plant, js, mesugaki, loli, ",
+            } },
+            { "!来张Q版弥", new () {
+                "(loli), <lora:miki-v2+v3:0.6>, school, plant, (chibi), loli, ",
+                "(loli), <lora:miki-v2+v3:0.6>, laboratory, js, (chibi), loli, ",
+                "(loli), <lora:miki-v2+v3:0.6>, street, plant, js, (chibi), loli, ",
+                "(loli), <lora:miki-v2+v3:0.6>, stairs, plant, js, (chibi), loli, ",
+                "(loli), <lora:miki-v2+v3:0.6>, school, plant, mesugaki, (chibi), loli, ",
+                "(loli), <lora:miki-v2+v3:0.6>, laboratory, js, mesugaki, (chibi), loli, ",
+                "(loli), <lora:miki-v2+v3:0.6>, street, plant, js, mesugaki, (chibi), loli, ",
+                "(loli), <lora:miki-v2+v3:0.6>, stairs, plant, js, mesugaki, (chibi), loli, ",
             } },
             { "!来张衬衫弥", new () {
                 "<lora:miki-v2+v3:0.6>, lake, forest, skirt, plant, ",
@@ -124,14 +134,14 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:0.5>, forest, maid, maid headdress, maid apron, ",
             } },
             { "!来张旗袍弥", new() {
-                "<lora:miki-v2+v3:0.6>, dormitory, (china dress), ",
-                "<lora:miki-v2+v3:0.6>, chinese street, (china dress), ",
-                "<lora:miki-v2+v3:0.6>, chinese mountain, (china dress), ",
-                "<lora:miki-v2+v3:0.6>, chinese forest, lake, (china dress), ",
-                "<lora:miki-v2+v3:0.6>, dormitory, (chinese clothes), ",
-                "<lora:miki-v2+v3:0.6>, chinese street, (chinese clothes), ",
-                "<lora:miki-v2+v3:0.6>, chinese mountain, (chinese clothes), ",
-                "<lora:miki-v2+v3:0.6>, chinese , lake, (chinese clothes), ",
+                "<lora:miki-v2+v3:0.6>, chinese, dormitory, (red china dress), ",
+                "<lora:miki-v2+v3:0.6>, chinese, chinese street, (red china dress), ",
+                "<lora:miki-v2+v3:0.6>, chinese, chinese mountain, (red china dress), ",
+                "<lora:miki-v2+v3:0.6>, chinese, chinese forest, lake, (red china dress), ",
+                "<lora:miki-v2+v3:0.6>, chinese, dormitory, (red chinese clothes), ",
+                "<lora:miki-v2+v3:0.6>, chinese, chinese street, (red chinese clothes), ",
+                "<lora:miki-v2+v3:0.6>, chinese, chinese mountain, (red chinese clothes), ",
+                "<lora:miki-v2+v3:0.6>, chinese, chinese forest, lake, (red chinese clothes), ",
             } },
             { "!来张机甲弥", new() {
                 "<lora:miki-v2+v3:0.5>, cyberpunk, kabuto, japanese armor, japanese clothes, holding tantou, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, tentacles, ",
@@ -243,7 +253,7 @@ namespace Mikibot.Analyze.Bot
                 extra = $"{behaviour}, {action}, {character}, ";
             }
 
-            return ($"{BasicPrompt}{scene}{emo}, {hair}, {extra}, {fullbody}", $"生成词：{scene}{fullbody}\n发型:{hair}\n表情:{emo}\n附加词 {extra}");
+            return ($"{BasicPrompt}{scene}({emo}), {hair}, {extra}, {fullbody}", $"生成词：{scene}{fullbody}\n发型:{hair}\n表情:{emo}\n附加词 {extra}");
         }
 
         private static DateTimeOffset latestGenerateAt = DateTimeOffset.Now.Subtract(TimeSpan.FromMinutes(5));
