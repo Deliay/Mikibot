@@ -54,9 +54,8 @@ namespace Mikibot.Analyze.Bot
             "((bad anatomy)), (((bad proportions))), ((extra limbs)), (((disfigured))), (bad anatomy), gross proportions, (malformed limbs), ((missing arms)), " +
             "(missing legs), (((extra arms))), (((extra legs))), mutated hands,(fused fingers), (too many fingers), (((long neck))), (bad body perspect:1.1), nsfw";
 
-        private const string BasicPrompt = "<lora:pastelMixStylizedAnime_pastelMixLoraVersion:0.2>, " +
-            "<lora:roluaStyleLora_r:0.3>,<lora:shadedface_2r16d16e:0.3>,<lora:V11ForegroundPlant_V11:0.3>, " +
-            "<lora:hipoly3DModelLora_v10:0.3>," +
+        private const string BasicPrompt = "<lora:pastelMixStylizedAnime_pastelMixLoraVersion:0.3>, " +
+            "<lora:roluaStyleLora_r:0.2>,<lora:shadedface_2r16d16e:0.2>,<lora:V11ForegroundPlant_V11:0.3>, " +
             "masterpiece, best quality, 1girl, solo, purple eyes, black long hair, [purple streaked hair], small breast, ";
 
 
@@ -94,8 +93,12 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:0.4>, side-tie bikini bottom, beach, ocean, ",
             } },
             { "!来张ol弥", new () {
-                "<lora:miki-v2+v3:0.6>, mountain in window, office, office lady",
+                "<lora:miki-v2+v3:0.6>, mountain in window, office lady",
                 "<lora:miki-v2+v3:0.6>, laboratory, office lady, ",
+                "<lora:miki-v2+v3:0.6>, dormitory, office lady, ",
+                "<lora:hipoly3DModelLora_v10:0.2>, <lora:miki-v2+v3:0.6>, dormitory, office lady, ",
+                "<lora:hipoly3DModelLora_v10:0.2>, <lora:miki-v2+v3:0.6>, laboratory, office lady, ",
+                "<lora:hipoly3DModelLora_v10:0.2>, <lora:miki-v2+v3:0.6>, mountain in window, office lady, ",
             } },
             { "!来张lo弥", new() {
                 "<lora:miki-v2+v3:0.5>, gothic lolita, lolita fashion, gothic architecture, plant, ",
@@ -176,7 +179,7 @@ namespace Mikibot.Analyze.Bot
         private static MessageChain GetGenerateMsg(string extra)
         {
             return new MessageChainBuilder()
-                               .Plain($"生成中，请稍等")
+                               .Plain($"生成中，请稍等\n")
                                .Plain(extra).Build();
         }
 
@@ -207,7 +210,7 @@ namespace Mikibot.Analyze.Bot
                 var hair = RandomOf(hairStyles);
                 var emo = RandomOf(emotions);
 
-                return ($"{BasicPrompt}{scene}{behaviour}, {action}, {hair}, {emo}, ", $"抽中了附加词 {behaviour}, {action}, {hair}, {emo}");
+                return ($"{BasicPrompt}{scene}{behaviour}, {action}, {hair}, {emo}, ", $"生成词：{scene}\n抽中了附加词 {behaviour}, {action}, {hair}, {emo}");
             }
 
             return ($"{BasicPrompt}{scene}", "没有抽中附加词");
