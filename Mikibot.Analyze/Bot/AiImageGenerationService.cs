@@ -320,7 +320,7 @@ namespace Mikibot.Analyze.Bot
         };
 
         private static readonly MessageChain helpMsg = new MessageChainBuilder()
-                                .Plain($"指令有2分钟的CD，使用'!来张[风格][人物]'生成，如，!来张随机弥\n可用人物:{string.Join(',', characterLore.Keys)}\n可用风格\n：随机,{string.Join(',', categories)}").Build();
+                                .Plain($"指令有2分钟的CD，使用'!来张[风格][人物]'生成（需要英文括号）\n\n例子：!来张随机弥\n可用人物:{string.Join(',', characterLore.Keys)}\n可用风格\n：随机,{string.Join(',', categories)}").Build();
 
         private static (string, string) parseCommand(string raw)
         {
