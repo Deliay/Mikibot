@@ -289,6 +289,12 @@ namespace Mikibot.Analyze.Bot
             "bust", "profile",
         };
 
+        private static readonly List<string> skys = new()
+        {
+            "morning", "sunset", "sunrise", "sunshine", "moon", "dark moon", "red moon", "blue sky", "cloudy sky", "starry sky",
+            "night sky", "gradient sky", "star"
+        };
+
         private static readonly List<string> emojis = new()
         {
             "🧝🏻‍♂️", "🧝🏻‍♀️", "🧙🏻‍♂️", "🧙🏻‍♀️", "🧐", "🦸🏻‍♂️", "🦸🏻‍♀️", "🥺", "🥴", "🤵🏻", "🤬", "🤡", "🤕", "🤓", "🙁", "😷", "😵", "😴",
@@ -362,13 +368,14 @@ namespace Mikibot.Analyze.Bot
             var view = random.Next(100) > 30 ? "full body" : RandomOf(views);
             var cfgScale = random.Next(100) > 40 ? random.Next(40, 111) / 10D : 8;
             var steps = random.Next(100) > 60 ? random.Next(24, 46) : 30;
+            var sky = random.Next(100) > 50 ? RandomOf(skys) :  "";
             var suffix = suffixOf(style, character);
 
             if (style == "原版")
             {
                 return (
-                    $"{BasicPrompt}{prefix}{main}({emo}), {view}, {suffix}",
-                    $"生成词: {main}\n视角: {view}\n表情: {emo}\n场景、人物专属附加词：{suffix}\ncfg_scale={cfgScale},step={steps}",
+                    $"{BasicPrompt}{prefix}{main}({emo}), {view}, {sky}, {suffix}",
+                    $"生成词: {main}\n视角: {view}\n表情: {emo}\n专属附加词：{suffix}\n天空: {sky}\ncfg_scale={cfgScale},step={steps}",
                     cfgScale, steps);
             }
 
@@ -387,8 +394,8 @@ namespace Mikibot.Analyze.Bot
             }
 
             return (
-                $"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {view}, {suffix}",
-                $"生成词: {main}{view}\n发型: {hair}\n表情: {emo}\n附加词: {extra}\n场景、人物专属附加词：{suffix}\ncfg_scale={cfgScale},step={steps}",
+                $"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {view}, {sky}, {suffix}",
+                $"生成词: {main}{view}\n发型: {hair}\n表情: {emo}\n附加词: {extra}\n专属附加词：{suffix}\n天空: {sky}\ncfg_scale={cfgScale},step={steps}",
                 cfgScale, steps);
         }
 
