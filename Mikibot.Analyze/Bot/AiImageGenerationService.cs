@@ -202,6 +202,11 @@ namespace Mikibot.Analyze.Bot
         {
             { "ol", new(){
                 "white thighhighs", "black thighhighs", "black stocking", "white stocking", "black pantyhose", "white pantyhose",
+                "black legwear",  "high heels",  "thigh boots",  "torn legwear",  "high heel boots",  "brown legwear",  
+                "toeless legwear",  "print legwear",  "lace-trimmed legwear",  "bodystocking",  "legwear under shorts",  
+                "pantylines",  "alternate legwear",  "seamed legwear",  "ribbed legwear",  "fur-trimmed legwear",  "strappy heels",  
+                "ankle socks",  "see-through legwear",  "fine fabric emphasis",  "legwear garter",  "stiletto heels",  "back-seamed legwear",  
+                "boots removed",  "two-tone legwear",  "bow legwear",  "leg cutout",
             } },
         };
 
