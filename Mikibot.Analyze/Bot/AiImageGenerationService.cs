@@ -363,7 +363,7 @@ namespace Mikibot.Analyze.Bot
             {
                 return (
                     $"{BasicPrompt}{prefix}{main}({emo}), {view}, {suffix}",
-                    $"生成词: {main}\n视角: {view}\n表情: {emo}\ncfg_scale={cfgScale},step={steps}",
+                    $"生成词: {main}\n视角: {view}\n表情: {emo}\n场景、人物专属附加词：{suffix}\ncfg_scale={cfgScale},step={steps}",
                     cfgScale, steps);
             }
 
@@ -383,7 +383,7 @@ namespace Mikibot.Analyze.Bot
 
             return (
                 $"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {view}, {suffix}",
-                $"生成词: {main}{view}\n发型: {hair}\n表情: {emo}\n附加词: {extra}\ncfg_scale={cfgScale},step={steps}",
+                $"生成词: {main}{view}\n发型: {hair}\n表情: {emo}\n附加词: {extra}\n场景、人物专属附加词：{suffix}\ncfg_scale={cfgScale},step={steps}",
                 cfgScale, steps);
         }
 
