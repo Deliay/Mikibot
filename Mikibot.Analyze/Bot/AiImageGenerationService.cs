@@ -381,7 +381,7 @@ namespace Mikibot.Analyze.Bot
             if (style == "原版")
             {
                 return (
-                    $"{BasicPrompt}{prefix}{main}({emo}), {view}, {sky}, {season}, {suffix}",
+                    $"{BasicPrompt}{prefix}{main}({emo}), {view}, ({sky}), ({season}), {suffix}",
                     $"生成词: {main}\n视角: {view}\n表情: {emo}\n专属附加词：{suffix}\n天空: {sky}\n季节: {season}\ncfg_scale={cfgScale},step={steps}",
                     cfgScale, steps);
             }
@@ -401,7 +401,7 @@ namespace Mikibot.Analyze.Bot
             }
 
             return (
-                $"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {view}, {sky}, {suffix}",
+                $"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {view}, ({sky}), ({season}), {suffix}",
                 $"生成词: {main}{view}\n发型: {hair}\n表情: {emo}\n附加词: {extra}\n专属附加词：{suffix}\n天空: {sky}\n季节: {season}\ncfg_scale={cfgScale},step={steps}",
                 cfgScale, steps);
         }
