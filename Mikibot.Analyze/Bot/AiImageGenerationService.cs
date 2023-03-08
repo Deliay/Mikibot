@@ -494,7 +494,7 @@ namespace Mikibot.Analyze.Bot
                                     negative_prompt = NegativePrompt,
                                     override_settings = new
                                     {
-                                        filter_nsfw = true,
+                                        filter_nsfw = false,
                                     },
                                 }), token);
                                 latestGenerateAt = DateTimeOffset.Now.Subtract(TimeSpan.FromSeconds(20));
@@ -521,6 +521,7 @@ namespace Mikibot.Analyze.Bot
                                 catch (Exception ex)
                                 {
                                     logger.LogError(ex, "catched after access AI!");
+                                    logger.LogInformation(await res.Content.ReadAsStringAsync());
                                     return;
                                 }
                             }
