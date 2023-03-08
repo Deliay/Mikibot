@@ -348,7 +348,7 @@ namespace Mikibot.Analyze.Bot
                 var rp = RandomOf(rolePalys);
                 var emoji = RandomOf(emojis);
 
-                extra = $"{behaviour}, {action}, {rp}, ({scene}), {emoji}, ";
+                extra = $"({behaviour}), ({action}), ({rp}), ({scene}), ({emoji}), ";
             }
 
             return (
