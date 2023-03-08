@@ -382,6 +382,7 @@ namespace Mikibot.Analyze.Bot
             { "悠", new() { "139528984" } },
             { "侑", new() { "139528984" } },
             { "炉", new() { "139528984" } },
+            { "毬", new() { "139528984", "972488523" } },
         };
 
         private static readonly Dictionary<string, string> characterLore = new()
@@ -391,6 +392,7 @@ namespace Mikibot.Analyze.Bot
             { "悠", "YuaVirtuareal_v01" },
             { "侑", "KiyuuVirtuareal_v20" },
             { "炉", "kaoru-1.0-v4" },
+            { "毬", "akumaria" },
         };
 
         private static readonly Dictionary<string, double> characterWeightOffset = new()
@@ -405,6 +407,7 @@ namespace Mikibot.Analyze.Bot
             { "悠", "(light blue eyes), black hair ribbon, silver hair, blue streaked hair, " },
             { "侑", "(white pink hair), (blue streaked hair), (cat_ear_headphone), <lora:Kiyuu_:0.2>, (small breast), " },
             { "炉", "yellow eyes, (pink to cyan gradient hair), (gradient hair), ahoge, (small breast), (flat chest), white colored eyelashes, (+ +), " },
+            { "毬", "red eyes, silver hair, read streaked hair, demon girl, demon tail, demon wings, demon horns, square pupils, (small breast), " },
         };
 
         private static readonly Dictionary<string, Dictionary<string, string>> characterSuffix = new()
@@ -417,8 +420,12 @@ namespace Mikibot.Analyze.Bot
             } },
         };
 
-        private static readonly MessageChain helpMsg = new MessageChainBuilder()
-                                .Plain($"指令有2分钟的CD，使用'!来张[风格][人物]'生成（需要英文括号）\n\n例子：!来张随机弥\n可用人物:{string.Join(',', characterLore.Keys)}\n可用风格\n：随机,{string.Join(',', categories)}").Build();
+        private static MessageChain getHelpMsg(string groupId) {
+            var availableCharacters = characterLore.Keys
+                .Where(c => characterLimit[c].Contains(groupId));
+            return new MessageChainBuilder()
+                                .Plain($"指令有2分钟的CD，使用'!来张[风格][人物]'生成（需要英文括号）\n\n例子：!来张随机弥\n可用人物:{string.Join(',', availableCharacters)}\n可用风格\n：随机,{string.Join(',', categories)}").Build();
+        }
 
         private static (string, string) parseCommand(string raw)
         {
@@ -441,7 +448,7 @@ namespace Mikibot.Analyze.Bot
                     {
                         if (plain.Text == "!help")
                         {
-                            await miraiService.SendMessageToGroup(group, token, helpMsg.ToArray());
+                            await miraiService.SendMessageToGroup(group, token, getHelpMsg(group.Id).ToArray());
                         }
                         var (style, character) = parseCommand(plain.Text);
                         if (character == "" )
