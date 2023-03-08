@@ -324,16 +324,16 @@ namespace Mikibot.Analyze.Bot
 
             var prefix = characterPrefix.GetValueOrDefault(character) ?? "";
             var emo = RandomOf(emotions);
-            var view = random.Next(100) > 50 ? "full body" : RandomOf(views);
-            var cfgScale = random.Next(100) > 70 ? random.Next(40, 101) / 10D : 10;
-            var steps = cfgScale != 10 ? random.Next(24, 46) : 30;
+            var view = random.Next(100) > 60 ? "full body" : RandomOf(views);
+            var cfgScale = random.Next(100) > 60 ? random.Next(40, 111) / 11D : 8;
+            var steps = random.Next(100) > 60 ? random.Next(24, 46) : 30;
             var suffix = suffixOf(style, character);
 
             if (style == "原版")
             {
                 return (
                     $"{BasicPrompt}{prefix}{main}({emo}), {view}, {suffix}",
-                    $"生成词: {main}\n视角: {view}\n表情: {emo}",
+                    $"生成词: {main}\n视角: {view}\n表情: {emo}\ncfg_scale={cfgScale},step={steps}",
                     cfgScale, steps);
             }
 
