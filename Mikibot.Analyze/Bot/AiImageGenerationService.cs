@@ -324,8 +324,8 @@ namespace Mikibot.Analyze.Bot
 
             var prefix = characterPrefix.GetValueOrDefault(character) ?? "";
             var emo = RandomOf(emotions);
-            var view = random.Next(100) > 40 ? "full body" : RandomOf(views);
-            var cfgScale = random.Next(100) > 50 ? random.Next(40, 111) / 10D : 8;
+            var view = random.Next(100) > 30 ? "full body" : RandomOf(views);
+            var cfgScale = random.Next(100) > 40 ? random.Next(40, 111) / 10D : 8;
             var steps = random.Next(100) > 60 ? random.Next(24, 46) : 30;
             var suffix = suffixOf(style, character);
 
@@ -486,7 +486,7 @@ namespace Mikibot.Analyze.Bot
                                     height = 432,
                                     negative_prompt = NegativePrompt,
                                 }), token);
-                                latestGenerateAt = DateTimeOffset.Now;
+                                latestGenerateAt = DateTimeOffset.Now.Subtract(TimeSpan.FromSeconds(20));
                                 try
                                 {
                                     var body = await res.Content.ReadFromJsonAsync<Ret>(cancellationToken: token);
