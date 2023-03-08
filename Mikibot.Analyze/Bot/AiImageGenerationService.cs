@@ -135,18 +135,18 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, side-tie bikini bottom, beach, ocean, ",
             } },
             { "ol", new () {
-                "(office lady),<lora:miki-v2+v3:-w->, mountain in window, (office lady), ",
-                "(office lady),<lora:miki-v2+v3:-w->, laboratory, (office lady), ",
-                "(office lady),<lora:miki-v2+v3:-w->, dormitory, (office lady), ",
-                "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, dormitory, (office lady), ",
-                "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, laboratory, (office lady), ",
-                "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, mountain in window, (office lady), ",
-                "(office lady),<lora:miki-v2+v3:-w->, mountain in window, (office lady), blazer, cardigan, ",
-                "(office lady),<lora:miki-v2+v3:-w->, laboratory, (office lady), blazer, cardigan, ",
-                "(office lady),<lora:miki-v2+v3:-w->, dormitory, (office lady), blazer, cardigan, ",
-                "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, dormitory, (office lady), blazer, cardigan, ",
-                "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, laboratory, (office lady), blazer, cardigan, ",
-                "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, mountain in window, (office lady), blazer, cardigan, ",
+                "(office lady),<lora:miki-v2+v3:-w->, office, mountain in window, (office lady), ",
+                "(office lady),<lora:miki-v2+v3:-w->, office, laboratory, (office lady), ",
+                "(office lady),<lora:miki-v2+v3:-w->, office, dormitory, (office lady), ",
+                "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, office, office, dormitory, (office lady), ",
+                "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, office, laboratory, (office lady), ",
+                "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, office, mountain in window, (office lady), ",
+                "(office lady),<lora:miki-v2+v3:-w->, office, mountain in window, (office lady), blazer, cardigan, ",
+                "(office lady),<lora:miki-v2+v3:-w->, office, laboratory, (office lady), blazer, cardigan, ",
+                "(office lady),<lora:miki-v2+v3:-w->, office, dormitory, (office lady), blazer, cardigan, ",
+                "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, office, dormitory, (office lady), blazer, cardigan, ",
+                "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, office, laboratory, (office lady), blazer, cardigan, ",
+                "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, office, mountain in window, (office lady), blazer, cardigan, ",
             } },
             { "lo", new() {
                 "<lora:miki-v2+v3:-w->, gothic lolita, lolita fashion, gothic architecture, plant, ",
@@ -201,7 +201,7 @@ namespace Mikibot.Analyze.Bot
         private static readonly Dictionary<string, List<string>> mainStocks = new()
         {
             { "ol", new(){
-                "white thighhighs", "black thighhighs", "black stocking"
+                "white thighhighs", "black thighhighs", "black stocking", "white stocking", "black pantyhose", "white pantyhose",
             } },
         };
 
