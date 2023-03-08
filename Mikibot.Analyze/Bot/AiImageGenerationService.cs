@@ -84,6 +84,11 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, laboratory, jk, school uniform, ",
                 "<lora:miki-v2+v3:-w->, street, plant, jk, school uniform, ",
                 "<lora:miki-v2+v3:-w->, stairs, plant, jk, school uniform, ",
+                "<lora:miki-v2+v3:-w->, school, plant, jk, school uniform, cardigan, ",
+                "<lora:miki-v2+v3:-w->, engine room, plant, jk, school uniform, cardigan, ",
+                "<lora:miki-v2+v3:-w->, laboratory, jk, school uniform, cardigan, ",
+                "<lora:miki-v2+v3:-w->, street, plant, jk, school uniform, cardigan, ",
+                "<lora:miki-v2+v3:-w->, stairs, plant, jk, school uniform, cardigan, ",
             } },
             { "萝莉", new () {
                 "(loli), <lora:miki-v2+v3:-w->, school, plant, loli, ",
@@ -106,12 +111,12 @@ namespace Mikibot.Analyze.Bot
                 "(loli), <lora:miki-v2+v3:-w->, stairs, plant, js, mesugaki, (chibi), loli, ",
             } },
             { "衬衫", new () {
-                "<lora:miki-v2+v3:-w->, mountain, lake, forest, shirt, plant, ",
+                "<lora:miki-v2+v3:-w->, mountain, lake, forest, shirt, plant, cardigan, ",
                 "<lora:miki-v2+v3:-w->, laboratory, shirt, ",
-                "<lora:miki-v2+v3:-w->, mountain, forest, shirt, plant, ",
+                "<lora:miki-v2+v3:-w->, mountain, forest, shirt, plant, cardigan, ",
                 "<lora:miki-v2+v3:-w->, castle, shirt, plant, ",
                 "<lora:miki-v2+v3:-w->, street, shirt, plant, ",
-                "<lora:miki-v2+v3:-w->, dormitory, shirt, plant, ",
+                "<lora:miki-v2+v3:-w->, dormitory, shirt, plant, cardigan, ",
             } },
             { "白裙", new () {
                 "<lora:miki-v2+v3:-w->, mountain, white dress, skirt, off-shoulder dress, bare shoulders, miki bag summer, ",
@@ -136,6 +141,12 @@ namespace Mikibot.Analyze.Bot
                 "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, dormitory, (office lady), ",
                 "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, laboratory, (office lady), ",
                 "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, mountain in window, (office lady), ",
+                "(office lady),<lora:miki-v2+v3:-w->, mountain in window, (office lady), blazer, cardigan, ",
+                "(office lady),<lora:miki-v2+v3:-w->, laboratory, (office lady), blazer, cardigan, ",
+                "(office lady),<lora:miki-v2+v3:-w->, dormitory, (office lady), blazer, cardigan, ",
+                "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, dormitory, (office lady), blazer, cardigan, ",
+                "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, laboratory, (office lady), blazer, cardigan, ",
+                "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, mountain in window, (office lady), blazer, cardigan, ",
             } },
             { "lo", new() {
                 "<lora:miki-v2+v3:-w->, gothic lolita, lolita fashion, gothic architecture, plant, ",
@@ -186,6 +197,20 @@ namespace Mikibot.Analyze.Bot
         }
 
         private static readonly List<string> categories = promptMap.Keys.ToList();
+
+        private static readonly Dictionary<string, List<string>> mainStocks = new()
+        {
+            { "ol", new(){
+                "white thighhighs", "black thighhighs", "black stocking"
+            } },
+        };
+
+        private static readonly Dictionary<string, List<string>> mainClothes = new()
+        {
+            { "ol", new(){
+                "office uniform", "police uniform", "military uniform", "business suit", "dress shirt", "shirt",
+            } },
+        };
 
         private static readonly List<string> behaviours = new()
         {
@@ -293,14 +318,19 @@ namespace Mikibot.Analyze.Bot
 
         private static string suffixOf(string style, string character)
         {
-            if (characterSuffix.TryGetValue(character, out var styleSuffix))
+            List<string> suffixs = new();
+            if (characterSuffix.TryGetValue(character, out var styleSuffixs))
             {
-                if (styleSuffix.TryGetValue(style, out var suffix))
+                if (styleSuffixs.TryGetValue(style, out var styleSuffix))
                 {
-                    return suffix;
+                    suffixs.Add(styleSuffix);
                 }
             }
-            return "";
+            if (mainStocks.TryGetValue(style, out var stocks))
+            {
+                suffixs.Add(RandomOf(stocks));
+            }
+            return $"{string.Join(", ", suffixs)}, ";
         }
 
         private static (string, string, double, int) GetPrompt(string style, string character)
