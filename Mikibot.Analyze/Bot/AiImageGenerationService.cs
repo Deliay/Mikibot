@@ -130,12 +130,12 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, side-tie bikini bottom, beach, ocean, ",
             } },
             { "ol", new () {
-                "<lora:miki-v2+v3:-w->, mountain in window, office lady",
-                "<lora:miki-v2+v3:-w->, laboratory, office lady, ",
-                "<lora:miki-v2+v3:-w->, dormitory, office lady, ",
-                "<lora:hipoly3DModelLora_v10:0.2>, <lora:miki-v2+v3:-w->, dormitory, office lady, ",
-                "<lora:hipoly3DModelLora_v10:0.2>, <lora:miki-v2+v3:-w->, laboratory, office lady, ",
-                "<lora:hipoly3DModelLora_v10:0.2>, <lora:miki-v2+v3:-w->, mountain in window, office lady, ",
+                "(office lady),<lora:miki-v2+v3:-w->, mountain in window, (office lady), ",
+                "(office lady),<lora:miki-v2+v3:-w->, laboratory, (office lady), ",
+                "(office lady),<lora:miki-v2+v3:-w->, dormitory, (office lady), ",
+                "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, dormitory, (office lady), ",
+                "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, laboratory, (office lady), ",
+                "(office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, mountain in window, (office lady), ",
             } },
             { "lo", new() {
                 "<lora:miki-v2+v3:-w->, gothic lolita, lolita fashion, gothic architecture, plant, ",
