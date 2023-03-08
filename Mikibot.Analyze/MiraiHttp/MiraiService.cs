@@ -75,6 +75,12 @@ namespace Mikibot.Analyze.MiraiHttp
             }
         }
 
+        private static readonly HashSet<string> allowGroups = new()
+        {
+            "314503649",
+            "139528984"
+        };
+
         public async ValueTask SendMessageToAllGroup(CancellationToken token, params MessageBase[] messages)
         {
             foreach (var group in Bot.Groups.Value)
@@ -82,10 +88,11 @@ namespace Mikibot.Analyze.MiraiHttp
 #if DEBUG
                 if (group.Id != "139528984") continue;
 #endif
-                if (group.Id == "1001856303") continue;
-                if (group.Id == "972488523") continue;
                 if (token.IsCancellationRequested) break;
-                await SendMessageToGroup(group, token, messages);
+
+                if (allowGroups.Contains(group.Id)) {
+                    await SendMessageToGroup(group, token, messages);
+                }
             }
         }
 
