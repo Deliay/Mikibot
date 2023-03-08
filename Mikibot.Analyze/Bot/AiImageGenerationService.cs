@@ -383,6 +383,7 @@ namespace Mikibot.Analyze.Bot
             { "侑", new() { "139528984" } },
             { "炉", new() { "139528984" } },
             { "毬", new() { "139528984", "972488523" } },
+            { "岁", new() { "139528984" } },
         };
 
         private static readonly Dictionary<string, string> characterLore = new()
@@ -393,6 +394,7 @@ namespace Mikibot.Analyze.Bot
             { "侑", "KiyuuVirtuareal_v20" },
             { "炉", "kaoru-1.0-v4" },
             { "毬", "akumaria" },
+            { "岁", "suiVirtuareal_suiVr" },
         };
 
         private static readonly Dictionary<string, double> characterWeightOffset = new()
@@ -408,6 +410,7 @@ namespace Mikibot.Analyze.Bot
             { "侑", "(white pink hair), (blue streaked hair), (cat_ear_headphone), <lora:Kiyuu_:0.2>, (small breast), " },
             { "炉", "yellow eyes, (pink to cyan gradient hair), (gradient hair), ahoge, (small breast), (flat chest), white colored eyelashes, (+ +), " },
             { "毬", "red eyes, silver hair, red streaked hair, demon girl, demon tail, demon wings, demon horns, square pupils, (small breast), " },
+            { "岁", "red eyes, silver hair, red hair robbon, (small breast), " },
         };
 
         private static readonly Dictionary<string, Dictionary<string, string>> characterSuffix = new()
