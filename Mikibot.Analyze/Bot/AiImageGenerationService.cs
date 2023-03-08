@@ -407,7 +407,7 @@ namespace Mikibot.Analyze.Bot
             { "悠", "(light blue eyes), black hair ribbon, silver hair, blue streaked hair, " },
             { "侑", "(white pink hair), (blue streaked hair), (cat_ear_headphone), <lora:Kiyuu_:0.2>, (small breast), " },
             { "炉", "yellow eyes, (pink to cyan gradient hair), (gradient hair), ahoge, (small breast), (flat chest), white colored eyelashes, (+ +), " },
-            { "毬", "red eyes, silver hair, read streaked hair, demon girl, demon tail, demon wings, demon horns, square pupils, (small breast), " },
+            { "毬", "red eyes, silver hair, red streaked hair, demon girl, demon tail, demon wings, demon horns, square pupils, (small breast), " },
         };
 
         private static readonly Dictionary<string, Dictionary<string, string>> characterSuffix = new()
