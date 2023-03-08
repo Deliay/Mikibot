@@ -492,6 +492,10 @@ namespace Mikibot.Analyze.Bot
                                     width = 768,
                                     height = 432,
                                     negative_prompt = NegativePrompt,
+                                    override_settings = new
+                                    {
+                                        filter_nsfw = true,
+                                    },
                                 }), token);
                                 latestGenerateAt = DateTimeOffset.Now.Subtract(TimeSpan.FromSeconds(20));
                                 try
