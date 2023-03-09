@@ -509,7 +509,7 @@ namespace Mikibot.Analyze.Bot
             return (match.Result("$1"), match.Result("$2"));
         }
 
-        private async ValueTask ProcessManual(string raw)
+        private async ValueTask ProcessManual(Mirai.Net.Data.Shared.Group group, string raw, CancellationToken token)
         {
             var (character, prompt) = ParseManualCommand(raw);
             
@@ -517,7 +517,11 @@ namespace Mikibot.Analyze.Bot
             var weight = 0.6 + characterWeightOffset.GetValueOrDefault(character);
             var lora = characterLore.GetValueOrDefault(character) ?? "";
             
-            await Request($"{BasicPrompt}, {prefix}, <lora:{lora}:{weight}>, {prompt}");
+            var fullPrompt = $"{BasicPrompt}, {prefix}, <lora:{lora}:{weight}>, {prompt}";
+            await miraiService.SendMessageToGroup(group, token, GetGenerateMsg(fullPrompt).ToArray());
+
+            var ret = await Request(fullPrompt);
+            await SendImage(group, ret, token);
         }
 
         private async ValueTask<Ret> Request(string prompt, double cfg_scale = 8, int steps = 26, CancellationToken token = default)
@@ -595,7 +599,7 @@ namespace Mikibot.Analyze.Bot
                         {
                             if (msg.Sender.Id == "644676751")
                             {
-                                await ProcessManual(plain.Text);
+                                await ProcessManual(group, plain.Text);
                             }
                             continue;
                         }
