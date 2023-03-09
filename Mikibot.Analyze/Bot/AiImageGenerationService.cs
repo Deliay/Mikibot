@@ -387,7 +387,7 @@ namespace Mikibot.Analyze.Bot
             var sky = RandomOf(skys);
             var season = RandomOf(seasons);
             var suffix = suffixOf(style, character);
-            var lightFix = random.Next(1) == 1 ? "epiNoiseoffset_v2" : "";
+            var lightFix = random.Next(2) == 1 ? "<lora:epiNoiseoffset_v2:1>" : "";
             var lightFixHint = lightFix == "" ? "关" : "开";
 
             if (style == "原版")
