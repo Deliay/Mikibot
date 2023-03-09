@@ -45,7 +45,7 @@ namespace Mikibot.Analyze.Bot
             AllowSynchronousContinuations = false,
         });
 
-        private const string NegativePrompt = "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, " +
+        private const string NegativePromptAnything = "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, " +
             "low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, (((look_at_viewer))),((((extra fingers)))),((look_at_viewer)), " +
             "mutated hands, ((poorly drawn hands)), paintings, sketches, (worst quality:2), (low quality:2), (normal quality:2), lowres, normal quality, ((monochrome)), " +
             "((grayscale)), skin spots, acnes, skin blemishes, age spot, glans, nipples, (((necklace))), (worst quality, low quality:1.2), watermark, username, " +
@@ -55,8 +55,8 @@ namespace Mikibot.Analyze.Bot
             "((bad anatomy)), (((bad proportions))), ((extra limbs)), (((disfigured))), (bad anatomy), gross proportions, (malformed limbs), ((missing arms)), " +
             "(missing legs), (((extra arms))), (((extra legs))), mutated hands,(fused fingers), (too many fingers), (((long neck))), (bad body perspect:1.1), (((nsfw)))";
 
-        private const string BasicPrompt = "<lora:pastelMixStylizedAnime_pastelMixLoraVersion:0.25>, " +
-            "<lora:roluaStyleLora_r:0.25>,<lora:V11ForegroundPlant_V11:0.3>, " +
+        private const string BasicPrompt = "<lora:pastelMixStylizedAnime_pastelMixLoraVersion:0.3>, " +
+            "<lora:roluaStyleLora_r:0.3>,<lora:V11ForegroundPlant_V11:0.4>, " +
             "masterpiece, best quality, 1girl, solo, ";
 
         private static readonly Dictionary<string, double> basicStyleWeight = new()
