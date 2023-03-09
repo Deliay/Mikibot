@@ -379,7 +379,7 @@ namespace Mikibot.Analyze.Bot
             return $"{string.Join(", ", suffixs)}, ";
         }
 
-        private static (string, string, double, int) GetPrompt(string style, string character)
+        private static (string, string, double, int, int, int) GetPrompt(string style, string character)
         {
             if (!promptMap.TryGetValue(style, out var prompts))
             {
@@ -397,7 +397,9 @@ namespace Mikibot.Analyze.Bot
                 .Replace(DefaultLora, lora)
                 .Replace("-w-", $"{weight}");
 
-
+            var direction = random.Next() >= 50;
+            var width = direction ? 768 : 432;
+            var height = direction ? 432 : 768;
             var prefix = characterPrefix.GetValueOrDefault(character) ?? "";
             var emo = RandomOf(emotions);
             var view = random.Next(100) > 30 ? "full body" : RandomOf(views);
@@ -412,7 +414,7 @@ namespace Mikibot.Analyze.Bot
                 return (
                     $"{BasicPrompt}{prefix}{main}({emo}), {view}, ({sky}), ({season}), {suffix}, ",
                     $"生成词: {main}\n视角: {view}\n表情: {emo}\n专属附加词：{suffix}\n天空: {sky}\n季节: {season}\ncfg_scale={cfgScale},step={steps}",
-                    cfgScale, steps);
+                    cfgScale, steps, width, height);
             }
 
             var hair = RandomOf(hairStyles);
@@ -432,7 +434,7 @@ namespace Mikibot.Analyze.Bot
             return (
                 $"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {view}, ({sky}), ({season}), {suffix}, ",
                 $"生成词: {main}\n视角: {view}\n发型: {hair}\n表情: {emo}\n附加词: {extra}\n专属附加词：{suffix}\n天空: {sky}\n季节: {season}\ncfg_scale={cfgScale},step={steps}",
-                cfgScale, steps);
+                cfgScale, steps, width, height);
         }
 
         private static DateTimeOffset latestGenerateAt = DateTimeOffset.Now.Subtract(TimeSpan.FromMinutes(5));
@@ -543,7 +545,7 @@ namespace Mikibot.Analyze.Bot
             await SendImage(group, ret, token);
         }
 
-        private async ValueTask<Ret> Request(string prompt, double cfg_scale = 8, int steps = 26, CancellationToken token = default)
+        private async ValueTask<Ret> Request(string prompt, double cfg_scale = 8, int steps = 26, int width = 768, int height = 432, CancellationToken token = default)
         {
 
             latestGenerateAt = DateTimeOffset.Now;
@@ -560,8 +562,8 @@ namespace Mikibot.Analyze.Bot
                 cfg_scale,
                 steps,
                 sampler_index = "DPM++ 2M Karras",
-                width = 768,
-                height = 432,
+                width,
+                height,
                 negative_prompt = NegativePrompt,
             }), token);
             latestGenerateAt = DateTimeOffset.Now.Subtract(TimeSpan.FromSeconds(20));
@@ -646,12 +648,12 @@ namespace Mikibot.Analyze.Bot
                             else
                             {
                                 isCdHintShown = false;
-                                var (prompt, extra, cfg_scale, steps) = GetPrompt(style, character);
+                                var (prompt, extra, cfg_scale, steps, width, height) = GetPrompt(style, character);
                                 await miraiService.SendMessageToGroup(group, token, GetGenerateMsg(extra).ToArray());
                                 logger.LogInformation("prompt: {}", prompt);
                                 try
                                 {
-                                    var body = await Request(prompt, cfg_scale, steps, token);
+                                    var body = await Request(prompt, cfg_scale, steps, width, height, token);
                                     await SendImage(group, body, token);
                                 }
                                 catch (Exception ex)
