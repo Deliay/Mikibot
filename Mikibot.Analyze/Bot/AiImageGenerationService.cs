@@ -182,6 +182,14 @@ namespace Mikibot.Analyze.Bot
             { "电锯", new() {
                 "<lora:miki-v2+v3:-w->, cyberpunk, (machine:1.2), blood, (chainsaw man), lolipop chainsaw, holding chainsaw, chainsaw, ",
                 "<lora:miki-v2+v3:-w->, kabuto, (machine:1.2), blood, (chainsaw man), lolipop chainsaw, holding chainsaw, chainsaw, ",
+                "<lora:miki-v2+v3:-w->, dormitory, (machine:1.2), blood, (chainsaw man), lolipop chainsaw, holding chainsaw, chainsaw, ",
+                "<lora:miki-v2+v3:-w->, street, (machine:1.2), blood, (chainsaw man), lolipop chainsaw, holding chainsaw, chainsaw, ",
+                "<lora:miki-v2+v3:-w->, castle, (machine:1.2), blood, (chainsaw man), lolipop chainsaw, holding chainsaw, chainsaw, ",
+                "<lora:miki-v2+v3:-w->, mountain, (machine:1.2), blood, (chainsaw man), lolipop chainsaw, holding chainsaw, chainsaw, ",
+                "<lora:miki-v2+v3:-w->, office, (machine:1.2), blood, (chainsaw man), lolipop chainsaw, holding chainsaw, chainsaw, ",
+                "<lora:miki-v2+v3:-w->, forest, (machine:1.2), blood, (chainsaw man), lolipop chainsaw, holding chainsaw, chainsaw, ",
+                "<lora:miki-v2+v3:-w->, laboratory, (machine:1.2), blood, (chainsaw man), lolipop chainsaw, holding chainsaw, chainsaw, ",
+                "<lora:miki-v2+v3:-w->, beach, (machine:1.2), blood, (chainsaw man), lolipop chainsaw, holding chainsaw, chainsaw, ",
             } },
             { "原版", new() {
                 "dormitory, <lora:miki-v2+v3:-w->, ",
