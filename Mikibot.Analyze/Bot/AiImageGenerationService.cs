@@ -397,7 +397,7 @@ namespace Mikibot.Analyze.Bot
                 .Replace(DefaultLora, lora)
                 .Replace("-w-", $"{weight}");
 
-            var direction = random.Next() >= 50;
+            var direction = random.Next(100) >= 50;
             var directionHint = direction ? "横板" : "竖版";
             var width = direction ? 768 : 432;
             var height = direction ? 432 : 768;
