@@ -55,6 +55,12 @@ namespace Mikibot.Analyze.Bot
             "((bad anatomy)), (((bad proportions))), ((extra limbs)), (((disfigured))), (bad anatomy), gross proportions, (malformed limbs), ((missing arms)), " +
             "(missing legs), (((extra arms))), (((extra legs))), mutated hands,(fused fingers), (too many fingers), (((long neck))), (bad body perspect:1.1), (((nsfw)))";
 
+        private const string NegativePromptAbyss = "nsfw, (worst quality, low quality:1.4), (lip, nose, tooth, rouge, lipstick, eyeshadow:1.4), (blush:1.2), " +
+            "(jpeg artifacts:1.4), (depth of field, bokeh, blurry, film grain, chromatic aberration, lens flare:1.0), (1boy, abs, muscular, rib:1.0), greyscale, " +
+            "monochrome, dusty sunbeams, trembling, motion lines, motion blur, emphasis lines, text, title, logo, signature, ";
+
+        private const string NegativePrompt = NegativePromptAbyss;
+
         private const string BasicPrompt = "<lora:pastelMixStylizedAnime_pastelMixLoraVersion:0.3>, " +
             "<lora:roluaStyleLora_r:0.3>,<lora:V11ForegroundPlant_V11:0.4>, " +
             "masterpiece, best quality, 1girl, solo, ";
@@ -68,12 +74,12 @@ namespace Mikibot.Analyze.Bot
             { "白裙", 0.6 },
             { "泳装", 0.6 },
             { "ol", 0.6 },
-            { "lo", 0.6 },
-            { "女仆", 0.6 },
+            { "lo", 0.4 },
+            { "女仆", 0.5 },
             { "旗袍", 0.6 },
-            { "机甲", 0.6 },
+            { "机甲", 0.4 },
             { "原版", 0.6 },
-            { "电锯", 0.6 },
+            { "电锯", 0.5 },
         };
 
 
@@ -471,8 +477,8 @@ namespace Mikibot.Analyze.Bot
 
         private static readonly Dictionary<string, double> characterWeightOffset = new()
         {
-            { "炉", 0.1 },
-            { "弥", 0.1 },
+            { "炉", 0 },
+            { "弥", 0 },
         };
 
         private static readonly Dictionary<string, string> characterPrefix = new()
