@@ -119,13 +119,13 @@ namespace Mikibot.Analyze.Bot
                 "dormitory, plant, <lora:miki-v2+v3:-w->, shirt, cardigan, ",
             } },
             { "白裙", new () {
-                "mountain, <lora:miki-v2+v3:-w->, white dress, skirt, off-shoulder dress, bare shoulders, miki bag summer, ",
-                "castle, <lora:miki-v2+v3:-w->, white dress, skirt, off-shoulder dress, bare shoulders, ",
-                "dormitory, <lora:miki-v2+v3:-w->, white dress, skirt, off-shoulder dress, bare shoulders, ",
-                "street, plant, <lora:miki-v2+v3:-w->, white dress, skirt, off-shoulder dress, bare shoulders, ",
-                "street, plant, <lora:miki-v2+v3:-w->, white dress, skirt, off-shoulder dress, bare shoulders, straw hat, ",
-                "beach, sunshine, <lora:miki-v2+v3:-w->, white dress, skirt, off-shoulder dress, bare shoulders, straw hat, ",
-                "flowers meadows, sunshine, <lora:miki-v2+v3:-w->, white dress, skirt, off-shoulder dress, bare shoulders, straw hat, ",
+                "mountain, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, miki bag summer, ",
+                "castle, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, ",
+                "dormitory, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, ",
+                "street, plant, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, ",
+                "street, plant, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, straw hat, ",
+                "beach, sunshine, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, straw hat, ",
+                "flowers meadows, sunshine, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, straw hat, ",
             } },
             { "泳装", new () {
                 "poolside, <lora:miki-v2+v3:-w->, school swimsuit, ",
@@ -454,7 +454,7 @@ namespace Mikibot.Analyze.Bot
 
         private static readonly Dictionary<string, string> characterPrefix = new()
         {
-            { "弥", "purple eyes, black hair, [purple streaked hair], (small breast), " },
+            { "弥", "purple eyes, black hair, [purple streaked hair], (small breast), side_braid" },
             { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, small demon horns, pointy ears, (small breast), (flat chest), " },
             { "悠", "(light blue eyes), black hair ribbon, silver hair, blue streaked hair, " },
             { "侑", "(white pink hair), (blue streaked hair), (cat_ear_headphone), <lora:Kiyuu_:0.2>, (small breast), " },
@@ -466,7 +466,8 @@ namespace Mikibot.Analyze.Bot
         private static readonly Dictionary<string, Dictionary<string, string>> characterSuffix = new()
         {
             { "弥", new() {
-                { "原版", "thighhighs, black hair, long hair, fish hair ornament, blush, hairclip, shoes, black_legwear, zettai ryouiki, grey_jacket, white shirt, bowtie, " }
+                { "原版", "thighhighs, black hair, long hair, fish hair ornament, blush, hairclip, shoes, black_legwear, zettai ryouiki, grey_jacket, white shirt, bowtie, " },
+                { "白裙", "sandals, blush, collarbone, white fottwear, miki bag summer, miki v2, " }
             } },
             { "炉", new() {
                 { "原版", "deep blue shorts, white shirt, (white capelet), [[hat]], black tie, long sleeves, " }
