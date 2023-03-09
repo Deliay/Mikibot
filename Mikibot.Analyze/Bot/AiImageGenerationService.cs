@@ -599,7 +599,7 @@ namespace Mikibot.Analyze.Bot
                         {
                             if (msg.Sender.Id == "644676751")
                             {
-                                await ProcessManual(group, plain.Text);
+                                await ProcessManual(group, plain.Text, token);
                             }
                             continue;
                         }
