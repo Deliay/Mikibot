@@ -56,7 +56,7 @@ namespace Mikibot.Analyze.Bot
             "(missing legs), (((extra arms))), (((extra legs))), mutated hands,(fused fingers), (too many fingers), (((long neck))), (bad body perspect:1.1), (((nsfw)))";
 
         private const string BasicPrompt = "<lora:pastelMixStylizedAnime_pastelMixLoraVersion:0.3>, " +
-            "<lora:roluaStyleLora_r:0.2>,<lora:V11ForegroundPlant_V11:0.3>, " +
+            "<lora:roluaStyleLora_r:0.3>,<lora:V11ForegroundPlant_V11:0.4>, " +
             "masterpiece, best quality, 1girl, solo, ";
 
         private static readonly Dictionary<string, double> basicStyleWeight = new()
@@ -228,7 +228,7 @@ namespace Mikibot.Analyze.Bot
         {
             "eye contact","symmetrical hand pose","symmetrical docking","back-to-back","leaning forward",
             "leg hug","indian style","yokozuwari","wariza","seiza","sitting","all fours","bent over",
-            "top-down bottom-up","kneeling","straddle","squatting","on stomach","lying","looking back","upside-down"
+            "kneeling","straddle","squatting","on stomach","lying","looking back",
         };
 
         private static readonly List<string> hairStyles = new()
@@ -455,7 +455,7 @@ namespace Mikibot.Analyze.Bot
         private static readonly Dictionary<string, string> characterPrefix = new()
         {
             { "弥", "purple eyes, black hair, [purple streaked hair], (small breast), " },
-            { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, small demon horns, (small breast), (flat chest), " },
+            { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, small demon horns, pointy ears, (small breast), (flat chest), " },
             { "悠", "(light blue eyes), black hair ribbon, silver hair, blue streaked hair, " },
             { "侑", "(white pink hair), (blue streaked hair), (cat_ear_headphone), <lora:Kiyuu_:0.2>, (small breast), " },
             { "炉", "yellow eyes, (pink to blue gradient hair), (gradient hair), ahoge, (small breast), (flat chest), white colored eyelashes, (+ +), " },
