@@ -387,12 +387,14 @@ namespace Mikibot.Analyze.Bot
             var sky = RandomOf(skys);
             var season = RandomOf(seasons);
             var suffix = suffixOf(style, character);
+            var lightFix = random.Next(1) == 1 ? "epiNoiseoffset_v2" : "";
+            var lightFixHint = lightFix == "" ? "关" : "开";
 
             if (style == "原版")
             {
                 return (
-                    $"{BasicPrompt}{prefix}{main}({emo}), {view}, ({sky}), ({season}), {suffix}",
-                    $"生成词: {main}\n视角: {view}\n表情: {emo}\n专属附加词：{suffix}\n天空: {sky}\n季节: {season}\ncfg_scale={cfgScale},step={steps}",
+                    $"{BasicPrompt}{prefix}{main}({emo}), {view}, ({sky}), ({season}), {suffix}, {lightFix}",
+                    $"生成词: {main}\n视角: {view}\n表情: {emo}\n专属附加词：{suffix}\n天空: {sky}\n季节: {season}\n灯光修复: {lightFixHint}\ncfg_scale={cfgScale},step={steps}",
                     cfgScale, steps);
             }
 
@@ -411,8 +413,8 @@ namespace Mikibot.Analyze.Bot
             }
 
             return (
-                $"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {view}, ({sky}), ({season}), {suffix}",
-                $"生成词: {main}\n视角: {view}\n发型: {hair}\n表情: {emo}\n附加词: {extra}\n专属附加词：{suffix}\n天空: {sky}\n季节: {season}\ncfg_scale={cfgScale},step={steps}",
+                $"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {view}, ({sky}), ({season}), {suffix}, {lightFix}",
+                $"生成词: {main}\n视角: {view}\n发型: {hair}\n表情: {emo}\n附加词: {extra}\n专属附加词：{suffix}\n天空: {sky}\n季节: {season}\n灯光修复: {lightFixHint}\ncfg_scale={cfgScale},step={steps}",
                 cfgScale, steps);
         }
 
