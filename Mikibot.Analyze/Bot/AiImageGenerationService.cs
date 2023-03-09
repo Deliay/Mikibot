@@ -398,6 +398,7 @@ namespace Mikibot.Analyze.Bot
                 .Replace("-w-", $"{weight}");
 
             var direction = random.Next() >= 50;
+            var directionHint = direction ? "横板" : "竖版";
             var width = direction ? 768 : 432;
             var height = direction ? 432 : 768;
             var prefix = characterPrefix.GetValueOrDefault(character) ?? "";
@@ -413,7 +414,8 @@ namespace Mikibot.Analyze.Bot
             {
                 return (
                     $"{BasicPrompt}{prefix}{main}({emo}), {view}, ({sky}), ({season}), {suffix}, ",
-                    $"生成词: {main}\n视角: {view}\n表情: {emo}\n专属附加词：{suffix}\n天空: {sky}\n季节: {season}\ncfg_scale={cfgScale},step={steps}",
+                    $"生成词: {main}\n视角: {view}\n表情: {emo}\n专属附加词：{suffix}\n天空: {sky}\n" +
+                    $"季节: {season}\ncfg_scale={cfgScale},step={steps},{directionHint}",
                     cfgScale, steps, width, height);
             }
 
@@ -433,7 +435,8 @@ namespace Mikibot.Analyze.Bot
 
             return (
                 $"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {view}, ({sky}), ({season}), {suffix}, ",
-                $"生成词: {main}\n视角: {view}\n发型: {hair}\n表情: {emo}\n附加词: {extra}\n专属附加词：{suffix}\n天空: {sky}\n季节: {season}\ncfg_scale={cfgScale},step={steps}",
+                $"生成词: {main}\n视角: {view}\n发型: {hair}\n表情: {emo}\n附加词: {extra}\n专属附加词：{suffix}\n天空: {sky}\n" +
+                $"季节: {season}\ncfg_scale={cfgScale},step={steps},{directionHint}",
                 cfgScale, steps, width, height);
         }
 
