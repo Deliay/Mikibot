@@ -73,6 +73,7 @@ namespace Mikibot.Analyze.Bot
             { "旗袍", 0.6 },
             { "机甲", 0.5 },
             { "原版", 0.7 },
+            { "电锯", 0.6 },
         };
 
 
@@ -177,6 +178,10 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, kabuto, japanese armor, holding tantou, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, ",
                 "<lora:miki-v2+v3:-w->, kabuto, japanese armor, japanese clothes, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, ",
                 "<lora:miki-v2+v3:-w->, kabuto, japanese armor, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, ",
+            } },
+            { "电锯", new() {
+                "<lora:miki-v2+v3:-w->, cyberpunk, (machine:1.2), blood, (chainsaw man), lolipop chainsaw, holding chainsaw, chainsaw, ",
+                "<lora:miki-v2+v3:-w->, kabuto, (machine:1.2), blood, (chainsaw man), lolipop chainsaw, holding chainsaw, chainsaw, ",
             } },
             { "原版", new() {
                 "dormitory, <lora:miki-v2+v3:-w->, ",
