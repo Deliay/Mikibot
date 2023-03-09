@@ -353,6 +353,10 @@ namespace Mikibot.Analyze.Bot
             {
                 suffixs.Add(RandomOf(stocks));
             }
+            if (mainClothes.TryGetValue(style, out var clothes))
+            {
+                suffixs.Add(RandomOf(clothes));
+            }
             return $"{string.Join(", ", suffixs)}, ";
         }
 
