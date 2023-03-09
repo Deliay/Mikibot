@@ -55,8 +55,8 @@ namespace Mikibot.Analyze.Bot
             "((bad anatomy)), (((bad proportions))), ((extra limbs)), (((disfigured))), (bad anatomy), gross proportions, (malformed limbs), ((missing arms)), " +
             "(missing legs), (((extra arms))), (((extra legs))), mutated hands,(fused fingers), (too many fingers), (((long neck))), (bad body perspect:1.1), (((nsfw)))";
 
-        private const string BasicPrompt = "<lora:pastelMixStylizedAnime_pastelMixLoraVersion:0.3>, " +
-            "<lora:roluaStyleLora_r:0.3>,<lora:V11ForegroundPlant_V11:0.4>, " +
+        private const string BasicPrompt = "<lora:pastelMixStylizedAnime_pastelMixLoraVersion:0.25>, " +
+            "<lora:roluaStyleLora_r:0.25>,<lora:V11ForegroundPlant_V11:0.3>, " +
             "masterpiece, best quality, 1girl, solo, ";
 
         private static readonly Dictionary<string, double> basicStyleWeight = new()
@@ -68,12 +68,12 @@ namespace Mikibot.Analyze.Bot
             { "白裙", 0.6 },
             { "泳装", 0.6 },
             { "ol", 0.6 },
-            { "lo", 0.4 },
-            { "女仆", 0.5 },
+            { "lo", 0.6 },
+            { "女仆", 0.6 },
             { "旗袍", 0.6 },
-            { "机甲", 0.4 },
+            { "机甲", 0.6 },
             { "原版", 0.6 },
-            { "电锯", 0.5 },
+            { "电锯", 0.6 },
         };
 
 
@@ -471,8 +471,8 @@ namespace Mikibot.Analyze.Bot
 
         private static readonly Dictionary<string, double> characterWeightOffset = new()
         {
-            { "炉", 0 },
-            { "弥", 0 },
+            { "炉", 0.1 },
+            { "弥", 0.1 },
         };
 
         private static readonly Dictionary<string, string> characterPrefix = new()
