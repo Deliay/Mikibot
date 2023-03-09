@@ -294,12 +294,12 @@ namespace Mikibot.Analyze.Bot
         {
             "morning", "sunset", "sunrise", "sunshine", "night, night sky, moon", "night, night sky, dark moon", "night, night sky, red moon",
             "blue sky", "cloudy sky", "night, night sky, starry sky", "night, night sky", "gradient sky", "night, night sky, star",
-            "night, night sky, cloudy sky"
+            "night, night sky, cloudy sky", "",
         };
 
         private static readonly List<string> seasons = new()
         {
-            "spring", "summer", "autumn", "winter",
+            "spring", "summer", "autumn", "winter", "",
         };
 
         private static readonly List<string> emojis = new()
@@ -375,8 +375,8 @@ namespace Mikibot.Analyze.Bot
             var view = random.Next(100) > 30 ? "full body" : RandomOf(views);
             var cfgScale = random.Next(100) > 40 ? random.Next(40, 111) / 10D : 8;
             var steps = random.Next(100) > 60 ? random.Next(24, 46) : 30;
-            var sky = random.Next(100) > 50 ? RandomOf(skys) :  "";
-            var season = random.Next(100) > 50 ? "" : RandomOf(seasons);
+            var sky = RandomOf(skys);
+            var season = RandomOf(seasons);
             var suffix = suffixOf(style, character);
 
             if (style == "原版")
@@ -390,20 +390,20 @@ namespace Mikibot.Analyze.Bot
             var hair = RandomOf(hairStyles);
             var extra = "";
 
-            if (random.Next(2) == 1)
+            if (random.Next(2) >= 1)
             {
                 var scene = RandomOf(scenes);
                 var behaviour = RandomOf(behaviours);
                 var action = RandomOf(actions);
-                var rp = RandomOf(rolePalys);
+                //var rp = RandomOf(rolePalys);
                 var emoji = RandomOf(emojis);
 
-                extra = $"({behaviour}), ({action}), ({rp}), ({scene}), ({emoji}), ";
+                extra = $"({behaviour}), ({action}), ({scene}), ({emoji}), ";
             }
 
             return (
                 $"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {view}, ({sky}), ({season}), {suffix}",
-                $"生成词: {main}{view}\n发型: {hair}\n表情: {emo}\n附加词: {extra}\n专属附加词：{suffix}\n天空: {sky}\n季节: {season}\ncfg_scale={cfgScale},step={steps}",
+                $"生成词: {main}\n视角: {view}\n发型: {hair}\n表情: {emo}\n附加词: {extra}\n专属附加词：{suffix}\n天空: {sky}\n季节: {season}\ncfg_scale={cfgScale},step={steps}",
                 cfgScale, steps);
         }
 
@@ -480,7 +480,7 @@ namespace Mikibot.Analyze.Bot
                                 .Plain($"指令有2分钟的CD，使用'!来张[风格][人物]'生成（需要英文括号）\n\n例子：!来张随机弥\n可用人物:{string.Join(',', availableCharacters)}\n可用风格\n：随机,{string.Join(',', categories)}").Build();
         }
 
-        private static (string, string) parseCommand(string raw)
+        private static (string, string) ParseCommand(string raw)
         {
             var match = MatchRegex().Matches(raw).FirstOrDefault();
             if (match is null) {
@@ -503,7 +503,7 @@ namespace Mikibot.Analyze.Bot
                         {
                             await miraiService.SendMessageToGroup(group, token, getHelpMsg(group.Id).ToArray());
                         }
-                        var (style, character) = parseCommand(plain.Text);
+                        var (style, character) = ParseCommand(plain.Text);
                         if (character == "" )
                         {
                             continue;
