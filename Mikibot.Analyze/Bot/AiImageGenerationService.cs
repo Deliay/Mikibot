@@ -162,14 +162,14 @@ namespace Mikibot.Analyze.Bot
                 "forest, <lora:miki-v2+v3:-w->, maid, maid headdress, maid apron, ",
             } },
             { "旗袍", new() {
-                "dormitory, <lora:miki-v2+v3:-w->, chinese, (red china dress), ",
-                "chinese street, <lora:miki-v2+v3:-w->, chinese, (red china dress), ",
-                "chinese mountain,, <lora:miki-v2+v3:-w->, chinese, red china dress), ",
-                "chinese forest, <lora:miki-v2+v3:-w->, chinese, lake, (red china dress), ",
-                "dormitory, <lora:miki-v2+v3:-w->, chinese, (red chinese clothes), ",
-                "chinese street, <lora:miki-v2+v3:-w->, chinese, (red chinese clothes), ",
-                "chinese mountain, <lora:miki-v2+v3:-w->, chinese, (red chinese clothes), ",
-                "chinese forest, <lora:miki-v2+v3:-w->, chinese, lake, (red chinese clothes), ",
+                "dormitory, <lora:miki-v2+v3:-w->, chinese, ",
+                "chinese street, <lora:miki-v2+v3:-w->, chinese, ",
+                "chinese mountain,, <lora:miki-v2+v3:-w->, chinese, ",
+                "chinese forest, <lora:miki-v2+v3:-w->, chinese, lake, ",
+                "dormitory, <lora:miki-v2+v3:-w->, chinese, ",
+                "chinese street, <lora:miki-v2+v3:-w->, chinese, ",
+                "chinese mountain, <lora:miki-v2+v3:-w->, chinese, ",
+                "chinese forest, <lora:miki-v2+v3:-w->, chinese, lake, ",
             } },
             { "机甲", new() {
                 "<lora:miki-v2+v3:-w->, cyberpunk, kabuto, japanese armor, japanese clothes, holding tantou, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, tentacles, ",
@@ -215,6 +215,11 @@ namespace Mikibot.Analyze.Bot
         {
             { "ol", new(){
                 "office uniform", "police uniform", "military uniform", "business suit", "dress shirt", "shirt",
+            } },
+            { "旗袍", new() {
+                "(red china dress)", "(white china dress)", "(blue china dress)", "(cyan china dress)",
+                "(yellow china dress)", "(red china clothes)", "(white china clothes)", "(blue china clothes)",
+                "(cyan china clothes)", "(yellow china clothes)",
             } },
         };
 
@@ -450,6 +455,7 @@ namespace Mikibot.Analyze.Bot
         private static readonly Dictionary<string, double> characterWeightOffset = new()
         {
             { "炉", -0.1 },
+            { "弥", 0.1 },
         };
 
         private static readonly Dictionary<string, string> characterPrefix = new()
