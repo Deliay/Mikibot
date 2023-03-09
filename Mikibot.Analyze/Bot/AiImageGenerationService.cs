@@ -387,14 +387,12 @@ namespace Mikibot.Analyze.Bot
             var sky = RandomOf(skys);
             var season = RandomOf(seasons);
             var suffix = suffixOf(style, character);
-            var lightFix = random.Next(2) == 1 ? "<lora:epiNoiseoffset_v2:1>" : "";
-            var lightFixHint = lightFix == "" ? "关" : "开";
 
             if (style == "原版")
             {
                 return (
-                    $"{BasicPrompt}{prefix}{main}({emo}), {view}, ({sky}), ({season}), {suffix}, {lightFix}",
-                    $"生成词: {main}\n视角: {view}\n表情: {emo}\n专属附加词：{suffix}\n天空: {sky}\n季节: {season}\n灯光修复: {lightFixHint}\ncfg_scale={cfgScale},step={steps}",
+                    $"{BasicPrompt}{prefix}{main}({emo}), {view}, ({sky}), ({season}), {suffix}, ",
+                    $"生成词: {main}\n视角: {view}\n表情: {emo}\n专属附加词：{suffix}\n天空: {sky}\n季节: {season}\ncfg_scale={cfgScale},step={steps}",
                     cfgScale, steps);
             }
 
@@ -413,8 +411,8 @@ namespace Mikibot.Analyze.Bot
             }
 
             return (
-                $"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {view}, ({sky}), ({season}), {suffix}, {lightFix}",
-                $"生成词: {main}\n视角: {view}\n发型: {hair}\n表情: {emo}\n附加词: {extra}\n专属附加词：{suffix}\n天空: {sky}\n季节: {season}\n灯光修复: {lightFixHint}\ncfg_scale={cfgScale},step={steps}",
+                $"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {view}, ({sky}), ({season}), {suffix}, ",
+                $"生成词: {main}\n视角: {view}\n发型: {hair}\n表情: {emo}\n附加词: {extra}\n专属附加词：{suffix}\n天空: {sky}\n季节: {season}\ncfg_scale={cfgScale},step={steps}",
                 cfgScale, steps);
         }
 
@@ -460,7 +458,7 @@ namespace Mikibot.Analyze.Bot
 
         private static readonly Dictionary<string, double> characterWeightOffset = new()
         {
-            { "炉", -0.1 },
+            { "炉", 0.1 },
             { "弥", 0.1 },
         };
 
@@ -502,6 +500,83 @@ namespace Mikibot.Analyze.Bot
             return (match.Result("$1"), match.Result("$2"));
         }
 
+        private static (string, string) ParseManualCommand(string raw)
+        {
+            var match = MatchManualRegex().Matches(raw).FirstOrDefault();
+            if (match is null) {
+                return ("", "");
+            }
+            return (match.Result("$1"), match.Result("$2"));
+        }
+
+        private async ValueTask ProcessManual(string raw)
+        {
+            var (character, prompt) = ParseManualCommand(raw);
+            
+            var prefix = characterPrefix.GetValueOrDefault(character) ?? "";
+            var weight = 0.6 + characterWeightOffset.GetValueOrDefault(character);
+            var lora = characterLore.GetValueOrDefault(character) ?? "";
+            
+            await Request($"{BasicPrompt}, {prefix}, <lora:{lora}:{weight}>, {prompt}");
+        }
+
+        private async ValueTask<Ret> Request(string prompt, double cfg_scale = 8, int steps = 26, CancellationToken token = default)
+        {
+
+            latestGenerateAt = DateTimeOffset.Now;
+            isCdHintShown = false;
+            logger.LogInformation("prompt: {}", prompt);
+            var res = await httpClient.PostAsync($"{WebUiEndpoint}", JsonContent.Create(new
+            {
+                prompt,
+                enable_hr = true,
+                denoising_strength = 0.6,
+                hr_scale = 2.0,
+                hr_upscaler = "Latent",
+                hr_second_pass_steps = 30,
+                cfg_scale,
+                steps,
+                sampler_index = "DPM++ 2M Karras",
+                width = 768,
+                height = 432,
+                negative_prompt = NegativePrompt,
+            }), token);
+            latestGenerateAt = DateTimeOffset.Now.Subtract(TimeSpan.FromSeconds(20));
+            try
+            {
+                var body = await res.Content.ReadFromJsonAsync<Ret>(cancellationToken: token);
+                var info = JsonSerializer.Deserialize<Info>(body.info);
+                logger.LogInformation("生成成功，种子:{}", info.seed);
+                return body;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "catched after access AI!");
+                logger.LogInformation(await res.Content.ReadAsStringAsync());
+                throw ex;
+            }
+        }
+
+        private async ValueTask SendImage(Mirai.Net.Data.Shared.Group group, Ret body, CancellationToken token)
+        {
+            var info = JsonSerializer.Deserialize<Info>(body.info);
+            logger.LogInformation("生成成功，种子:{}", info.seed);
+            if (body.images.Count != 0)
+            {
+                await miraiService.SendMessageToGroup(group, token, new MessageBase[]
+                {
+                new PlainMessage()
+                {
+                    Text = $"生成成功，种子:{info.seed}"
+                },
+                new ImageMessage()
+                {
+                    Base64 = body.images[0],
+                },
+                });
+            }
+        }
+
         private async ValueTask Dequeue(CancellationToken token)
         {
             await foreach (var msg in messageQueue.Reader.ReadAllAsync(token))
@@ -515,6 +590,14 @@ namespace Mikibot.Analyze.Bot
                         if (plain.Text == "!help")
                         {
                             await miraiService.SendMessageToGroup(group, token, getHelpMsg(group.Id).ToArray());
+                        }
+                        if (plain.Text.StartsWith("!!"))
+                        {
+                            if (msg.Sender.Id == "644676751")
+                            {
+                                await ProcessManual(plain.Text);
+                            }
+                            continue;
                         }
                         var (style, character) = ParseCommand(plain.Text);
                         if (character == "" )
@@ -539,51 +622,18 @@ namespace Mikibot.Analyze.Bot
                             }
                             else
                             {
-                                latestGenerateAt = DateTimeOffset.Now;
                                 isCdHintShown = false;
                                 var (prompt, extra, cfg_scale, steps) = GetPrompt(style, character);
                                 await miraiService.SendMessageToGroup(group, token, GetGenerateMsg(extra).ToArray());
                                 logger.LogInformation("prompt: {}", prompt);
-                                var res = await httpClient.PostAsync($"{WebUiEndpoint}", JsonContent.Create(new
-                                {
-                                    prompt,
-                                    enable_hr = true,
-                                    denoising_strength = 0.6,
-                                    hr_scale = 2.0,
-                                    hr_upscaler = "Latent",
-                                    hr_second_pass_steps = 30,
-                                    cfg_scale,
-                                    steps,
-                                    sampler_index = "DPM++ 2M Karras",
-                                    width = 768,
-                                    height = 432,
-                                    negative_prompt = NegativePrompt,
-                                }), token);
-                                latestGenerateAt = DateTimeOffset.Now.Subtract(TimeSpan.FromSeconds(20));
                                 try
                                 {
-                                    var body = await res.Content.ReadFromJsonAsync<Ret>(cancellationToken: token);
-                                    var info = JsonSerializer.Deserialize<Info>(body.info);
-                                    logger.LogInformation("生成成功，种子:{}", info.seed);
-                                    if (body.images.Count != 0)
-                                    {
-                                        await miraiService.SendMessageToGroup(group, token, new MessageBase[]
-                                        {
-                                        new PlainMessage()
-                                        {
-                                            Text = $"生成成功，种子:{info.seed}"
-                                        },
-                                        new ImageMessage()
-                                        {
-                                            Base64 = body.images[0],
-                                        },
-                                        });
-                                    }
+                                    var body = await Request(prompt, cfg_scale, steps, token);
+                                    await SendImage(group, body, token);
                                 }
                                 catch (Exception ex)
                                 {
-                                    logger.LogError(ex, "catched after access AI!");
-                                    logger.LogInformation(await res.Content.ReadAsStringAsync());
+                                    logger.LogError(ex, "access AI errored!");
                                     return;
                                 }
                             }
@@ -614,5 +664,9 @@ namespace Mikibot.Analyze.Bot
 
         [GeneratedRegex("!来张(.*?)(.)$")]
         private static partial Regex MatchRegex();
+
+        
+        [GeneratedRegex("!!(.)(.*)$")]
+        private static partial Regex MatchManualRegex();
     }
 }
