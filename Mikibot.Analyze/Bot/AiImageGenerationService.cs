@@ -480,6 +480,7 @@ namespace Mikibot.Analyze.Bot
 
         private static readonly Dictionary<string, HashSet<string>> characterLimit = new()
         {
+            { "恶魔弥", new() { "139528984" } },
             { "弥", new() { "139528984" } },
             { "真", new() { "139528984" } },
             { "悠", new() { "139528984" } },
@@ -491,6 +492,7 @@ namespace Mikibot.Analyze.Bot
 
         private static readonly Dictionary<string, string> characterLore = new()
         {
+            { "恶魔弥", "miki-4.0-v1" },
             { "弥", "miki-v2+v3" },
             { "真", "mahiru-v2" },
             { "悠", "YuaVirtuareal_v01" },
@@ -515,6 +517,7 @@ namespace Mikibot.Analyze.Bot
             { "炉", "yellow eyes, (pink to blue gradient hair), (gradient hair), ahoge, (small breast), (flat chest), white colored eyelashes, (+ +), " },
             { "毬", "red eyes, silver hair, red streaked hair, demon girl, demon tail, demon wings, demon horns, square pupils, (small breast), " },
             { "岁", "red eyes, silver hair, red hair robbon, (small breast), " },
+            { "恶魔弥", "yellow eyes, black hair, purple horns, purple streaked hair, small breast, purple hair ornament, " }
         };
 
         private static readonly Dictionary<string, Dictionary<string, string>> characterSuffix = new()
@@ -525,6 +528,12 @@ namespace Mikibot.Analyze.Bot
             } },
             { "炉", new() {
                 { "原版", "deep blue shorts, white shirt, (white capelet), [[hat]], black tie, long sleeves, " }
+            } },
+            { "恶魔弥", new() {
+                { "原版", "ero thletic leotard, ero thletic leotar, sleeves pass wrists, bare shoulders, off shoulder," +
+                    "collarbone, fishnet legwear, long sleeves, thighhighs, black fishnets," +
+                    "garter straps, black footwear, demon tail, heart ear ornament, black shorts," +
+                    " bangs, " }
             } },
         };
 
@@ -721,11 +730,11 @@ namespace Mikibot.Analyze.Bot
             }
         }
 
-        [GeneratedRegex("([hvs]?)!来张(.*?)(.)$")]
+        [GeneratedRegex("([hvs]?)!来张(..)(.*)$")]
         private static partial Regex MatchRegex();
 
         
-        [GeneratedRegex("([hvs]?)!!(.)(.*)$")]
+        [GeneratedRegex("([hvs]?)!!(.) (.*)$")]
         private static partial Regex MatchManualRegex();
     }
 }
