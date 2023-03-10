@@ -523,17 +523,21 @@ namespace Mikibot.Analyze.Bot
         private static readonly Dictionary<string, Dictionary<string, string>> characterSuffix = new()
         {
             { "弥", new() {
-                { "原版", "thighhighs, black hair, long hair, fish hair ornament, blush, hairclip, shoes, black_legwear, zettai ryouiki, grey_jacket, white shirt, bowtie, " },
-                { "白裙", "sandals, blush, collarbone, white fottwear, miki bag summer, miki v2, " }
+                { "原版", "thighhighs, black hair, long hair, fish hair ornament, blush, hairclip, shoes, black_legwear, zettai ryouiki, uniform, school uniform, grey_jacket, white shirt, bowtie, " },
+                { "白裙", "sandals, blush, collarbone, white footwear, miki bag summer, miki v2, " },
             } },
             { "炉", new() {
-                { "原版", "deep blue shorts, white shirt, (white capelet), [[hat]], black tie, long sleeves, " }
+                { "原版", "deep blue shorts, white shirt, (white capelet), [[hat]], black tie, long sleeves, " },
+            } },
+            { "真", new()
+            {
+                { "原版", "twintails, bat hair ornament, cape, white shirt, white legwear, stuffed toy, stuffed animal toy, beret, gloves, bangs, hat, " },
             } },
             { "恶魔弥", new() {
                 { "原版", "ero thletic leotard, ero thletic leotar, sleeves pass wrists, bare shoulders, off shoulder," +
                     "collarbone, fishnet legwear, long sleeves, thighhighs, black fishnets," +
                     "garter straps, black footwear, demon tail, heart ear ornament, black shorts," +
-                    " bangs, " }
+                    " bangs, " },
             } },
         };
 
