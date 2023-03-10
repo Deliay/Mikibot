@@ -400,14 +400,14 @@ namespace Mikibot.Analyze.Bot
             var direction = random.Next(100) switch
             {
                 <= 20 => 1,
-                >20 and <70 => 2,
+                > 20 and < 70 => 2,
                 _ => 3,
             };
             var directionHint = direction switch
             {
-                1 => "横版",
-                2 => "等宽",
-                _ => "竖版",
+                1 => $"横版({direction})",
+                2 => $"等宽({direction})",
+                _ => $"竖版({direction})",
             };
             var width = direction switch
             {
