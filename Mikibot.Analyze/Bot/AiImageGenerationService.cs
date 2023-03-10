@@ -379,7 +379,7 @@ namespace Mikibot.Analyze.Bot
             return $"{string.Join(", ", suffixs)}, ";
         }
 
-        private static (string, string, double, int, int, int) GetPrompt(string style, string character)
+        private static (string, string, double, int, int, int) GetPrompt(string style, string character, int sizeRange = 0)
         {
             if (!promptMap.TryGetValue(style, out var prompts))
             {
@@ -397,7 +397,7 @@ namespace Mikibot.Analyze.Bot
                 .Replace(DefaultLora, lora)
                 .Replace("-w-", $"{weight}");
 
-            var direction = random.Next(100) switch
+            var direction = (sizeRange > 0 ? sizeRange : random.Next(100)) switch
             {
                 <= 20 => 1,
                 > 20 and < 70 => 2,
@@ -535,27 +535,38 @@ namespace Mikibot.Analyze.Bot
                                 .Plain($"指令有2分钟的CD，使用'!来张[风格][人物]'生成（需要英文括号）\n\n例子：!来张随机弥\n可用人物:{string.Join(',', availableCharacters)}\n可用风格\n：随机,{string.Join(',', categories)}").Build();
         }
 
-        private static (string, string) ParseCommand(string raw)
+        private static int numbericHvs(string hvs)
+        {
+            return hvs switch
+            {
+                "h" => 10,
+                "v" => 90,
+                "s" => 50,
+                _ => 0,
+            };
+        }
+
+        private static (string, string, int) ParseCommand(string raw)
         {
             var match = MatchRegex().Matches(raw).FirstOrDefault();
             if (match is null) {
-                return ("", "");
+                return ("", "", 0);
             }
-            return (match.Result("$1"), match.Result("$2"));
+            return (match.Result("$2"), match.Result("$3"), numbericHvs(match.Result("$1")));
         }
 
-        private static (string, string) ParseManualCommand(string raw)
+        private static (string, string, int) ParseManualCommand(string raw)
         {
             var match = MatchManualRegex().Matches(raw).FirstOrDefault();
             if (match is null) {
-                return ("", "");
+                return ("", "", 0);
             }
-            return (match.Result("$1"), match.Result("$2"));
+            return (match.Result("$1"), match.Result("$2"), numbericHvs(match.Result("$1")));
         }
 
         private async ValueTask ProcessManual(Mirai.Net.Data.Shared.Group group, string raw, CancellationToken token)
         {
-            var (character, prompt) = ParseManualCommand(raw);
+            var (character, prompt, _) = ParseManualCommand(raw);
             
             var prefix = characterPrefix.GetValueOrDefault(character) ?? "";
             var weight = 0.6 + characterWeightOffset.GetValueOrDefault(character);
@@ -647,7 +658,7 @@ namespace Mikibot.Analyze.Bot
                             }
                             continue;
                         }
-                        var (style, character) = ParseCommand(plain.Text);
+                        var (style, character, sizeRange) = ParseCommand(plain.Text);
                         if (character == "" )
                         {
                             continue;
@@ -671,7 +682,7 @@ namespace Mikibot.Analyze.Bot
                             else
                             {
                                 isCdHintShown = false;
-                                var (prompt, extra, cfg_scale, steps, width, height) = GetPrompt(style, character);
+                                var (prompt, extra, cfg_scale, steps, width, height) = GetPrompt(style, character, sizeRange);
                                 await miraiService.SendMessageToGroup(group, token, GetGenerateMsg(extra).ToArray());
                                 logger.LogInformation("prompt: {}", prompt);
                                 try
@@ -710,11 +721,11 @@ namespace Mikibot.Analyze.Bot
             }
         }
 
-        [GeneratedRegex("!来张(.*?)(.)$")]
+        [GeneratedRegex("([hvs]?)!来张(.*?)(.)$")]
         private static partial Regex MatchRegex();
 
         
-        [GeneratedRegex("!!(.)(.*)$")]
+        [GeneratedRegex("([hvs]?)!!(.)(.*)$")]
         private static partial Regex MatchManualRegex();
     }
 }
