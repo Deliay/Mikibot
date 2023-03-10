@@ -318,12 +318,12 @@ namespace Mikibot.Analyze.Bot
         {
             "morning", "sunset", "sunrise", "sunshine", "night, night sky, moon", "night, night sky, dark moon", "night, night sky, red moon",
             "blue sky", "cloudy sky", "night, night sky, starry sky", "night, night sky", "gradient sky", "night, night sky, star",
-            "night, night sky, cloudy sky", "",
+            "night, night sky, cloudy sky",
         };
 
         private static readonly List<string> seasons = new()
         {
-            "spring", "summer", "autumn", "winter", "",
+            "spring", "summer", "autumn", "winter",
         };
 
         private static readonly List<string> emojis = new()
