@@ -397,10 +397,30 @@ namespace Mikibot.Analyze.Bot
                 .Replace(DefaultLora, lora)
                 .Replace("-w-", $"{weight}");
 
-            var direction = random.Next(100) >= 50;
-            var directionHint = direction ? "横板" : "竖版";
-            var width = direction ? 768 : 432;
-            var height = direction ? 432 : 768;
+            var direction = random.Next(100) switch
+            {
+                <= 20 => 1,
+                >20 and <70 => 2,
+                _ => 3,
+            };
+            var directionHint = direction switch
+            {
+                1 => "横版",
+                2 => "等宽",
+                _ => "竖版",
+            };
+            var width = direction switch
+            {
+                1 => 768,
+                2 => 512,
+                _ => 432,
+            };
+            var height = direction switch
+            {
+                1 => 432,
+                2 => 512,
+                _ => 768,
+            };
             var prefix = characterPrefix.GetValueOrDefault(character) ?? "";
             var emo = RandomOf(emotions);
             var view = random.Next(100) > 30 ? "full body" : RandomOf(views);
