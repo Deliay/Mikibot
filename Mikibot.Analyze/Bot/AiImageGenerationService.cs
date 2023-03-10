@@ -561,7 +561,7 @@ namespace Mikibot.Analyze.Bot
             if (match is null) {
                 return ("", "", 0);
             }
-            return (match.Result("$1"), match.Result("$2"), numbericHvs(match.Result("$1")));
+            return (match.Result("$2"), match.Result("$3"), numbericHvs(match.Result("$1")));
         }
 
         private async ValueTask ProcessManual(Mirai.Net.Data.Shared.Group group, string raw, CancellationToken token)
