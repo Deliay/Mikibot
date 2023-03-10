@@ -238,7 +238,7 @@ namespace Mikibot.Analyze.Bot
             { "旗袍", new() {
                 "(red china dress)", "(white china dress)", "(blue china dress)", "(cyan china dress)",
                 "(yellow china dress)", "(red chinese clothes)", "(white chinese clothes)", "(blue chinese clothes)",
-                "(cyan chinese clothes)", "(yellow chinese clothes)",
+                "(cyan chinese clothes)", "(yellow chinese clothes)", "(black china dress)", "(black chinese clothes)",
             } },
         };
 
