@@ -61,8 +61,8 @@ namespace Mikibot.Analyze.Bot
 
         private const string NegativePrompt = NegativePromptAbyss;
 
-        private const string BasicPrompt = "<lora:pastelMixStylizedAnime_pastelMixLoraVersion:0.3>, " +
-            "<lora:roluaStyleLora_r:0.3>,<lora:V11ForegroundPlant_V11:0.4>, " +
+        private const string BasicPrompt = "<lora:pastelMixStylizedAnime_pastelMixLoraVersion:0.25>, " +
+            "<lora:roluaStyleLora_r:0.25>,<lora:V11ForegroundPlant_V11:0.3>, " +
             "masterpiece, best quality, 1girl, solo, ";
 
         private static readonly Dictionary<string, double> basicStyleWeight = new()
