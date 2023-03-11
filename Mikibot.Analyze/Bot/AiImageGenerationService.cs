@@ -16,6 +16,7 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using Websocket.Client.Logging;
 using Mikibot.BuildingBlocks.Util;
+using NPOI.Util;
 
 namespace Mikibot.Analyze.Bot
 {
@@ -654,6 +655,63 @@ namespace Mikibot.Analyze.Bot
             } 
         }
 
+        private static readonly Dictionary<string, int> characterRandomWeight = new()
+        {
+            { "恶魔弥", 25 },
+            { "弥", 25 },
+            { "真", 10 },
+            { "悠", 5 },
+            { "侑", 10 },
+            { "炉", 10 },
+            { "毬", 10 },
+            { "岁", 5 },
+        };
+        private static int Max = characterRandomWeight.Values.Sum();
+        private static List<string> allCharacters = characterRandomWeight.Keys.ToList();
+
+        private async Task Idle(Mirai.Net.Data.Shared.Group group, CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
+            {
+                var rand = random.Next(Max) + 1;
+                var character = "弥";
+                foreach (var currCharacter in allCharacters)
+                {
+                    var weight = characterRandomWeight[currCharacter];
+                    if (weight > rand)
+                    {
+                        character = currCharacter;
+                        continue;
+                    }
+                    rand -= weight;
+                }
+                var style = "随机";
+
+                await _lock.WaitAsync(token);
+                try
+                {
+                    if (IsColdingDown())
+                    {
+                        continue;
+                    }
+                    var (prompt, extra, cfg_scale, steps, width, height) = GetPrompt(style, character);
+                    await miraiService.SendMessageToGroup(group, token, GetGenerateMsg(extra).ToArray());
+                    logger.LogInformation("prompt: {}", prompt);
+
+                    var body = await Request(prompt, cfg_scale, steps, width, height, token);
+                    await SendImage(group, prompt, body, token);
+                }
+                finally
+                {
+                    _lock.Release();
+                }
+                await Task.Delay(TimeSpan.FromMinutes(10), token);
+            }
+        }
+
+        private readonly SemaphoreSlim _lock = new(1);
+        private readonly Dictionary<string, CancellationTokenSource> controller = new();
+
         private async ValueTask Dequeue(CancellationToken token)
         {
             await foreach (var msg in messageQueue.Reader.ReadAllAsync(token))
@@ -667,6 +725,30 @@ namespace Mikibot.Analyze.Bot
                         if (plain.Text == "!help")
                         {
                             await miraiService.SendMessageToGroup(group, token, getHelpMsg(group.Id).ToArray());
+                        }
+                        if (plain.Text.StartsWith("!idle"))
+                        {
+                            if (controller.ContainsKey(group.Id))
+                            {
+                                await miraiService.SendMessageToGroup(group, token, new MessageBase[]
+                                {
+                                    new PlainMessage() { Text = "已关闭本群的闲置跑图功能。" },
+                                });
+                                using var csc = controller[group.Id];
+                                csc.Cancel();
+                                controller.Remove(group.Id);
+                            }
+                            else
+                            {
+                                var csc = CancellationTokenSource.CreateLinkedTokenSource(token);
+                                controller.Add(group.Id, csc);
+                                _ = Idle(group, csc.Token);
+
+                                await miraiService.SendMessageToGroup(group, token, new MessageBase[]
+                                {
+                                    new PlainMessage() { Text = "已开启本群的闲置跑图功能。" },
+                                });
+                            }
                         }
                         if (plain.Text.StartsWith("!!"))
                         {
@@ -689,30 +771,38 @@ namespace Mikibot.Analyze.Bot
                         }
                         if (HasCategory(style) || style == "随机")
                         {
-                            if (IsColdingDown())
+                            await _lock.WaitAsync(token);
+                            try
                             {
-                                if (!isCdHintShown)
+                                if (IsColdingDown())
                                 {
-                                    await miraiService.SendMessageToGroup(group, token, GetCdMessage().ToArray());
-                                    isCdHintShown = true;
+                                    if (!isCdHintShown)
+                                    {
+                                        await miraiService.SendMessageToGroup(group, token, GetCdMessage().ToArray());
+                                        isCdHintShown = true;
+                                    }
+                                }
+                                else
+                                {
+                                    isCdHintShown = false;
+                                    var (prompt, extra, cfg_scale, steps, width, height) = GetPrompt(style, character, sizeRange);
+                                    await miraiService.SendMessageToGroup(group, token, GetGenerateMsg(extra).ToArray());
+                                    logger.LogInformation("prompt: {}", prompt);
+                                    try
+                                    {
+                                        var body = await Request(prompt, cfg_scale, steps, width, height, token);
+                                        await SendImage(group, prompt, body, token);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        logger.LogError(ex, "access AI errored!");
+                                        return;
+                                    }
                                 }
                             }
-                            else
+                            finally
                             {
-                                isCdHintShown = false;
-                                var (prompt, extra, cfg_scale, steps, width, height) = GetPrompt(style, character, sizeRange);
-                                await miraiService.SendMessageToGroup(group, token, GetGenerateMsg(extra).ToArray());
-                                logger.LogInformation("prompt: {}", prompt);
-                                try
-                                {
-                                    var body = await Request(prompt, cfg_scale, steps, width, height, token);
-                                    await SendImage(group, prompt, body, token);
-                                }
-                                catch (Exception ex)
-                                {
-                                    logger.LogError(ex, "access AI errored!");
-                                    return;
-                                }
+                                _lock.Release();
                             }
                         }
                     }
