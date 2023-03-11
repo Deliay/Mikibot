@@ -26,7 +26,7 @@ appBuilder.RegisterType<ConsoleEmailService>().As<IEmailService>().SingleInstanc
 #else
 appBuilder.RegisterType<MiraiService>().As<IMiraiService>().SingleInstance();
 appBuilder.RegisterType<LocalOssService>().As<IOssService>().SingleInstance();
-appBuilder.RegisterType<TecentEmailService>().As<IEmailService>().SingleInstance();
+appBuilder.RegisterType<ConsoleEmailService>().As<IEmailService>().SingleInstance();
 #endif
 
 appBuilder.RegisterType<LiveStreamEventService>().AsSelf().SingleInstance();

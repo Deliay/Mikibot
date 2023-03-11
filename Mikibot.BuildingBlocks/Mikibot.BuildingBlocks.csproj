@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -21,7 +21,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
     <!--<PackageReference Include="Tencent.QCloud.Cos.Sdk" Version="5.4.34" />-->
 	<PackageReference Include="SendGrid" Version="9.28.1" />
-	<PackageReference Include="TencentCloudSDK" Version="3.0.682" />
+	<!--<PackageReference Include="TencentCloudSDK" Version="3.0.682" />-->
     <PackageReference Include="SixLabors.ImageSharp" Version="3.0.0" />
   </ItemGroup>
 
