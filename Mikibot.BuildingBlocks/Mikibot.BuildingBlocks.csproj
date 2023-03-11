@@ -8,10 +8,12 @@
 
   <ItemGroup>
     <Compile Remove="Util\OssService.cs" />
+    <Compile Remove="Util\TecentEmailService.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="Util\OssService.cs" />
+    <None Include="Util\TecentEmailService.cs" />
   </ItemGroup>
 
   <ItemGroup>

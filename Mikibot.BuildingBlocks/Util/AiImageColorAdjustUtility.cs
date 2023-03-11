@@ -21,21 +21,18 @@ namespace Mikibot.BuildingBlocks.Util
 
         public static bool TryAdjust(string prompts, string base64encodedImage, out string adjustedImage)
         {
-            if (!prompts.Contains("night,"))
-            {
-                adjustedImage = base64encodedImage;
-                return false;
-            }
-
-            var data = Convert.FromBase64String(base64encodedImage);
+            var data = Convert.FromBase64String(base64encodedImage); 
             using Image image = Image.Load(data);
             
             image.Mutate((ctx) =>
             {
-                ctx.ApplyProcessor(new TemperatureProcessor(-15));
+                if (!prompts.Contains("night,"))
+                {
+                    ctx.ApplyProcessor(new TemperatureProcessor(-10));
+                }
                 ctx.Brightness(0.95f);
-                ctx.Contrast(1.25f);
-                ctx.Saturate(1.1f);
+                ctx.Contrast(1.15f);
+                ctx.Saturate(1.05f);
             });
 
             using var ms = new MemoryStream(data.Length);

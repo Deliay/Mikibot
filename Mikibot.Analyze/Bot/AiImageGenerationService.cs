@@ -619,14 +619,14 @@ namespace Mikibot.Analyze.Bot
             {
                 var body = await res.Content.ReadFromJsonAsync<Ret>(cancellationToken: token);
                 var info = JsonSerializer.Deserialize<Info>(body.info);
-                logger.LogInformation("生成成功，种子:{}", info.seed);
+                logger.LogInformation("生成成功，种子: {}", info.seed);
                 return body;
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "catched after access AI!");
                 logger.LogInformation(await res.Content.ReadAsStringAsync());
-                throw ex;
+                throw;
             }
         }
 
@@ -637,7 +637,7 @@ namespace Mikibot.Analyze.Bot
             if (body.images.Count != 0)
             {
                 var imageBase64 = body.images[0];
-
+                AiImageColorAdjustUtility.TryAdjust(prompt, imageBase64, out var adjustedImage);
                 List<MessageBase> messages = new()
                 {
                     new PlainMessage()
@@ -646,14 +646,9 @@ namespace Mikibot.Analyze.Bot
                     },
                     new ImageMessage()
                     {
-                        Base64 = imageBase64,
+                        Base64 = adjustedImage,
                     },
                 };
-                if (AiImageColorAdjustUtility.TryAdjust(prompt, imageBase64, out var adjustedImage))
-                {
-                    messages.Add(new PlainMessage() { Text = "检测到夜晚相关词条，自动调色：" });
-                    messages.Add(new ImageMessage() { Base64 = adjustedImage });
-                }
 
                 await miraiService.SendMessageToGroup(group, token, messages.ToArray());
             } 
