@@ -15,17 +15,17 @@ var appBuilder = ContainerInitializer.Create();
 appBuilder.RegisterType<BiliLiveCrawler>().AsSelf().SingleInstance();
 appBuilder.RegisterType<BiliVideoCrawler>().AsSelf().SingleInstance();
 
-appBuilder.Register<MySqlConfiguration>((_) => MySqlConfiguration.FromEnviroment());
+appBuilder.Register((_) => MySqlConfiguration.FromEnviroment());
 appBuilder.RegisterType<MikibotDatabaseContext>().AsSelf().InstancePerDependency();
 
-appBuilder.Register<MiraiBotConfig>((_) => MiraiBotConfig.FromEnviroment());
+appBuilder.Register((_) => MiraiBotConfig.FromEnviroment());
 #if DEBUG
 appBuilder.RegisterType<ConsoleMiraiService>().As<IMiraiService>().SingleInstance();
 appBuilder.RegisterType<LocalOssService>().As<IOssService>().SingleInstance();
 appBuilder.RegisterType<ConsoleEmailService>().As<IEmailService>().SingleInstance();
 #else
 appBuilder.RegisterType<MiraiService>().As<IMiraiService>().SingleInstance();
-appBuilder.RegisterType<OssService>().As<IOssService>().SingleInstance();
+appBuilder.RegisterType<LocalOssService>().As<IOssService>().SingleInstance();
 appBuilder.RegisterType<TecentEmailService>().As<IEmailService>().SingleInstance();
 #endif
 

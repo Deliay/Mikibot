@@ -15,6 +15,7 @@ using System.Text.Json;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Websocket.Client.Logging;
+using Mikibot.BuildingBlocks.Util;
 
 namespace Mikibot.Analyze.Bot
 {
@@ -588,8 +589,8 @@ namespace Mikibot.Analyze.Bot
             var fullPrompt = $"{BasicPrompt}, {prefix}, <lora:{lora}:{weight}>, {prompt}";
             await miraiService.SendMessageToGroup(group, token, GetGenerateMsg(fullPrompt).ToArray());
 
-            var ret = await Request(fullPrompt);
-            await SendImage(group, ret, token);
+            var ret = await Request(fullPrompt, token: token);
+            await SendImage(group, prompt, ret, token);
         }
 
         private async ValueTask<Ret> Request(string prompt, double cfg_scale = 8, int steps = 26, int width = 768, int height = 432, CancellationToken token = default)
@@ -629,24 +630,33 @@ namespace Mikibot.Analyze.Bot
             }
         }
 
-        private async ValueTask SendImage(Mirai.Net.Data.Shared.Group group, Ret body, CancellationToken token)
+        private async ValueTask SendImage(Mirai.Net.Data.Shared.Group group, string prompt, Ret body, CancellationToken token)
         {
             var info = JsonSerializer.Deserialize<Info>(body.info);
             logger.LogInformation("生成成功，种子:{}", info.seed);
             if (body.images.Count != 0)
             {
-                await miraiService.SendMessageToGroup(group, token, new MessageBase[]
+                var imageBase64 = body.images[0];
+
+                List<MessageBase> messages = new()
                 {
-                new PlainMessage()
+                    new PlainMessage()
+                    {
+                        Text = $"生成成功，种子:{info.seed}"
+                    },
+                    new ImageMessage()
+                    {
+                        Base64 = imageBase64,
+                    },
+                };
+                if (AiImageColorAdjustUtility.TryAdjust(prompt, imageBase64, out var adjustedImage))
                 {
-                    Text = $"生成成功，种子:{info.seed}"
-                },
-                new ImageMessage()
-                {
-                    Base64 = body.images[0],
-                },
-                });
-            }
+                    messages.Add(new PlainMessage() { Text = "检测到夜晚相关词条，自动调色：" });
+                    messages.Add(new ImageMessage() { Base64 = adjustedImage });
+                }
+
+                await miraiService.SendMessageToGroup(group, token, messages.ToArray());
+            } 
         }
 
         private async ValueTask Dequeue(CancellationToken token)
@@ -701,7 +711,7 @@ namespace Mikibot.Analyze.Bot
                                 try
                                 {
                                     var body = await Request(prompt, cfg_scale, steps, width, height, token);
-                                    await SendImage(group, body, token);
+                                    await SendImage(group, prompt, body, token);
                                 }
                                 catch (Exception ex)
                                 {

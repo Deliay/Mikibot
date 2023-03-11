@@ -12,4 +12,8 @@
 	  <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Mikibot.BuildingBlocks\Mikibot.BuildingBlocks.csproj" />
+  </ItemGroup>
+
 </Project>
