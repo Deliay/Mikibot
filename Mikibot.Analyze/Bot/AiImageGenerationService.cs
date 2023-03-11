@@ -674,6 +674,7 @@ namespace Mikibot.Analyze.Bot
             while (!token.IsCancellationRequested)
             {
                 var rand = random.Next(Max) + 1;
+                var original = rand;
                 var character = "弥";
                 foreach (var currCharacter in allCharacters)
                 {
@@ -681,7 +682,7 @@ namespace Mikibot.Analyze.Bot
                     if (weight > rand)
                     {
                         character = currCharacter;
-                        continue;
+                        break;
                     }
                     rand -= weight;
                 }
@@ -695,7 +696,7 @@ namespace Mikibot.Analyze.Bot
                         continue;
                     }
                     var (prompt, extra, cfg_scale, steps, width, height) = GetPrompt(style, character);
-                    await miraiService.SendMessageToGroup(group, token, GetGenerateMsg(extra).ToArray());
+                    await miraiService.SendMessageToGroup(group, token, GetGenerateMsg($"{extra}\n随机区间: {original}").ToArray());
                     logger.LogInformation("prompt: {}", prompt);
 
                     var body = await Request(prompt, cfg_scale, steps, width, height, token);
