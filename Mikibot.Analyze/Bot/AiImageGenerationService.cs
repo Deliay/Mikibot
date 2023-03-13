@@ -749,7 +749,7 @@ namespace Mikibot.Analyze.Bot
                                 reqStyle = reqStyle == "" ? "随机" : reqStyle;
                                 reqCharacter = reqCharacter == "" ? "随机" : reqCharacter;
 
-                                _ = Idle(group, reqStyle, reqCharacter, csc.Token);
+                                _ = Idle(group, reqCharacter, reqStyle, csc.Token);
 
                                 await miraiService.SendMessageToGroup(group, token, new MessageBase[]
                                 {
