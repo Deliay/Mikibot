@@ -669,24 +669,25 @@ namespace Mikibot.Analyze.Bot
         private static int Max = characterRandomWeight.Values.Sum();
         private static List<string> allCharacters = characterRandomWeight.Keys.ToList();
 
-        private async Task Idle(Mirai.Net.Data.Shared.Group group, CancellationToken token)
+        private async Task Idle(Mirai.Net.Data.Shared.Group group, string requireCharacter = "随机", string requireStyle = "随机", CancellationToken token = default)
         {
             while (!token.IsCancellationRequested)
             {
-                var rand = random.Next(Max) + 1;
-                var original = rand;
-                var character = "弥";
-                foreach (var currCharacter in allCharacters)
+                var character = requireCharacter;
+                if (character == "随机")
                 {
-                    var weight = characterRandomWeight[currCharacter];
-                    if (weight > rand)
+                    var rand = random.Next(Max) + 1;
+                    foreach (var currCharacter in allCharacters)
                     {
-                        character = currCharacter;
-                        break;
+                        var weight = characterRandomWeight[currCharacter];
+                        if (weight > rand)
+                        {
+                            character = currCharacter;
+                            break;
+                        }
+                        rand -= weight;
                     }
-                    rand -= weight;
                 }
-                var style = "随机";
 
                 await _lock.WaitAsync(token);
                 try
@@ -695,8 +696,8 @@ namespace Mikibot.Analyze.Bot
                     {
                         continue;
                     }
-                    var (prompt, extra, cfg_scale, steps, width, height) = GetPrompt(style, character);
-                    await miraiService.SendMessageToGroup(group, token, GetGenerateMsg($"{extra}\n随机区间: {original}").ToArray());
+                    var (prompt, extra, cfg_scale, steps, width, height) = GetPrompt(requireStyle, character);
+                    await miraiService.SendMessageToGroup(group, token, GetGenerateMsg($"{extra}").ToArray());
                     logger.LogInformation("prompt: {}", prompt);
 
                     var body = await Request(prompt, cfg_scale, steps, width, height, token);
@@ -706,7 +707,7 @@ namespace Mikibot.Analyze.Bot
                 {
                     _lock.Release();
                 }
-                await Task.Delay(TimeSpan.FromMinutes(10), token);
+                await Task.Delay(TimeSpan.FromMinutes(5), token);
             }
         }
 
@@ -729,13 +730,13 @@ namespace Mikibot.Analyze.Bot
                         }
                         if (plain.Text.StartsWith("!idle"))
                         {
-                            if (controller.ContainsKey(group.Id))
+                            if (controller.TryGetValue(group.Id, out var value))
                             {
                                 await miraiService.SendMessageToGroup(group, token, new MessageBase[]
                                 {
                                     new PlainMessage() { Text = "已关闭本群的闲置跑图功能。" },
                                 });
-                                using var csc = controller[group.Id];
+                                using var csc = value;
                                 csc.Cancel();
                                 controller.Remove(group.Id);
                             }
@@ -743,11 +744,16 @@ namespace Mikibot.Analyze.Bot
                             {
                                 var csc = CancellationTokenSource.CreateLinkedTokenSource(token);
                                 controller.Add(group.Id, csc);
-                                _ = Idle(group, csc.Token);
+
+                                var (reqStyle, reqCharacter, size) = ParseCommand(plain.Text);
+                                reqStyle = reqStyle == "" ? "随机" : reqStyle;
+                                reqCharacter = reqCharacter == "" ? "随机" : reqCharacter;
+
+                                _ = Idle(group, reqStyle, reqCharacter, csc.Token);
 
                                 await miraiService.SendMessageToGroup(group, token, new MessageBase[]
                                 {
-                                    new PlainMessage() { Text = "已开启本群的闲置跑图功能。" },
+                                    new PlainMessage() { Text = $"已开启本群的闲置跑图功能。\n角色：{reqCharacter}，风格：{reqStyle}" },
                                 });
                             }
                         }
