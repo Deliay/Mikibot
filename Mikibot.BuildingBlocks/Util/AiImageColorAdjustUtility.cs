@@ -1,6 +1,7 @@
 ﻿using SixLabors.ImageSharp.Advanced;
 using SixLabors.ImageSharp.ColorSpaces;
 using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing.Processors;
 using SixLabors.ImageSharp.Processing.Processors.Filters;
 using System;
@@ -17,6 +18,7 @@ namespace Mikibot.BuildingBlocks.Util
         static AiImageColorAdjustUtility()
         {
             Configuration.Default.ImageFormatsManager.AddImageFormat(PngFormat.Instance);
+            Configuration.Default.ImageFormatsManager.AddImageFormat(JpegFormat.Instance);
         }
 
         public static bool TryAdjust(string prompts, string base64encodedImage, out string adjustedImage)
@@ -28,15 +30,19 @@ namespace Mikibot.BuildingBlocks.Util
             {
                 if (!prompts.Contains("night,"))
                 {
-                    ctx.ApplyProcessor(new TemperatureProcessor(-10));
+                    ctx.ApplyProcessor(new TemperatureProcessor(-15));
+                    ctx.Brightness(0.925f);
                 }
-                ctx.Brightness(0.95f);
+                else
+                {
+                    ctx.Brightness(0.97f);
+                }
                 ctx.Contrast(1.15f);
                 ctx.Saturate(1.05f);
             });
 
             using var ms = new MemoryStream(data.Length);
-            image.SaveAsPng(ms);
+            image.SaveAsJpeg(ms);
             adjustedImage = Convert.ToBase64String(ms.ToArray());
             return true;
         }
