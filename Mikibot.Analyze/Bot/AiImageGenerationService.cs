@@ -605,7 +605,7 @@ namespace Mikibot.Analyze.Bot
                 prompt,
                 enable_hr = true,
                 denoising_strength = 0.6,
-                hr_scale = 2.0,
+                hr_scale = 2.5,
                 hr_upscaler = "Latent",
                 hr_second_pass_steps = 30,
                 cfg_scale,
@@ -615,7 +615,7 @@ namespace Mikibot.Analyze.Bot
                 height,
                 negative_prompt = NegativePrompt,
             }), token);
-            latestGenerateAt = DateTimeOffset.Now.Subtract(TimeSpan.FromSeconds(20));
+            latestGenerateAt = DateTimeOffset.Now;
             try
             {
                 var body = await res.Content.ReadFromJsonAsync<Ret>(cancellationToken: token);
