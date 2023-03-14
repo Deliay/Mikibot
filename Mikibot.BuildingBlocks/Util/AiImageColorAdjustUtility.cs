@@ -21,6 +21,12 @@ namespace Mikibot.BuildingBlocks.Util
             Configuration.Default.ImageFormatsManager.AddImageFormat(JpegFormat.Instance);
         }
 
+        private readonly static IImageProcessor NightTemperatrueProcessor = new TemperatureProcessor(-15);
+        private readonly static JpegEncoder CustomJpegEncoder = new()
+        {
+            Quality = 90,
+        };
+
         public static bool TryAdjust(string prompts, string base64encodedImage, out string adjustedImage)
         {
             var data = Convert.FromBase64String(base64encodedImage); 
@@ -30,7 +36,7 @@ namespace Mikibot.BuildingBlocks.Util
             {
                 if (!prompts.Contains("night,"))
                 {
-                    ctx.ApplyProcessor(new TemperatureProcessor(-15));
+                    ctx.ApplyProcessor(NightTemperatrueProcessor);
                     ctx.Brightness(0.925f);
                 }
                 else
@@ -42,7 +48,7 @@ namespace Mikibot.BuildingBlocks.Util
             });
 
             using var ms = new MemoryStream(data.Length);
-            image.SaveAsJpeg(ms);
+            image.SaveAsJpeg(ms, CustomJpegEncoder);
             adjustedImage = Convert.ToBase64String(ms.ToArray());
             return true;
         }
