@@ -83,6 +83,7 @@ namespace Mikibot.Analyze.Bot
             { "原版", 0.6 },
             { "电锯", 0.55 },
             { "日常", 0.6 },
+            { "臭脚", 0.6 },
         };
 
 
@@ -227,6 +228,12 @@ namespace Mikibot.Analyze.Bot
                 "laboratory,  <lora:miki-v2+v3:-w->, ",
                 "beach, <lora:miki-v2+v3:-w->, ",
             } },
+            { "臭脚", new()
+            {
+                "<lora:miki-v2+v3:-w->, sneakers, black legwear, thighhighs",
+                "<lora:miki-v2+v3:-w->, sneakers, white legwear, thighhighs",
+                "<lora:miki-v2+v3:-w->, sneakers, black legwear, thighhighs",
+            } },
             { "日常", new() {
                 "<lora:miki-v2+v3:-w->, ",
                 "<lora:miki-v2+v3:-w->, ",
@@ -293,8 +300,15 @@ namespace Mikibot.Analyze.Bot
                 "white shirt, long skirt",
                 "full body, short pants, sports bra, jacket, sneakers",
                 "short pants, sports bra, jacket",
-                "sweatshirt,short pants,sneakers,black legwear, thighhighs",
-                "fullbody, sweatshirt,short pants,sneakers,black legwear, thighhighs",
+            } },
+            { "臭脚", new()
+            {
+                "fullbody, sweatshirt, short pants",
+                "fullbody, sweatshirt, short pants, on stomach",
+                "fullbody, sportswear, sports bra, short pants",
+                "fullbody, sportswear, sports bra, short pants, on stomach",
+                "fullbody, shirt, short pants",
+                "fullbody, shirt, short pants, on stomach",
             } },
         };
 
@@ -568,10 +582,10 @@ namespace Mikibot.Analyze.Bot
 
         private static readonly Dictionary<string, string> characterPrefix = new()
         {
-            { "弥", "purple eyes, black hair, [purple streaked hair], (small breast), side_braid" },
+            { "弥", "purple eyes, black hair, [purple streaked hair], (small breast), " },
             { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, small demon horns, pointy ears, (small breast), (flat chest), " },
             { "悠", "(light blue eyes), black hair ribbon, silver hair, blue streaked hair, vr-yua, " },
-            { "侑", "(white pink hair), (blue streaked hair), (cat_ear_headphone), <lora:Kiyuu_:0.2>, (small breast), " },
+            { "侑", "(white pink hair), (blue streaked hair), (cat ear headphone), <lora:Kiyuu_:0.15>, (small breast), " },
             { "炉", "yellow eyes, (pink to blue gradient hair), (gradient hair), ahoge, (small breast), (flat chest), white colored eyelashes, (+ +), " },
             { "毬", "red eyes, silver hair, red streaked hair, demon girl, demon tail, demon wings, demon horns, square pupils, (small breast), " },
             { "岁", "red eyes, silver hair, red hair robbon, (small breast), " },
