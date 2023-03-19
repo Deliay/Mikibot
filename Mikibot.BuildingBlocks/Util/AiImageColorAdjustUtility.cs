@@ -21,7 +21,7 @@ namespace Mikibot.BuildingBlocks.Util
             Configuration.Default.ImageFormatsManager.AddImageFormat(JpegFormat.Instance);
         }
 
-        private readonly static IImageProcessor NightTemperatrueProcessor = new TemperatureProcessor(-10);
+        private readonly static IImageProcessor NightTemperatrueProcessor = new TemperatureProcessor(-15);
         private readonly static JpegEncoder CustomJpegEncoder = new()
         {
             Quality = 90,
@@ -34,10 +34,14 @@ namespace Mikibot.BuildingBlocks.Util
             
             image.Mutate((ctx) =>
             {
-                if (!prompts.Contains("night,"))
+                if (prompts.Contains("night,"))
                 {
                     ctx.ApplyProcessor(NightTemperatrueProcessor);
                     ctx.Brightness(0.925f);
+                }
+                else
+                {
+                    ctx.Brightness(0.975f);
                 }
                 ctx.Contrast(1.15f);
                 ctx.Saturate(1.05f);
