@@ -303,12 +303,12 @@ namespace Mikibot.Analyze.Bot
             } },
             { "臭脚", new()
             {
-                "fullbody, sweatshirt, short pants",
-                "fullbody, sweatshirt, short pants, on stomach",
-                "fullbody, sportswear, sports bra, short pants",
-                "fullbody, sportswear, sports bra, short pants, on stomach",
-                "fullbody, shirt, short pants",
-                "fullbody, shirt, short pants, on stomach",
+                "sweatshirt, short pants",
+                "full body, sweatshirt, short pants, on stomach",
+                "sportswear, sports bra, short pants",
+                "full body, sportswear, sports bra, short pants, on stomach",
+                "shirt, short pants",
+                "full body, shirt, short pants, on stomach",
             } },
         };
 
