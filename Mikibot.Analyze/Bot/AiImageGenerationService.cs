@@ -495,7 +495,8 @@ namespace Mikibot.Analyze.Bot
         private static readonly Dictionary<string, string> characterLore = new()
         {
             { "恶魔弥", "miki-4.0-v1" },
-            { "弥", "miki-v2+v3" },
+            { "老弥", "miki-v2+v3" },
+            { "弥", "miki-2.0+3.0-v1-hd" },
             { "真", "mahiru-v2" },
             { "悠", "YuaVirtuareal_v01" },
             { "侑", "KiyuuVirtuareal_v20" },
