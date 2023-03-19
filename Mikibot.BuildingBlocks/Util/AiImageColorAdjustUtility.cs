@@ -21,7 +21,7 @@ namespace Mikibot.BuildingBlocks.Util
             Configuration.Default.ImageFormatsManager.AddImageFormat(JpegFormat.Instance);
         }
 
-        private readonly static IImageProcessor NightTemperatrueProcessor = new TemperatureProcessor(-15);
+        private readonly static IImageProcessor NightTemperatrueProcessor = new TemperatureProcessor(-10);
         private readonly static JpegEncoder CustomJpegEncoder = new()
         {
             Quality = 90,
