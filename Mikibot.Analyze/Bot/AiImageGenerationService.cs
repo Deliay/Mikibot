@@ -484,6 +484,7 @@ namespace Mikibot.Analyze.Bot
         {
             { "恶魔弥", new() { "139528984" } },
             { "弥", new() { "139528984" } },
+            { "老弥", new() { "139528984" } },
             { "真", new() { "139528984" } },
             { "悠", new() { "139528984" } },
             { "侑", new() { "139528984" } },
@@ -498,7 +499,7 @@ namespace Mikibot.Analyze.Bot
             { "老弥", "miki-v2+v3" },
             { "弥", "miki-2.0+3.0-v1-hd" },
             { "真", "mahiru-v2" },
-            { "悠", "YuaVirtuareal_v01" },
+            { "悠", "yuaVirtuareal_v20" },
             { "侑", "KiyuuVirtuareal_v20" },
             { "炉", "kaoru-1.0-v5" },
             { "毬", "akumaria" },
@@ -659,7 +660,8 @@ namespace Mikibot.Analyze.Bot
         private static readonly Dictionary<string, int> characterRandomWeight = new()
         {
             { "恶魔弥", 25 },
-            { "弥", 25 },
+            { "弥", 50 },
+            { "老弥", 25 },
             { "真", 10 },
             { "悠", 5 },
             { "侑", 10 },
