@@ -289,10 +289,12 @@ namespace Mikibot.Analyze.Bot
                 "upper body, hoodie, sneakers",
                 "full body, bare legs, hoodie, sneakers",
                 "full body, sportswear, sports bra, shorts, sneakers",
-                "full body, white shirt, long skirt, boots",
+                "white shirt, long skirt, boots",
                 "white shirt, long skirt",
                 "full body, short pants, sports bra, jacket, sneakers",
                 "short pants, sports bra, jacket",
+                "sweatshirt,short pants,sneakers,black legwear, thighhighs",
+                "fullbody, sweatshirt,short pants,sneakers,black legwear, thighhighs",
             } },
         };
 
@@ -509,7 +511,7 @@ namespace Mikibot.Analyze.Bot
 
             return (
                 $"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {view}, ({scene}), ({sky}), ({season}), {suffix}, ",
-                $"生成词: {main}\n视角: {view}\n发型: {hair}\n表情: {emo}\n附加词: {extra}\n专属附加词：{suffix}\n天空: {sky}\n" +
+                $"生成词: {main}\n视角: {view}\n发型: {hair}\n场景:{scene}\n表情: {emo}\n附加词: {extra}\n专属附加词：{suffix}\n天空: {sky}\n" +
                 $"季节: {season}\ncfg_scale={cfgScale},step={steps},{directionHint}",
                 cfgScale, steps, width, height);
         }
@@ -811,6 +813,7 @@ namespace Mikibot.Analyze.Bot
                                     new PlainMessage() { Text = $"已开启本群的闲置跑图功能。\n角色：{reqCharacter}，风格：{reqStyle}" },
                                 });
                             }
+                            continue;
                         }
                         if (plain.Text.StartsWith("!!"))
                         {
