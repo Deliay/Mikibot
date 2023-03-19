@@ -39,10 +39,6 @@ namespace Mikibot.BuildingBlocks.Util
                     ctx.ApplyProcessor(NightTemperatrueProcessor);
                     ctx.Brightness(0.925f);
                 }
-                else
-                {
-                    ctx.Brightness(0.97f);
-                }
                 ctx.Contrast(1.15f);
                 ctx.Saturate(1.05f);
             });
