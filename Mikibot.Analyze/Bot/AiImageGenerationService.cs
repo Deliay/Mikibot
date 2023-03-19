@@ -483,6 +483,7 @@ namespace Mikibot.Analyze.Bot
             var sky = RandomOf(skys);
             var season = RandomOf(seasons);
             var suffix = suffixOf(style, character);
+            var scene = RandomOf(scenes);
 
             if (style == "原版")
             {
@@ -498,17 +499,16 @@ namespace Mikibot.Analyze.Bot
 
             if (random.Next(2) >= 1)
             {
-                var scene = RandomOf(scenes);
                 var behaviour = RandomOf(behaviours);
                 var action = RandomOf(actions);
                 //var rp = RandomOf(rolePalys);
                 var emoji = RandomOf(emojis);
 
-                extra = $"({behaviour}), ({action}), ({scene}), ({emoji}), ";
+                extra = $"({behaviour}), ({action}), ({emoji}), ";
             }
 
             return (
-                $"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {view}, ({sky}), ({season}), {suffix}, ",
+                $"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {view}, ({scene}), ({sky}), ({season}), {suffix}, ",
                 $"生成词: {main}\n视角: {view}\n发型: {hair}\n表情: {emo}\n附加词: {extra}\n专属附加词：{suffix}\n天空: {sky}\n" +
                 $"季节: {season}\ncfg_scale={cfgScale},step={steps},{directionHint}",
                 cfgScale, steps, width, height);
@@ -669,7 +669,7 @@ namespace Mikibot.Analyze.Bot
                 height,
                 negative_prompt = NegativePrompt,
             }), token);
-            latestGenerateAt = DateTimeOffset.Now;
+            latestGenerateAt = DateTimeOffset.Now - TimeSpan.FromSeconds(10);
             try
             {
                 var body = await res.Content.ReadFromJsonAsync<Ret>(cancellationToken: token);
