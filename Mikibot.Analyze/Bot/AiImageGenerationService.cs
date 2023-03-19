@@ -132,9 +132,16 @@ namespace Mikibot.Analyze.Bot
                 "castle, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, ",
                 "dormitory, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, ",
                 "street, plant, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, ",
-                "street, plant, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, straw hat, ",
-                "beach, sunshine, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, straw hat, ",
-                "flowers meadows, sunshine, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, straw hat, ",
+                "street, plant, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, ",
+                "beach, sunshine, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, ",
+                "flowers meadows, sunshine, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, ",
+                "mountain, <lora:miki-v2+v3:-w->, (white dress), strap slip, off-shoulder dress, bare shoulders, ",
+                "castle, <lora:miki-v2+v3:-w->, (white dress), strap slip, off-shoulder dress, bare shoulders, ",
+                "dormitory, <lora:miki-v2+v3:-w->, (white dress), strap slip, off-shoulder dress, bare shoulders, ",
+                "street, plant, <lora:miki-v2+v3:-w->, (white dress), strap slip, off-shoulder dress, bare shoulders, ",
+                "street, plant, <lora:miki-v2+v3:-w->, (white dress), strap slip, off-shoulder dress, bare shoulders, ",
+                "beach, sunshine, <lora:miki-v2+v3:-w->, (white dress), strap slip, off-shoulder dress, bare shoulders, ",
+                "flowers meadows, sunshine, <lora:miki-v2+v3:-w->, (white dress), strap slip, off-shoulder dress, bare shoulders, ",
             } },
             { "泳装", new () {
                 "poolside, <lora:miki-v2+v3:-w->, school swimsuit, ",
@@ -180,12 +187,22 @@ namespace Mikibot.Analyze.Bot
                 "chinese mountain, <lora:miki-v2+v3:-w->, chinese, ",
                 "chinese forest, <lora:miki-v2+v3:-w->, chinese, lake, ",
             } },
+            { "浴衣", new() {
+                "dormitory, <lora:miki-v2+v3:-w->, japanese kimono, obi, ",
+                "japanese street, <lora:miki-v2+v3:-w->, japanese kimono, ",
+                "japanese mountain,, <lora:miki-v2+v3:-w->, japanese kimono, obi, ",
+                "japanese forest, <lora:miki-v2+v3:-w->, japanese kimono, lake, ",
+                "dormitory, <lora:miki-v2+v3:-w->, japanese yukata, obi, ",
+                "japanese street, <lora:miki-v2+v3:-w->, japanese yukata, ",
+                "japanese mountain, <lora:miki-v2+v3:-w->, japanese yukata, ",
+                "japanese forest, <lora:miki-v2+v3:-w->, japanese yukata, lake, obi, ",
+            } },
             { "机甲", new() {
-                "<lora:miki-v2+v3:-w->, cyberpunk, kabuto, japanese armor, japanese clothes, holding tantou, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, tentacles, ",
-                "<lora:miki-v2+v3:-w->, cyberpunk, kabuto, japanese armor, japanese clothes, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, tentacles, ",
-                "<lora:miki-v2+v3:-w->, kabuto, japanese armor, holding tantou, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, ",
-                "<lora:miki-v2+v3:-w->, kabuto, japanese armor, japanese clothes, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, ",
-                "<lora:miki-v2+v3:-w->, kabuto, japanese armor, (machine:1.2),(translucent:1.2),false limb, prosthetic weapon, ",
+                "<lora:miki-v2+v3:-w->, kabuto, holding tantou, (machine:1.2),false limb, prosthetic weapon, ",
+                "<lora:miki-v2+v3:-w->, kabuto, (machine:1.2),false limb, prosthetic weapon, ",
+                "<lora:miki-v2+v3:-w->, kabuto, (machine:1.2),false limb, prosthetic weapon, ",
+                "<lora:miki-v2+v3:-w->, (mecha:1.2), (machine:1.2), ",
+                "<lora:miki-v2+v3:-w->, (mecha:1.2), (machine:1.2), ",
             } },
             { "电锯", new() {
                 "<lora:miki-v2+v3:-w->, cyberpunk, (machine:1.2), (blood), (chainsaw man:1.2), (lolipop chainsaw:1.2), (holding chainsaw:1.2), ",
@@ -208,6 +225,10 @@ namespace Mikibot.Analyze.Bot
                 "office,  <lora:miki-v2+v3:-w->, ",
                 "laboratory,  <lora:miki-v2+v3:-w->, ",
                 "beach, <lora:miki-v2+v3:-w->, ",
+            } },
+            { "日常", new() {
+                "<lora:miki-v2+v3:-w->, ",
+                "<lora:miki-v2+v3:-w->, ",
             } },
         };
 
@@ -241,6 +262,36 @@ namespace Mikibot.Analyze.Bot
                 "(red china dress)", "(white china dress)", "(blue china dress)", "(cyan china dress)",
                 "(yellow china dress)", "(red chinese clothes)", "(white chinese clothes)", "(blue chinese clothes)",
                 "(cyan chinese clothes)", "(yellow chinese clothes)", "(black china dress)", "(black chinese clothes)",
+            } },
+            { "白裙", new()
+            {
+                "straw hat", "paper fan", ",",
+            } },
+            { "浴衣", new()
+            {
+                "aerial fireworks", "sparkler", "paper fan",
+                "pink kimono", "red kimono", "blue kimono", "white kimono", "purple kimono"
+            } },
+            { "日常", new()
+            {
+                "full body, white skirt, short dress, bag, red jacket, thighhighs, black legwear, shoes",
+                "full body, white skirt, short dress, bag, sandals",
+                "upper body, white skirt, short dress, bag",
+                "pants, shirt, holding phone",
+                "pants, shirt, jacket",
+                "upper body, pants, shirt, holding phone",
+                "upper body, pants, shirt, jacket",
+                "full body, pants, shirt, holding phone, sneakers",
+                "full body, pants, shirt, jacket, sneakers",
+                "upper body, bare legs, sweatshirt, sneakers",
+                "full body, bare legs, sweatshirt, sneakers",
+                "upper body, hoodie, sneakers",
+                "full body, bare legs, hoodie, sneakers",
+                "full body, sportswear, sports bra, shorts, sneakers",
+                "full body, white shirt, long skirt, boots",
+                "white shirt, long skirt",
+                "full body, short pants, sports bra, jacket, sneakers",
+                "short pants, sports bra, jacket",
             } },
         };
 
@@ -509,14 +560,14 @@ namespace Mikibot.Analyze.Bot
         private static readonly Dictionary<string, double> characterWeightOffset = new()
         {
             { "炉", 0.1 },
-            { "弥", 0 },
+            { "弥", 0.1 },
         };
 
         private static readonly Dictionary<string, string> characterPrefix = new()
         {
             { "弥", "purple eyes, black hair, [purple streaked hair], (small breast), side_braid" },
             { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, small demon horns, pointy ears, (small breast), (flat chest), " },
-            { "悠", "(light blue eyes), black hair ribbon, silver hair, blue streaked hair, " },
+            { "悠", "(light blue eyes), black hair ribbon, silver hair, blue streaked hair, vr-yua, " },
             { "侑", "(white pink hair), (blue streaked hair), (cat_ear_headphone), <lora:Kiyuu_:0.2>, (small breast), " },
             { "炉", "yellow eyes, (pink to blue gradient hair), (gradient hair), ahoge, (small breast), (flat chest), white colored eyelashes, (+ +), " },
             { "毬", "red eyes, silver hair, red streaked hair, demon girl, demon tail, demon wings, demon horns, square pupils, (small breast), " },
