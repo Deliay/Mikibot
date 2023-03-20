@@ -905,11 +905,11 @@ namespace Mikibot.Analyze.Bot
             }
         }
 
-        [GeneratedRegex("([hvs]?)!来张(..)(.*)$")]
+        [GeneratedRegex("([hvslw]?)!来张(..)(.*)$")]
         private static partial Regex MatchRegex();
 
         
-        [GeneratedRegex("([hvs]?)!!(.) (.*)$")]
+        [GeneratedRegex("([hvslw]?)!!(.) (.*)$")]
         private static partial Regex MatchManualRegex();
     }
 }
