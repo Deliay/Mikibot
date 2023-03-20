@@ -521,7 +521,7 @@ namespace Mikibot.Analyze.Bot
                 //var rp = RandomOf(rolePalys);
                 var emoji = RandomOf(emojis);
 
-                extra = $"({behaviour}), ({action}), ({emoji}), ";
+                extra = $"[{behaviour}], [{action}], [{emoji}], ";
             }
 
             return (
@@ -553,7 +553,7 @@ namespace Mikibot.Analyze.Bot
         {
             { "恶魔弥", new() { "139528984" } },
             { "弥", new() { "139528984" } },
-            { "老弥", new() { "139528984" } },
+            { "弥(老lora)", new() { "139528984" } },
             { "真", new() { "139528984" } },
             { "悠", new() { "139528984" } },
             { "侑", new() { "139528984" } },
@@ -565,7 +565,7 @@ namespace Mikibot.Analyze.Bot
         private static readonly Dictionary<string, string> characterLore = new()
         {
             { "恶魔弥", "miki-4.0-v1" },
-            { "老弥", "miki-v2+v3" },
+            { "弥(老lora)", "miki-v2+v3" },
             { "弥", "miki-2.0+3.0-v1-hd" },
             { "真", "mahiru-v2" },
             { "悠", "yuaVirtuareal_v20" },
