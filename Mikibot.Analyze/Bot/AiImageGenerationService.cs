@@ -514,14 +514,14 @@ namespace Mikibot.Analyze.Bot
             var hair = RandomOf(hairStyles);
             var extra = "";
 
-            if (random.Next(2) >= 1)
+            if (random.Next(10) >= 9)
             {
                 var behaviour = RandomOf(behaviours);
                 var action = RandomOf(actions);
-                //var rp = RandomOf(rolePalys);
+                var rp = RandomOf(rolePalys);
                 var emoji = RandomOf(emojis);
 
-                extra = $"[{behaviour}], [{action}], [{emoji}], ";
+                extra = $"[{behaviour}], [{action}], [{emoji}], [{rp}], ";
             }
 
             return (
