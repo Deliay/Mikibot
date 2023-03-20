@@ -453,12 +453,19 @@ namespace Mikibot.Analyze.Bot
 
         private static List<(string, int, int)> resoultions = new()
         {
-            ("横版", 768, 432),
-            ("竖版", 432, 768),
-            ("等宽", 512, 512),
-            ("超宽", 1024, 256),
-            ("超长", 256, 1024),
+            ("中横版", 768, 432),
+            ("中竖版", 432, 768),
+            ("中等宽", 576, 576),
+            ("中超宽", 1024, 256),
+            ("中超长", 256, 1024),
+            ("大横板", 1024, 576),
+            ("大竖版", 576, 1024),
+            ("大等宽", 768, 768),
+            ("大超宽", 1280, 432),
+            ("大超长", 432, 1280),
         };
+
+        private const int LargeSize = 768 * 768;
 
         private static (string, string, double, int, int, int) GetPrompt(string style, string character, int sizeRange = 0)
         {
@@ -613,7 +620,11 @@ namespace Mikibot.Analyze.Bot
             var availableCharacters = characterLore.Keys
                 .Where(c => characterLimit[c].Contains(groupId));
             return new MessageChainBuilder()
-                                .Plain($"指令有2分钟的CD，使用'!来张[风格][人物]'生成（需要英文括号）\n\n例子：!来张随机弥\n可用人物:{string.Join(',', availableCharacters)}\n可用风格\n：随机,{string.Join(',', categories)}").Build();
+                                .Plain($"指令有2分钟的CD，使用'[原话][画幅]!来张[风格][人物]'生成（需要英文符号）\n\n" +
+                                $"例子：!来张随机弥\n可用人物:{string.Join(',', availableCharacters)}\n" +
+                                $"可用风格\n：随机,{string.Join(',', categories)}\n\n" +
+                                $"原画大小：[ml] m-中等 l-大(该选项会增加15秒CD)\n" +
+                                $"画幅选项：[hvswl] h,v 横,纵 / s 等宽 / w,l 超宽,超长\n").Build();
         }
 
         private static int NumbericHvs(string hvs)
@@ -625,6 +636,16 @@ namespace Mikibot.Analyze.Bot
                 "s" => 3,
                 "w" => 4,
                 "l" => 5,
+                "mh" => 1,
+                "mv" => 2,
+                "ms" => 3,
+                "mw" => 4,
+                "ml" => 5,
+                "lh" => 6,
+                "lv" => 7,
+                "ls" => 8,
+                "lw" => 9,
+                "ll" => 10,
                 _ => 0,
             };
         }
@@ -665,7 +686,7 @@ namespace Mikibot.Analyze.Bot
         private async ValueTask<Ret> Request(string prompt, double cfg_scale = 8, int steps = 26, int width = 768, int height = 432, CancellationToken token = default)
         {
 
-            latestGenerateAt = DateTimeOffset.Now;
+            latestGenerateAt = DateTimeOffset.Now + TimeSpan.FromMinutes(1);
             isCdHintShown = false;
             logger.LogInformation("prompt: {}", prompt);
             var res = await httpClient.PostAsync($"{WebUiEndpoint}", JsonContent.Create(new
@@ -683,7 +704,9 @@ namespace Mikibot.Analyze.Bot
                 height,
                 negative_prompt = NegativePrompt,
             }), token);
-            latestGenerateAt = DateTimeOffset.Now - TimeSpan.FromSeconds(10);
+            var isLarge = width * height >= LargeSize;
+            var cdModify = isLarge ? 15 : -10;
+            latestGenerateAt = DateTimeOffset.Now + TimeSpan.FromSeconds(cdModify);
             try
             {
                 var body = await res.Content.ReadFromJsonAsync<Ret>(cancellationToken: token);
@@ -906,11 +929,11 @@ namespace Mikibot.Analyze.Bot
             }
         }
 
-        [GeneratedRegex("([hvslw]?)!来张(..)(.*)$")]
+        [GeneratedRegex("([ml]?[hvslw]?)!来张(..)(.*)$")]
         private static partial Regex MatchRegex();
 
         
-        [GeneratedRegex("([hvslw]?)!!(.) (.*)$")]
+        [GeneratedRegex("([ml]?[hvslw]?)!!(.) (.*)$")]
         private static partial Regex MatchManualRegex();
     }
 }
