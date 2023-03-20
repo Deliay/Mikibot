@@ -231,9 +231,9 @@ namespace Mikibot.Analyze.Bot
             } },
             { "臭脚", new()
             {
-                "<lora:miki-v2+v3:-w->, sneakers, black legwear, thighhighs",
-                "<lora:miki-v2+v3:-w->, sneakers, white legwear, thighhighs",
-                "<lora:miki-v2+v3:-w->, sneakers, black legwear, thighhighs",
+                "<lora:miki-v2+v3:-w->, sneakers, black legwear, thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, sneakers, white legwear, thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, sneakers, black legwear, thighhighs, (full body), ",
             } },
             { "日常", new() {
                 "<lora:miki-v2+v3:-w->, ",
