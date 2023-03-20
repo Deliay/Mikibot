@@ -577,6 +577,7 @@ namespace Mikibot.Analyze.Bot
 
         private static readonly Dictionary<string, string> characterPrefix = new()
         {
+            { "弥(老lora)", "purple eyes, black hair, [purple streaked hair], (small breast), " },
             { "弥", "purple eyes, black hair, [purple streaked hair], (small breast), " },
             { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, small demon horns, pointy ears, (small breast), (flat chest), " },
             { "悠", "(light blue eyes), black hair ribbon, silver hair, blue streaked hair, vr-yua, " },
