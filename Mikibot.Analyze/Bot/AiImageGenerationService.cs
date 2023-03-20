@@ -346,11 +346,11 @@ namespace Mikibot.Analyze.Bot
             ":>","rectangular mouth",":<>",":c","o3o","x3",":o",":>",":>",":<",":<",":p",">:(",">:)",":d","angry",
             "blush","bored","depressed","despair","disdain", "nose blush","sleepy",
             "sobbing","turn pale","torogao","tongue","teeth","tears","surprised","smile","skin fang","singing sang",
-            "sigh","serious","screaming","scared","sad","round teeth","raised eyebrow","pout","pain",
-            "orgasm","open mouth","nervous","naughty face","light smile","licking","gloom depressed","fucked silly",
-            "frown","fang","expressionless","embarrassed","drunk","drooling","disgust","confused","clenched teeth",
-            "annoyed","ahegao","looking at viewer","open mouth","clenched teeth","lips","eyeball","eyelid pull",
-            "food on face","wink","dark persona","shy"
+            "sigh","serious","screaming","scared","sad","raised eyebrow","pout",
+            "orgasm","open mouth","nervous","naughty face","light smile","licking","gloom depressed",
+            "frown","fang","expressionless","embarrassed","drunk","drooling","disgust","confused",
+            "annoyed","ahegao","open mouth","lips","eyelid pull",
+            "food on face","wink","dark persona","shy",
         };
 
         private static readonly List<string> rolePalys = new()
@@ -382,19 +382,20 @@ namespace Mikibot.Analyze.Bot
         {
             "thigh focus", "navel focus", "breast focus", "back focus", "armpit focus", "horizontal view angle", "full-body shot",
             "focus on face", "looking at viewer", "from below", "from above", "dynamic angle", "dynamic pose", "back", "full body",
-            "bust", "profile",
+            "bust", "profile", "upper body", "full body",
         };
 
         private static readonly List<string> skys = new()
         {
             "morning", "sunset", "sunrise", "sunshine", "night, night sky, moon", "night, night sky, dark moon", "night, night sky, red moon",
             "blue sky", "cloudy sky", "night, night sky, starry sky", "night, night sky", "gradient sky", "night, night sky, star",
-            "night, night sky, cloudy sky",
+            "night, night sky, cloudy sky", "morning, cloudy sky", "sunset, cloudy sky", "sunrise, cloudy sky", "sunshine, cloudy sky", 
         };
 
         private static readonly List<string> seasons = new()
         {
             "spring", "summer", "autumn", "winter",
+            "spring", "summer", "autumn",
         };
 
         private static readonly List<string> emojis = new()
@@ -429,7 +430,7 @@ namespace Mikibot.Analyze.Bot
 
         private const string DefaultLora = "miki-v2+v3";
 
-        private static string suffixOf(string style, string character)
+        private static string SuffixOf(string style, string character)
         {
             List<string> suffixs = new();
             if (characterSuffix.TryGetValue(character, out var styleSuffixs))
@@ -450,6 +451,15 @@ namespace Mikibot.Analyze.Bot
             return $"{string.Join(", ", suffixs)}, ";
         }
 
+        private static List<(string, int, int)> resoultions = new()
+        {
+            ("横版", 768, 432),
+            ("竖版", 432, 768),
+            ("等宽", 512, 512),
+            ("超宽", 1024, 256),
+            ("超长", 256, 1024),
+        };
+
         private static (string, string, double, int, int, int) GetPrompt(string style, string character, int sizeRange = 0)
         {
             if (!promptMap.TryGetValue(style, out var prompts))
@@ -468,45 +478,29 @@ namespace Mikibot.Analyze.Bot
                 .Replace(DefaultLora, lora)
                 .Replace("-w-", $"{weight}");
 
-            var direction = (sizeRange > 0 ? sizeRange : random.Next(100)) switch
+            var direction = sizeRange > 0 ? sizeRange - 1 : (random.Next(100) switch
             {
-                <= 20 => 1,
-                > 20 and < 70 => 2,
-                _ => 3,
-            };
-            var directionHint = direction switch
-            {
-                1 => $"横版({direction})",
-                2 => $"等宽({direction})",
-                _ => $"竖版({direction})",
-            };
-            var width = direction switch
-            {
-                1 => 768,
-                2 => 512,
-                _ => 432,
-            };
-            var height = direction switch
-            {
-                1 => 432,
-                2 => 512,
-                _ => 768,
-            };
-            var prefix = characterPrefix.GetValueOrDefault(character) ?? "";
+                <= 20 => 0,
+                > 20 and < 70 => 1,
+                _ => 2,
+            });
+            var (directionHint, width, height) = resoultions[direction];
+            directionHint = $"{directionHint}({width * 2.5}*{height * 2.5})";
+            var prefix = characterPrefix.GetValueOrDefault(key: character) ?? "";
             var emo = RandomOf(emotions);
-            var view = random.Next(100) > 30 ? "full body" : RandomOf(views);
+            var view = RandomOf(views);
             var cfgScale = random.Next(100) > 40 ? random.Next(45, 100) / 10D : 8;
             var steps = random.Next(100) > 60 ? random.Next(24, 46) : 30;
             var sky = RandomOf(skys);
             var season = RandomOf(seasons);
-            var suffix = suffixOf(style, character);
+            var suffix = SuffixOf(style, character);
             var scene = RandomOf(scenes);
 
             if (style == "原版")
             {
                 return (
-                    $"{BasicPrompt}{prefix}{main}({emo}), {view}, ({sky}), ({season}), {suffix}, ",
-                    $"生成词: {main}\n视角: {view}\n表情: {emo}\n专属附加词：{suffix}\n天空: {sky}\n" +
+                    $"{BasicPrompt}{prefix}({main}){emo}, {view}, {sky}, {season}, {suffix}, ",
+                    $"生成词: ({main})\n视角: {view}\n表情: {emo}\n专属附加词：{suffix}\n天空: {sky}\n" +
                     $"季节: {season}\ncfg_scale={cfgScale},step={steps},{directionHint}",
                     cfgScale, steps, width, height);
             }
@@ -525,8 +519,8 @@ namespace Mikibot.Analyze.Bot
             }
 
             return (
-                $"{BasicPrompt}{prefix}{main}({emo}), {hair}, {extra}, {view}, ({scene}), ({sky}), ({season}), {suffix}, ",
-                $"生成词: {main}\n视角: {view}\n发型: {hair}\n场景:{scene}\n表情: {emo}\n附加词: {extra}\n专属附加词：{suffix}\n天空: {sky}\n" +
+                $"{BasicPrompt}{prefix}({main}){emo}, {hair}, {extra}, {view}, {scene}, {sky}, {season}, {suffix}, ",
+                $"生成词: ({main})\n视角: {view}\n发型: {hair}\n场景:{scene}\n表情: {emo}\n附加词: {extra}\n专属附加词：{suffix}\n天空: {sky}\n" +
                 $"季节: {season}\ncfg_scale={cfgScale},step={steps},{directionHint}",
                 cfgScale, steps, width, height);
         }
@@ -621,13 +615,15 @@ namespace Mikibot.Analyze.Bot
                                 .Plain($"指令有2分钟的CD，使用'!来张[风格][人物]'生成（需要英文括号）\n\n例子：!来张随机弥\n可用人物:{string.Join(',', availableCharacters)}\n可用风格\n：随机,{string.Join(',', categories)}").Build();
         }
 
-        private static int numbericHvs(string hvs)
+        private static int NumbericHvs(string hvs)
         {
             return hvs switch
             {
-                "h" => 10,
-                "v" => 90,
-                "s" => 50,
+                "h" => 1,
+                "v" => 2,
+                "s" => 3,
+                "w" => 4,
+                "l" => 5,
                 _ => 0,
             };
         }
@@ -638,7 +634,7 @@ namespace Mikibot.Analyze.Bot
             if (match is null) {
                 return ("", "", 0);
             }
-            return (match.Result("$2"), match.Result("$3"), numbericHvs(match.Result("$1")));
+            return (match.Result("$2"), match.Result("$3"), NumbericHvs(match.Result("$1")));
         }
 
         private static (string, string, int) ParseManualCommand(string raw)
@@ -647,7 +643,7 @@ namespace Mikibot.Analyze.Bot
             if (match is null) {
                 return ("", "", 0);
             }
-            return (match.Result("$2"), match.Result("$3"), numbericHvs(match.Result("$1")));
+            return (match.Result("$2"), match.Result("$3"), NumbericHvs(match.Result("$1")));
         }
 
         private async ValueTask ProcessManual(Mirai.Net.Data.Shared.Group group, string raw, CancellationToken token)
