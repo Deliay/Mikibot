@@ -183,7 +183,7 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, ",
                 "<lora:miki-v2+v3:-w->, ",
             } },
-            { "日常", new() {
+            { "抱枕", new() {
                 "<lora:miki-v2+v3:-w->, dakimakura, (lie on the bed), (white bed sheet background",
                 "<lora:miki-v2+v3:-w->, dakimakura, top view, (lie on the bed), (white bed sheet background)",
                 "<lora:miki-v2+v3:-w->, dakimakura, plan view, (lie on the bed), (white bed sheet background)",
