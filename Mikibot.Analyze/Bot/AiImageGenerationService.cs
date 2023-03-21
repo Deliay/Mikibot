@@ -91,114 +91,64 @@ namespace Mikibot.Analyze.Bot
         private static readonly Dictionary<string, List<string>> promptMap = new()
         {
             { "jk", new () {
-                "school, plant, <lora:miki-v2+v3:-w->, jk, school uniform, ",
-                "engine room, plant, <lora:miki-v2+v3:-w->, jk, school uniform, ",
-                "laboratory, jk, <lora:miki-v2+v3:-w->, school uniform, ",
-                "street, plant, <lora:miki-v2+v3:-w->, jk, school uniform, ",
-                "stairs, plant, <lora:miki-v2+v3:-w->, jk, school uniform, ",
-                "school, plant, <lora:miki-v2+v3:-w->, jk, school uniform, cardigan, ",
-                "engine room, plant, <lora:miki-v2+v3:-w->, jk, school uniform, cardigan, ",
-                "laboratory, <lora:miki-v2+v3:-w->, jk, school uniform, cardigan, ",
-                "street, plant, <lora:miki-v2+v3:-w->, jk, school uniform, cardigan, ",
-                "stairs, plant, <lora:miki-v2+v3:-w->, jk, school uniform, cardigan, ",
+                "plant, <lora:miki-v2+v3:-w->, jk, school uniform, ",
+                "jk, plant, <lora:miki-v2+v3:-w->, jk, school uniform, ",
+                "jk, <lora:miki-v2+v3:-w->, school uniform, ",
+                "<lora:miki-v2+v3:-w->, jk, school uniform, ",
             } },
             { "萝莉", new () {
-                "school, plant, (loli), <lora:miki-v2+v3:-w->, loli, ",
-                "laboratory, (loli), <lora:miki-v2+v3:-w->, js, loli, ",
-                "street, plant, (loli), <lora:miki-v2+v3:-w->, js, loli, ",
-                "stairs, plant, (loli), <lora:miki-v2+v3:-w->, js, loli, ",
-                "school, plant, (loli), <lora:miki-v2+v3:-w->, mesugaki, loli, ",
-                "laboratory, (loli), <lora:miki-v2+v3:-w->, js, mesugaki, loli, ",
-                "street, plant, (loli), <lora:miki-v2+v3:-w->, js, mesugaki, loli, ",
-                "stairs, plant, (loli), <lora:miki-v2+v3:-w->, js, mesugaki, loli, ",
+                "plant, (loli), <lora:miki-v2+v3:-w->, js, loli, ",
+                "(loli), <lora:miki-v2+v3:-w->, js, loli, ",
+                "(loli), <lora:miki-v2+v3:-w->, js, mesugaki, loli, ",
+                "plant, (loli), <lora:miki-v2+v3:-w->, js, mesugaki, loli, ",
             } },
             { "Q版", new () {
-                "school, plant, (loli), <lora:miki-v2+v3:-w->, (chibi), loli, ",
-                "laboratory, (loli), <lora:miki-v2+v3:-w->, js, (chibi), loli, ",
-                "street, plant, (loli), <lora:miki-v2+v3:-w->, js, (chibi), loli, ",
-                "stairs, plant, (loli), <lora:miki-v2+v3:-w->, js, (chibi), loli, ",
-                "school, plant, (loli), <lora:miki-v2+v3:-w->, mesugaki, (chibi), loli, ",
-                "laboratory, (loli), <lora:miki-v2+v3:-w->, js, mesugaki, (chibi), loli, ",
-                "street, plant, (loli), <lora:miki-v2+v3:-w->, js, mesugaki, (chibi), loli, ",
-                "stairs, plant, (loli), <lora:miki-v2+v3:-w->, js, mesugaki, (chibi), loli, ",
+                "plant, (loli), <lora:miki-v2+v3:-w->, (chibi), loli, ",
+                "(loli), <lora:miki-v2+v3:-w->, js, (chibi), loli, ",
             } },
             { "衬衫", new () {
-                "mountain, lake, forest, <lora:miki-v2+v3:-w->, shirt, plant, cardigan, ",
-                "laboratory, <lora:miki-v2+v3:-w->, shirt, ",
-                "mountain, forest, plant, <lora:miki-v2+v3:-w->, shirt, cardigan, ",
-                "castle, <lora:miki-v2+v3:-w->, shirt, plant, ",
-                "street, <lora:miki-v2+v3:-w->, shirt, plant, ",
-                "dormitory, plant, <lora:miki-v2+v3:-w->, shirt, cardigan, ",
+                "<lora:miki-v2+v3:-w->, shirt, ",
+                "<lora:miki-v2+v3:-w->, shirt, cardigan, ",
             } },
             { "白裙", new () {
-                "mountain, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, miki bag summer, ",
-                "castle, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, ",
-                "dormitory, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, ",
-                "street, plant, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, ",
-                "street, plant, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, ",
-                "beach, sunshine, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, ",
-                "flowers meadows, sunshine, <lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, ",
-                "mountain, <lora:miki-v2+v3:-w->, (white dress), strap slip, off-shoulder dress, bare shoulders, ",
-                "castle, <lora:miki-v2+v3:-w->, (white dress), strap slip, off-shoulder dress, bare shoulders, ",
-                "dormitory, <lora:miki-v2+v3:-w->, (white dress), strap slip, off-shoulder dress, bare shoulders, ",
-                "street, plant, <lora:miki-v2+v3:-w->, (white dress), strap slip, off-shoulder dress, bare shoulders, ",
-                "street, plant, <lora:miki-v2+v3:-w->, (white dress), strap slip, off-shoulder dress, bare shoulders, ",
-                "beach, sunshine, <lora:miki-v2+v3:-w->, (white dress), strap slip, off-shoulder dress, bare shoulders, ",
-                "flowers meadows, sunshine, <lora:miki-v2+v3:-w->, (white dress), strap slip, off-shoulder dress, bare shoulders, ",
+                "<lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, bag, ",
+                "<lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, ",
+                "<lora:miki-v2+v3:-w->, (white dress), strap slip, off-shoulder dress, bare shoulders, ",
             } },
             { "泳装", new () {
-                "poolside, <lora:miki-v2+v3:-w->, school swimsuit, ",
-                "beach, ocean, <lora:miki-v2+v3:-w->, school swimsuit, ",
-                "poolside, <lora:miki-v2+v3:-w->, one-piece swimsuit, ",
-                "beach, ocean, <lora:miki-v2+v3:-w->, one-piece swimsuit, ",
-                "beach, ocean, <lora:miki-v2+v3:-w->, side-tie bikini bottom, ",
+                "<lora:miki-v2+v3:-w->, school swimsuit, ",
+                "<lora:miki-v2+v3:-w->, one-piece swimsuit, ",
+                "<lora:miki-v2+v3:-w->, side-tie bikini bottom, ",
             } },
             { "ol", new () {
-                "office, (office lady), mountain in window, <lora:miki-v2+v3:-w->, ",
-                "office, laboratory, (office lady),<lora:miki-v2+v3:-w->, ",
-                "office, dormitory, (office lady),<lora:miki-v2+v3:-w->, office, ",
-                "office, dormitory, (office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, (office lady), ",
-                "office, laboratory, (office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, (office lady), ",
-                "office, (office lady), mountain in window, <lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, (office lady), ",
-                "office, (office lady), <lora:miki-v2+v3:-w->, (office lady), blazer, cardigan, ",
-                "office, laboratory, (office lady),<lora:miki-v2+v3:-w->, (office lady), blazer, cardigan, ",
-                "office, dormitory, (office lady),<lora:miki-v2+v3:-w->, (office lady), blazer, cardigan, ",
-                "office, dormitory, (office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, (office lady), blazer, cardigan, ",
-                "office, laboratory, (office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, (office lady), blazer, cardigan, ",
-                "office, mountain in window, (office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, (office lady), blazer, cardigan, ",
+                "office, (office lady),<lora:miki-v2+v3:-w->, (office lady), ",
+                "office, (office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, (office lady), ",
+                "office, (office lady),<lora:miki-v2+v3:-w->, (office lady), blazer, cardigan, ",
+                "office, (office lady),<lora:hipoly3DModelLora_v10:0.3>, <lora:miki-v2+v3:-w->, (office lady), blazer, cardigan, ",
             } },
             { "lo", new() {
-                "gothic architecture, plant, <lora:miki-v2+v3:-w->, gothic lolita, lolita fashion, ",
-                "gothic architecture, plant, (loli), <lora:miki-v2+v3:-w->, gothic lolita, lolita fashion, chibi, loli, ",
-                "gothic architecture, plant, (loli), <lora:miki-v2+v3:-w->, gothic lolita, lolita fashion, mesugaki, loli, ",
-                "gothic architecture, plant, (loli), <lora:miki-v2+v3:-w->, gothic lolita, lolita fashion, mesugaki, loli, ",
+                "<lora:miki-v2+v3:-w->, (gothic lolita), lolita fashion, ",
+                "(loli), <lora:miki-v2+v3:-w->, (gothic lolita, lolita fashion), chibi, loli, ",
+                "(loli), <lora:miki-v2+v3:-w->, (gothic lolita, lolita fashion), mesugaki, loli, ",
             } },
             { "女仆", new() {
-                "dormitory, <lora:miki-v2+v3:-w->, maid, maid headdress, maid apron, ",
-                "street, <lora:miki-v2+v3:-w->, maid, maid headdress, maid apron, ",
-                "castle, <lora:miki-v2+v3:-w->, maid, maid headdress, maid apron, ",
-                "mountain, <lora:miki-v2+v3:-w->, maid, maid headdress, maid apron, ",
-                "forest, <lora:miki-v2+v3:-w->, maid, maid headdress, maid apron, ",
+                "<lora:miki-v2+v3:-w->, maid, maid headdress, maid apron, ",
             } },
             { "旗袍", new() {
-                "dormitory, <lora:miki-v2+v3:-w->, chinese, ",
-                "chinese street, <lora:miki-v2+v3:-w->, chinese, ",
-                "chinese mountain,, <lora:miki-v2+v3:-w->, chinese, ",
-                "chinese forest, <lora:miki-v2+v3:-w->, chinese, lake, ",
-                "dormitory, <lora:miki-v2+v3:-w->, chinese, ",
-                "chinese street, <lora:miki-v2+v3:-w->, chinese, ",
-                "chinese mountain, <lora:miki-v2+v3:-w->, chinese, ",
-                "chinese forest, <lora:miki-v2+v3:-w->, chinese, lake, ",
+                "<lora:miki-v2+v3:-w->, chinese, ",
+                "<lora:miki-v2+v3:-w->, chinese, ",
+                "<lora:miki-v2+v3:-w->, chinese, ",
+                "<lora:miki-v2+v3:-w->, chinese, ",
+                "<lora:miki-v2+v3:-w->, chinese, ",
+                "<lora:miki-v2+v3:-w->, chinese, ",
+                "<lora:miki-v2+v3:-w->, chinese, ",
+                "<lora:miki-v2+v3:-w->, chinese, ",
             } },
             { "浴衣", new() {
-                "dormitory, <lora:miki-v2+v3:-w->, japanese kimono, obi, ",
-                "japanese street, <lora:miki-v2+v3:-w->, japanese kimono, ",
-                "japanese mountain,, <lora:miki-v2+v3:-w->, japanese kimono, obi, ",
-                "japanese forest, <lora:miki-v2+v3:-w->, japanese kimono, lake, ",
-                "dormitory, <lora:miki-v2+v3:-w->, japanese yukata, obi, ",
-                "japanese street, <lora:miki-v2+v3:-w->, japanese yukata, ",
-                "japanese mountain, <lora:miki-v2+v3:-w->, japanese yukata, ",
-                "japanese forest, <lora:miki-v2+v3:-w->, japanese yukata, lake, obi, ",
+                "<lora:miki-v2+v3:-w->, japanese kimono, obi, ",
+                "<lora:miki-v2+v3:-w->, japanese kimono, ",
+                "<lora:miki-v2+v3:-w->, japanese yukata, obi, ",
+                "<lora:miki-v2+v3:-w->, japanese yukata, ",
             } },
             { "机甲", new() {
                 "<lora:miki-v2+v3:-w->, kabuto, holding tantou, (machine:1.2),false limb, prosthetic weapon, ",
@@ -220,14 +170,7 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, beach, (machine:1.2), (blood), (chainsaw man:1.2), (lolipop chainsaw:1.2), (holding chainsaw:1.2), ",
             } },
             { "原版", new() {
-                "dormitory, <lora:miki-v2+v3:-w->, ",
-                "street, <lora:miki-v2+v3:-w->, ",
-                "castle, <lora:miki-v2+v3:-w->, ",
-                "mountain, <lora:miki-v2+v3:-w->, ",
-                "forest,  <lora:miki-v2+v3:-w->, ",
-                "office,  <lora:miki-v2+v3:-w->, ",
-                "laboratory,  <lora:miki-v2+v3:-w->, ",
-                "beach, <lora:miki-v2+v3:-w->, ",
+                "<lora:miki-v2+v3:-w->, ",
             } },
             { "臭脚", new()
             {
@@ -361,12 +304,13 @@ namespace Mikibot.Analyze.Bot
 
         private static readonly List<string> scenes = new()
         {
-            "cityscape", "scenery", "loong, dragon background, loong background", "rose", "petal", "coconut tree", 
+            "cityscape", "scenery", "rose", "petal", "coconut tree", 
             "pine tree", "maple tree", "cypress", "fruit tree", "treehouse", "twig", "tree stump", "tree shade", 
             "rainy days", "night", "full moon", "on a desert", "in a meadow", "in hawaii", "in winter", "in autumn", 
             "in summer", "in spring", "futon", "sofa", "train", "locker room", "hallway", "telephone pole", "underwater", 
             "ruins", "magic circle", "pentagram background", "christmas tree", "cherry tree", "building", "bathtub", 
-            "starry sky", "sea", 
+            "starry sky", "sea", "mountain","gothic architecture","office, mountain in window",
+            "castle","dormitory","street, plant","beach, sunshine","flowers meadows, sunshine",
             "forest,outline,fountain,shop,outdoors,east asian architecture,greco-roman architecture,restaurant,shanty town,slum", 
             "cyberpunk, city, kowloon, rain", "starry sky,clusters of stars,starry sky,glinting stars", "floating sakura", 
             "violet background", "glinting stars", "floating white feathers", "aurora", "snowflakes", "snowfield", "cafe", 
@@ -494,20 +438,20 @@ namespace Mikibot.Analyze.Bot
             var (directionHint, width, height) = resoultions[direction];
             directionHint = $"{directionHint}({width * 2.5}*{height * 2.5})";
             var prefix = characterPrefix.GetValueOrDefault(key: character) ?? "";
-            var emo = RandomOf(emotions);
-            var view = RandomOf(views);
+            //var emo = RandomOf(emotions);
+            var view = random.Next(100) > 75 ? RandomOf(views) : "";
             var cfgScale = random.Next(100) > 40 ? random.Next(45, 100) / 10D : 8;
             var steps = random.Next(100) > 60 ? random.Next(24, 46) : 30;
-            var sky = RandomOf(skys);
-            var season = RandomOf(seasons);
+            var sky = random.Next(100) > 75 ? RandomOf(skys) : "";
+            var season = random.Next(100) > 75 ? RandomOf(seasons) : "";
+            var scene = random.Next(100) > 75 ? RandomOf(scenes) : "";
             var suffix = SuffixOf(style, character);
-            var scene = RandomOf(scenes);
 
             if (style == "原版")
             {
                 return (
-                    $"{BasicPrompt}{prefix}({main}){emo}, {view}, {sky}, {season}, {suffix}, ",
-                    $"生成词: ({main})\n视角: {view}\n表情: {emo}\n专属附加词：{suffix}\n天空: {sky}\n" +
+                    $"{BasicPrompt}{prefix}({main}), {view}, {sky}, {season}, {suffix}, ",
+                    $"生成词: ({main})\n视角: {view}\n专属附加词：{suffix}\n天空: {sky}\n" +
                     $"季节: {season}\ncfg_scale={cfgScale},step={steps},{directionHint}",
                     cfgScale, steps, width, height);
             }
@@ -526,8 +470,8 @@ namespace Mikibot.Analyze.Bot
             }
 
             return (
-                $"{BasicPrompt}{prefix}({main}){emo}, {hair}, {extra}, {view}, {scene}, {sky}, {season}, {suffix}, ",
-                $"生成词: ({main})\n视角: {view}\n发型: {hair}\n场景:{scene}\n表情: {emo}\n附加词: {extra}\n专属附加词：{suffix}\n天空: {sky}\n" +
+                $"{BasicPrompt}{prefix}({main}), {hair}, {extra}, {view}, {scene}, {sky}, {season}, {suffix}, ",
+                $"生成词: ({main})\n视角: {view}\n发型: {hair}\n场景:{scene}\n附加词: {extra}\n专属附加词：{suffix}\n天空: {sky}\n" +
                 $"季节: {season}\ncfg_scale={cfgScale},step={steps},{directionHint}",
                 cfgScale, steps, width, height);
         }
