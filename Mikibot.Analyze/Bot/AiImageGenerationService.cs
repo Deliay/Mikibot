@@ -186,7 +186,7 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, ",
             } },
             { "抱枕", new() {
-                "<lora:miki-v2+v3:-w->, dakimakura, (lie on the bed), (white bed sheet background",
+                "<lora:miki-v2+v3:-w->, dakimakura, (lie on the bed), (white bed sheet background)",
                 "<lora:miki-v2+v3:-w->, dakimakura, top view, (lie on the bed), (white bed sheet background)",
                 "<lora:miki-v2+v3:-w->, dakimakura, plan view, (lie on the bed), (white bed sheet background)",
                 "<lora:miki-v2+v3:-w->, dakimakura, on back, (lie on the bed), (white bed sheet background), sheet grab, panty pull, bra pull",
@@ -463,7 +463,7 @@ namespace Mikibot.Analyze.Bot
             if (style == "原版")
             {
                 return (
-                    $"{BasicPrompt}{prefix}({main}), {view}, {sky}, {season}, {suffix}, ",
+                    $"{BasicPrompt}{prefix}{main}, {view}, {sky}, {season}, {suffix}, ",
                     $"生成词: ({main})\n视角: {view}\n专属附加词：{suffix}\n天空: {sky}\n" +
                     $"季节: {season}\ncfg_scale={cfgScale},step={steps},{directionHint}",
                     cfgScale, steps, width, height);
@@ -483,7 +483,7 @@ namespace Mikibot.Analyze.Bot
             }
 
             return (
-                $"{BasicPrompt}{prefix}({main}), {hair}, {extra}, {view}, {scene}, {sky}, {season}, {suffix}, ",
+                $"{BasicPrompt}{prefix}{main}, {hair}, {extra}, {view}, {scene}, {sky}, {season}, {suffix}, ",
                 $"生成词: ({main})\n视角: {view}\n发型: {hair}\n场景:{scene}\n附加词: {extra}\n专属附加词：{suffix}\n天空: {sky}\n" +
                 $"季节: {season}\ncfg_scale={cfgScale},step={steps},{directionHint}",
                 cfgScale, steps, width, height);
