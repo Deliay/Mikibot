@@ -182,6 +182,15 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, ",
                 "<lora:miki-v2+v3:-w->, ",
             } },
+            { "日常", new() {
+                "<lora:miki-v2+v3:-w->, dakimakura, (lie on the bed), (white bed sheet background",
+                "<lora:miki-v2+v3:-w->, dakimakura, top view, (lie on the bed), (white bed sheet background)",
+                "<lora:miki-v2+v3:-w->, dakimakura, plan view, (lie on the bed), (white bed sheet background)",
+                "<lora:miki-v2+v3:-w->, dakimakura, on back, white bed sheet background, sheet grab, panty pull, bra pull",
+                "<lora:miki-v2+v3:-w->, dakimakura, (top view), plan view, lie on the bed, white bed sheet background",
+                "<lora:miki-v2+v3:-w->, dakimakura, (top view), lie on the bed, white bed sheet background",
+                "<lora:miki-v2+v3:-w->, dakimakura, (plan view), lie on the bed, white bed sheet background",
+            } },
         };
 
         private const int CD = 30;
