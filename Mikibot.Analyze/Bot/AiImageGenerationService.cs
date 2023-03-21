@@ -88,6 +88,8 @@ namespace Mikibot.Analyze.Bot
             { "抱枕", 0.6 },
         };
 
+        private static readonly HashSet<string> disableExtraStyle = new() { "抱枕" };
+
 
         private static readonly Dictionary<string, List<string>> promptMap = new()
         {
@@ -187,10 +189,9 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, dakimakura, (lie on the bed), (white bed sheet background",
                 "<lora:miki-v2+v3:-w->, dakimakura, top view, (lie on the bed), (white bed sheet background)",
                 "<lora:miki-v2+v3:-w->, dakimakura, plan view, (lie on the bed), (white bed sheet background)",
+                "<lora:miki-v2+v3:-w->, dakimakura, on back, (lie on the bed), (white bed sheet background), sheet grab, panty pull, bra pull",
                 "<lora:miki-v2+v3:-w->, dakimakura, on back, white bed sheet background, sheet grab, panty pull, bra pull",
-                "<lora:miki-v2+v3:-w->, dakimakura, (top view), plan view, lie on the bed, white bed sheet background",
-                "<lora:miki-v2+v3:-w->, dakimakura, (top view), lie on the bed, white bed sheet background",
-                "<lora:miki-v2+v3:-w->, dakimakura, (plan view), lie on the bed, white bed sheet background",
+                "<lora:miki-v2+v3:-w->, dakimakura, on back, (white bed sheet background), sheet grab, panty pull, bra pull",
             } },
         };
 
@@ -447,14 +448,16 @@ namespace Mikibot.Analyze.Bot
             });
             var (directionHint, width, height) = resoultions[direction];
             directionHint = $"{directionHint}({width * 2.5}*{height * 2.5})";
+            var enableExtra = !disableExtraStyle.Contains(style);
+
             var prefix = characterPrefix.GetValueOrDefault(key: character) ?? "";
             //var emo = RandomOf(emotions);
-            var view = random.Next(100) > 75 ? RandomOf(views) : "";
+            var view = enableExtra && random.Next(100) > 75 ? RandomOf(views) : "";
             var cfgScale = random.Next(100) > 40 ? random.Next(45, 100) / 10D : 8;
             var steps = random.Next(100) > 60 ? random.Next(24, 46) : 30;
-            var sky = random.Next(100) > 75 ? RandomOf(skys) : "";
-            var season = random.Next(100) > 75 ? RandomOf(seasons) : "";
-            var scene = random.Next(100) > 75 ? RandomOf(scenes) : "";
+            var sky = enableExtra && random.Next(100) > 75 ? RandomOf(skys) : "";
+            var season = enableExtra && random.Next(100) > 75 ? RandomOf(seasons) : "";
+            var scene = enableExtra && random.Next(100) > 75 ? RandomOf(scenes) : "";
             var suffix = SuffixOf(style, character);
 
             if (style == "原版")
