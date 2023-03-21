@@ -535,7 +535,6 @@ namespace Mikibot.Analyze.Bot
 
         private static readonly Dictionary<string, double> characterWeightOffset = new()
         {
-            { "炉", 0.1 },
             { "弥", 0.1 },
         };
 
