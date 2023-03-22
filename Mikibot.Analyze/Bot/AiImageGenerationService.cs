@@ -63,8 +63,8 @@ namespace Mikibot.Analyze.Bot
 
         private const string NegativePrompt = NegativePromptAbyss;
 
-        private const string BasicPrompt = "<lora:pastelMixStylizedAnime_pastelMixLoraVersion:0.25>, " +
-            "<lora:roluaStyleLora_r:0.25>,<lora:V11ForegroundPlant_V11:0.3>, " +
+        private const string BasicPrompt = "<lora:pastelMixStylizedAnime_pastelMixLoraVersion:0.15>, " +
+            "<lora:roluaStyleLora_r:0.15>,<lora:V11ForegroundPlant_V11:0.25>, " +
             "masterpiece, best quality, 1girl, solo, ";
 
         private static readonly Dictionary<string, double> basicStyleWeight = new()
@@ -79,13 +79,16 @@ namespace Mikibot.Analyze.Bot
             { "lo", 0.55 },
             { "女仆", 0.6 },
             { "旗袍", 0.6 },
+            { "水墨", 0.6 },
             { "机甲", 0.55 },
             { "原版", 0.6 },
+            { "立绘", 0.6 },
             { "电锯", 0.55 },
             { "日常", 0.6 },
             { "浴衣", 0.6 },
             { "臭脚", 0.6 },
             { "抱枕", 0.6 },
+            { "油画", 0.3 },
         };
 
         private static readonly HashSet<string> disableExtraStyle = new() { "抱枕" };
@@ -138,14 +141,13 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, maid, maid headdress, maid apron, ",
             } },
             { "旗袍", new() {
+                "<lora:miki-v2+v3:-w->, ",
                 "<lora:miki-v2+v3:-w->, chinese, ",
-                "<lora:miki-v2+v3:-w->, chinese, ",
-                "<lora:miki-v2+v3:-w->, chinese, ",
-                "<lora:miki-v2+v3:-w->, chinese, ",
-                "<lora:miki-v2+v3:-w->, chinese, ",
-                "<lora:miki-v2+v3:-w->, chinese, ",
-                "<lora:miki-v2+v3:-w->, chinese, ",
-                "<lora:miki-v2+v3:-w->, chinese, ",
+            } },
+            { "水墨", new() {
+                "<lora:miki-v2+v3:-w->, ((((ink painting)))), illustration, ((Chinese ink painting)), (((masterpiece))), (((best quality)))," +
+                " ((((Ink dyeing)))), (((Watercolor))), ((Chinese Brush Painting)), (Chinese style),((red ink)), ink background, petals, (((soaked))), " +
+                "(((The character is in the center of the frame))),(((flowing)))"
             } },
             { "浴衣", new() {
                 "<lora:miki-v2+v3:-w->, japanese kimono, obi, ",
@@ -157,23 +159,18 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, kabuto, holding tantou, (machine:1.2),false limb, prosthetic weapon, ",
                 "<lora:miki-v2+v3:-w->, kabuto, (machine:1.2),false limb, prosthetic weapon, ",
                 "<lora:miki-v2+v3:-w->, kabuto, (machine:1.2),false limb, prosthetic weapon, ",
-                "<lora:miki-v2+v3:-w->, (mecha:1.2), (machine:1.2), ",
-                "<lora:miki-v2+v3:-w->, (mecha:1.2), (machine:1.2), ",
+                "<lora:miki-v2+v3:-w->, (mecha:1.2), (machine:1.2), mecha clothes",
+                "<lora:miki-v2+v3:-w->, (mecha:1.2), (machine:1.2), sliver bodysuit",
+                "<lora:miki-v2+v3:-w->, (mecha:1.2), (machine:1.2), beautiful detailed sliver dragon armor",
             } },
             { "电锯", new() {
-                "<lora:miki-v2+v3:-w->, cyberpunk, (machine:1.2), (blood), (chainsaw man:1.2), (lolipop chainsaw:1.2), (holding chainsaw:1.2), ",
-                "<lora:miki-v2+v3:-w->, kabuto, (machine:1.2), (blood), (chainsaw man:1.2), (lolipop chainsaw:1.2), (holding chainsaw:1.2), ",
-                "<lora:miki-v2+v3:-w->, dormitory, (machine:1.2), (blood), (chainsaw man:1.2), (lolipop chainsaw:1.2), (holding chainsaw:1.2), ",
-                "<lora:miki-v2+v3:-w->, street, (machine:1.2), (blood), (chainsaw man:1.2), (lolipop chainsaw:1.2), (holding chainsaw:1.2), ",
-                "<lora:miki-v2+v3:-w->, castle, (machine:1.2), (blood), (chainsaw man:1.2), (lolipop chainsaw:1.2), (holding chainsaw:1.2), ",
-                "<lora:miki-v2+v3:-w->, mountain, (machine:1.2), (blood), (chainsaw man:1.2), (lolipop chainsaw:1.2), (holding chainsaw:1.2), ",
-                "<lora:miki-v2+v3:-w->, office, (machine:1.2), (blood), (chainsaw man:1.2), (lolipop chainsaw:1.2), (holding chainsaw:1.2), ",
-                "<lora:miki-v2+v3:-w->, forest, (machine:1.2), (blood), (chainsaw man:1.2), (lolipop chainsaw:1.2), (holding chainsaw:1.2), ",
-                "<lora:miki-v2+v3:-w->, laboratory, (machine:1.2), (blood), (chainsaw man:1.2), (lolipop chainsaw:1.2), (holding chainsaw:1.2), ",
-                "<lora:miki-v2+v3:-w->, beach, (machine:1.2), (blood), (chainsaw man:1.2), (lolipop chainsaw:1.2), (holding chainsaw:1.2), ",
+                "<lora:miki-v2+v3:-w->, (machine:1.2), (blood), (chainsaw man:1.2), (lolipop chainsaw:1.2), (holding chainsaw:1.2), ",
             } },
             { "原版", new() {
                 "<lora:miki-v2+v3:-w->, ",
+            } },
+            { "立绘", new() {
+                "<lora:miki-v2+v3:-w->, [(white background:1.5),::5] hexagon, mid shot, full body, <lora:gachaSplashLORA_gachaSplash31:1>, ",
             } },
             { "臭脚", new()
             {
@@ -192,6 +189,9 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, dakimakura, on back, (lie on the bed), (white bed sheet background), sheet grab, panty pull, bra pull",
                 "<lora:miki-v2+v3:-w->, dakimakura, on back, white bed sheet background, sheet grab, panty pull, bra pull",
                 "<lora:miki-v2+v3:-w->, dakimakura, on back, (white bed sheet background), sheet grab, panty pull, bra pull",
+            } },
+            { "油画", new() {
+                "(illustration), ((impasto)), ((oil painting)), (classicism), <lora:miki-v2+v3:-w->, (portrait), rembrandt lighting, brown background, detailed face, picture frame, "
             } },
         };
 
@@ -225,6 +225,8 @@ namespace Mikibot.Analyze.Bot
                 "(red china dress)", "(white china dress)", "(blue china dress)", "(cyan china dress)",
                 "(yellow china dress)", "(red chinese clothes)", "(white chinese clothes)", "(blue chinese clothes)",
                 "(cyan chinese clothes)", "(yellow chinese clothes)", "(black china dress)", "(black chinese clothes)",
+                "(red cheongsam)", "(white cheongsam)", "(blue cheongsam)", "(cyan cheongsam)", "(yellow cheongsam)",
+                "(black cheongsam)",
             } },
             { "白裙", new()
             {
