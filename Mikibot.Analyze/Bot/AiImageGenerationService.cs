@@ -145,9 +145,8 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, chinese, ",
             } },
             { "水墨", new() {
-                "<lora:miki-v2+v3:-w->, ((((ink painting)))), illustration, ((Chinese ink painting)), (((masterpiece))), (((best quality)))," +
-                " ((((Ink dyeing)))), (((Watercolor))), ((Chinese Brush Painting)), (Chinese style),((red ink)), ink background, petals, (((soaked))), " +
-                "(((The character is in the center of the frame))),(((flowing)))"
+                "<lora:miki-v2+v3:-w->, (ink painting), illustration, (Chinese ink painting)," +
+                "(Ink dyeing), (watercolor), (Chinese Brush Painting), (Chinese style), ink background, petals, (soaked), (flowing)"
             } },
             { "浴衣", new() {
                 "<lora:miki-v2+v3:-w->, japanese kimono, obi, ",
