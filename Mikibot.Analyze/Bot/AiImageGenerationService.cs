@@ -437,7 +437,7 @@ namespace Mikibot.Analyze.Bot
             if (characterWeightOffset.TryGetValue(character, out var offset)) {
                 weight += offset;
             }
-            var loraSuffix = useCustomWeight ? ":MIDDH" : "";
+            var loraSuffix = useCustomWeight ? ":MIDD" : "";
             var main = RandomOf(prompts)
                 .Replace(DefaultLora, lora)
                 .Replace("-w-", $"{weight}{loraSuffix}");
@@ -633,7 +633,7 @@ namespace Mikibot.Analyze.Bot
             var prefix = characterPrefix.GetValueOrDefault(character) ?? "";
             var weight = 0.6 + characterWeightOffset.GetValueOrDefault(character);
             var lora = characterLore.GetValueOrDefault(character) ?? "";
-            var loraSuffix = customWieght ? ":MIDDH" : "";
+            var loraSuffix = customWieght ? ":MIDD" : "";
             var fullPrompt = $"{BasicPrompt}, {prefix}, <lora:{lora}:{weight}{loraSuffix}>, {prompt}";
             await miraiService.SendMessageToGroup(group, token, GetGenerateMsg(fullPrompt).ToArray());
 
