@@ -423,7 +423,7 @@ namespace Mikibot.Analyze.Bot
 
         private const int LargeSize = 768 * 768;
 
-        private static (string, string, double, int, int, int) GetPrompt(string style, string character, int sizeRange = 0)
+        private static (string, string, double, int, int, int) GetPrompt(string style, string character, int sizeRange = 0, bool useCustomWeight = false)
         {
             if (!promptMap.TryGetValue(style, out var prompts))
             {
@@ -437,9 +437,10 @@ namespace Mikibot.Analyze.Bot
             if (characterWeightOffset.TryGetValue(character, out var offset)) {
                 weight += offset;
             }
+            var loraSuffix = useCustomWeight ? ":MIDDH" : "";
             var main = RandomOf(prompts)
                 .Replace(DefaultLora, lora)
-                .Replace("-w-", $"{weight}");
+                .Replace("-w-", $"{weight}{loraSuffix}");
 
             var direction = sizeRange > 0 ? sizeRange - 1 : (random.Next(100) switch
             {
@@ -607,33 +608,33 @@ namespace Mikibot.Analyze.Bot
             };
         }
 
-        private static (string, string, int) ParseCommand(string raw)
+        private static (string, string, int, bool) ParseCommand(string raw)
         {
             var match = MatchRegex().Matches(raw).FirstOrDefault();
             if (match is null) {
-                return ("", "", 0);
+                return ("", "", 0, false);
             }
-            return (match.Result("$2"), match.Result("$3"), NumbericHvs(match.Result("$1")));
+            return (match.Result("$2"), match.Result("$3"), NumbericHvs(match.Result("$1")), match.Result("$4") == "@");
         }
 
-        private static (string, string, int) ParseManualCommand(string raw)
+        private static (string, string, int, bool) ParseManualCommand(string raw)
         {
             var match = MatchManualRegex().Matches(raw).FirstOrDefault();
             if (match is null) {
-                return ("", "", 0);
+                return ("", "", 0, false);
             }
-            return (match.Result("$2"), match.Result("$3"), NumbericHvs(match.Result("$1")));
+            return (match.Result("$2"), match.Result("$3"), NumbericHvs(match.Result("$1")), match.Result("$4") == "@");
         }
 
         private async ValueTask ProcessManual(Mirai.Net.Data.Shared.Group group, string raw, CancellationToken token)
         {
-            var (character, prompt, _) = ParseManualCommand(raw);
+            var (character, prompt, _, customWieght) = ParseManualCommand(raw);
             
             var prefix = characterPrefix.GetValueOrDefault(character) ?? "";
             var weight = 0.6 + characterWeightOffset.GetValueOrDefault(character);
             var lora = characterLore.GetValueOrDefault(character) ?? "";
-            
-            var fullPrompt = $"{BasicPrompt}, {prefix}, <lora:{lora}:{weight}>, {prompt}";
+            var loraSuffix = customWieght ? ":MIDDH" : "";
+            var fullPrompt = $"{BasicPrompt}, {prefix}, <lora:{lora}:{weight}{loraSuffix}>, {prompt}";
             await miraiService.SendMessageToGroup(group, token, GetGenerateMsg(fullPrompt).ToArray());
 
             var ret = await Request(fullPrompt, token: token);
@@ -794,7 +795,7 @@ namespace Mikibot.Analyze.Bot
                                 var csc = CancellationTokenSource.CreateLinkedTokenSource(token);
                                 controller.Add(group.Id, csc);
 
-                                var (reqStyle, reqCharacter, size) = ParseCommand(plain.Text);
+                                var (reqStyle, reqCharacter, size, _) = ParseCommand(plain.Text);
                                 reqStyle = reqStyle == "" ? "随机" : reqStyle;
                                 reqCharacter = reqCharacter == "" ? "随机" : reqCharacter;
 
@@ -815,7 +816,7 @@ namespace Mikibot.Analyze.Bot
                             }
                             continue;
                         }
-                        var (style, character, sizeRange) = ParseCommand(plain.Text);
+                        var (style, character, sizeRange, useCustomWeigth) = ParseCommand(plain.Text);
                         if (character == "" )
                         {
                             continue;
@@ -842,7 +843,7 @@ namespace Mikibot.Analyze.Bot
                                 else
                                 {
                                     isCdHintShown = false;
-                                    var (prompt, extra, cfg_scale, steps, width, height) = GetPrompt(style, character, sizeRange);
+                                    var (prompt, extra, cfg_scale, steps, width, height) = GetPrompt(style, character, sizeRange, useCustomWeigth);
                                     await miraiService.SendMessageToGroup(group, token, GetGenerateMsg(extra).ToArray());
                                     logger.LogInformation("prompt: {}", prompt);
                                     try
@@ -886,11 +887,11 @@ namespace Mikibot.Analyze.Bot
             }
         }
 
-        [GeneratedRegex("([ml]?[hvslw]?)!来张(..)(.*)$")]
+        [GeneratedRegex("([ml]?[hvslw]?)!来张(..)(.*)(@?)$")]
         private static partial Regex MatchRegex();
 
         
-        [GeneratedRegex("([ml]?[hvslw]?)!!(.) (.*)$")]
+        [GeneratedRegex("([ml]?[hvslw]?)!!(.) (.*)(@?)$")]
         private static partial Regex MatchManualRegex();
     }
 }
