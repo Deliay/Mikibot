@@ -887,11 +887,11 @@ namespace Mikibot.Analyze.Bot
             }
         }
 
-        [GeneratedRegex("([ml]?[hvslw]?)!来张(..)(.*)(@?)$")]
+        [GeneratedRegex("([ml]?[hvslw]?)!来张(..)(.*?)(@?)$")]
         private static partial Regex MatchRegex();
 
         
-        [GeneratedRegex("([ml]?[hvslw]?)!!(.) (.*)(@?)$")]
+        [GeneratedRegex("([ml]?[hvslw]?)!!(.) (.*?)(@?)$")]
         private static partial Regex MatchManualRegex();
     }
 }
