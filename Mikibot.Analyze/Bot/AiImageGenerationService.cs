@@ -17,6 +17,8 @@ using System.Threading.Tasks;
 using Websocket.Client.Logging;
 using Mikibot.BuildingBlocks.Util;
 using NPOI.Util;
+using Mikibot.StableDiffusion.WebUi.Api.Models;
+using NPOI.SS.Formula.Functions;
 
 namespace Mikibot.Analyze.Bot
 {
@@ -55,17 +57,19 @@ namespace Mikibot.Analyze.Bot
             "low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, bad feet, single color, ((((ugly)))), (((duplicate))), ((morbid)), " +
             "((mutilated)), (((tranny))), (((trans))), (((trannsexual))), (hermaphrodite),((poorly drawn face)), (((mutation))), (((deformed))), ((ugly)), blurry, " +
             "((bad anatomy)), (((bad proportions))), ((extra limbs)), (((disfigured))), (bad anatomy), gross proportions, (malformed limbs), ((missing arms)), " +
-            "(missing legs), (((extra arms))), (((extra legs))), mutated hands,(fused fingers), (too many fingers), (((long neck))), (bad body perspect:1.1), (((nsfw)))";
+            "(missing legs), (((extra arms))), (((extra legs))), mutated hands,(fused fingers), (too many fingers), (((long neck))), (bad body perspect:1.1), (((nsfw))), ";
 
         private const string NegativePromptAbyss = "nsfw, (worst quality, low quality:1.4), (lip, nose, tooth, rouge, lipstick, eyeshadow:1.4), (blush:1.2), " +
             "(jpeg artifacts:1.4), (depth of field, bokeh, blurry, film grain, chromatic aberration, lens flare:1.0), (1boy, abs, muscular, rib:1.0), greyscale, " +
             "monochrome, dusty sunbeams, trembling, motion lines, motion blur, emphasis lines, text, title, logo, signature, ";
 
-        private const string NegativePrompt = NegativePromptAbyss;
+        private const string NegativePrompt = NegativePromptAnything + NegativePromptAbyss;
 
-        private const string BasicPrompt = "<lora:pastelMixStylizedAnime_pastelMixLoraVersion:0.15>, " +
-            "<lora:roluaStyleLora_r:0.15>,<lora:V11ForegroundPlant_V11:0.25>, " +
-            "masterpiece, best quality, 1girl, solo, ";
+        private const string BasicBasePrompt = "<lora:pastelMixStylizedAnime_pastelMixLoraVersion:0.15>, " +
+            "<lora:roluaStyleLora_r:0.15>,<lora:V11ForegroundPlant_V11:0.25>, masterpiece, best quality, ";
+
+        private const string BasicSinglePrompt = BasicBasePrompt + "1girl, solo, ";
+        private const string BasicTwinPrompt = BasicBasePrompt + "2girl, ";
 
         private static readonly Dictionary<string, double> basicStyleWeight = new()
         {
@@ -423,7 +427,7 @@ namespace Mikibot.Analyze.Bot
 
         private const int LargeSize = 768 * 768;
 
-        private static (string, string, double, int, int, int) GetPrompt(string style, string character, int sizeRange = 0, bool useCustomWeight = false)
+        private static (string, string, double, int, int, int) GetPrompt(string style, string character, int sizeRange = 0, bool useCustomWeight = false, double weightOffset = 0.0)
         {
             if (!promptMap.TryGetValue(style, out var prompts))
             {
@@ -433,7 +437,7 @@ namespace Mikibot.Analyze.Bot
             }
 
             var lora = characterLore[character];
-            var weight = basicStyleWeight[style];
+            var weight = basicStyleWeight[style] + weightOffset;
             if (characterWeightOffset.TryGetValue(character, out var offset)) {
                 weight += offset;
             }
@@ -465,7 +469,7 @@ namespace Mikibot.Analyze.Bot
             if (style == "原版")
             {
                 return (
-                    $"{BasicPrompt}{prefix}{main}, {view}, {sky}, {season}, {suffix}, ",
+                    $"{BasicSinglePrompt}{prefix}{main}, {view}, {sky}, {season}, {suffix}, ",
                     $"生成词: ({main})\n视角: {view}\n专属附加词：{suffix}\n天空: {sky}\n" +
                     $"季节: {season}\ncfg_scale={cfgScale},step={steps},{directionHint}",
                     cfgScale, steps, width, height);
@@ -485,7 +489,7 @@ namespace Mikibot.Analyze.Bot
             }
 
             return (
-                $"{BasicPrompt}{prefix}{main}, {hair}, {extra}, {view}, {scene}, {sky}, {season}, {suffix}, ",
+                $"{BasicSinglePrompt}{prefix}{main}, {hair}, {extra}, {view}, {scene}, {sky}, {season}, {suffix}, ",
                 $"生成词: ({main})\n视角: {view}\n发型: {hair}\n场景:{scene}\n附加词: {extra}\n专属附加词：{suffix}\n天空: {sky}\n" +
                 $"季节: {season}\ncfg_scale={cfgScale},step={steps},{directionHint}",
                 cfgScale, steps, width, height);
@@ -626,6 +630,37 @@ namespace Mikibot.Analyze.Bot
             return (match.Result("$2"), match.Result("$3"), NumbericHvs(match.Result("$1")), match.Result("$4") == "@");
         }
 
+        private struct TwinArg
+        {
+            public int Size { get; set; }
+            public string TwinStyle { get; set; }
+            public string FirstStyle { get; set; }
+            public string SecondStyle { get; set; }
+            public string First { get; set; }
+            public string Second { get; set; }
+            public bool WeightControl { get; set; }
+        }
+
+        private static bool ParseTwinCommand(string raw, out TwinArg arg)
+        {
+            var match = MatchRegexTwin().Matches(raw).FirstOrDefault();
+            arg = new TwinArg();
+            if (match is null)
+            {
+                return false;
+            }
+
+            arg.Size = NumbericHvs(match.Result("$1"));
+            arg.TwinStyle = match.Result("$2");
+            arg.FirstStyle = match.Result("$3");
+            arg.First = match.Result("$4");
+            arg.SecondStyle = match.Result("$5");
+            arg.Second = match.Result("$6");
+            arg.WeightControl = match.Result("$7") == "@";
+
+            return true;
+        }
+
         private async ValueTask ProcessManual(Mirai.Net.Data.Shared.Group group, string raw, CancellationToken token)
         {
             var (character, prompt, _, customWieght) = ParseManualCommand(raw);
@@ -634,11 +669,83 @@ namespace Mikibot.Analyze.Bot
             var weight = 0.6 + characterWeightOffset.GetValueOrDefault(character);
             var lora = characterLore.GetValueOrDefault(character) ?? "";
             var loraSuffix = customWieght ? ":MIDD" : "";
-            var fullPrompt = $"{BasicPrompt}, {prefix}, <lora:{lora}:{weight}{loraSuffix}>, {prompt}";
+            var fullPrompt = $"{BasicSinglePrompt}, {prefix}, <lora:{lora}:{weight}{loraSuffix}>, {prompt}";
             await miraiService.SendMessageToGroup(group, token, GetGenerateMsg(fullPrompt).ToArray());
 
             var ret = await Request(fullPrompt, token: token);
             await SendImage(group, prompt, ret, token);
+        }
+
+        private static readonly Dictionary<string, string> twinStyles = new()
+        {
+            { "啵嘴", " (kiss), looking at another, beautiful, looking at another, eye contact, facing another, " }
+        };
+
+        private static readonly List<string> randomTwinStyles = new() { "啵嘴" };
+
+        private async ValueTask ProcessTwin(Mirai.Net.Data.Shared.Group group, TwinArg twinArg, CancellationToken token)
+        {
+            var (promptFirst, extraFirst, cfg_scale, steps, width, height) = GetPrompt(twinArg.FirstStyle, twinArg.First, twinArg.Size, twinArg.WeightControl, -0.3);
+            var (promptSecond, extraSecond, _, _, _, _) = GetPrompt(twinArg.SecondStyle, twinArg.Second, twinArg.Size, twinArg.WeightControl, -0.3);
+
+            promptFirst = promptFirst[BasicSinglePrompt.Length..];
+            promptSecond = promptSecond[BasicSinglePrompt.Length..];
+
+            if (!twinStyles.TryGetValue(twinArg.TwinStyle, out var twinStylePrompt))
+            {
+                twinStylePrompt = twinStyles[RandomOf(randomTwinStyles)];
+            }
+
+            var fullPrompt = $"2girl, {BasicTwinPrompt}{twinStylePrompt},\n" +
+                $"AND masterpiece, best quality, 2girl, {promptFirst},{twinStylePrompt}\n" +
+                $"AND masterpiece, best quality, 2girl, {promptSecond},{twinStylePrompt}";
+            await miraiService.SendMessageToGroup(group, token, GetGenerateMsg($"左：{twinArg.FirstStyle}{twinArg.First}\n右：{twinArg.SecondStyle}{twinArg.Second}").ToArray());
+            var ret = await Request((arg) =>
+            {
+                DefaultArg(arg);
+                arg.CfgScale = cfg_scale;
+                arg.Steps = steps;
+                arg.Size(width, height);
+                arg.EnabledComposableLora();
+                arg.EnableLatentCouple(Extensions.LatentCouple.LeftRight(steps));
+                arg.EnableHiresScale(2.5f);
+                arg.Prompt = fullPrompt;
+            }, token);
+            await SendImage(group, "", ret, token);
+        }
+
+        private async ValueTask<Ret> Request(Action<Text2Img> argHandler, CancellationToken token = default)
+        {
+
+            latestGenerateAt = DateTimeOffset.Now + TimeSpan.FromMinutes(1);
+            isCdHintShown = false;
+            var arg = new Text2Img();
+            argHandler(arg);
+            var content = JsonContent.Create(arg);
+            logger.LogInformation("request = {}", await content.ReadAsStringAsync(token));
+            var res = await httpClient.PostAsync($"{WebUiEndpoint}", content, token);
+            var isLarge = arg.Width * arg.Height >= LargeSize;
+            var cdModify = isLarge ? 15 : -10;
+            latestGenerateAt = DateTimeOffset.Now + TimeSpan.FromSeconds(cdModify);
+            try
+            {
+                var body = await res.Content.ReadFromJsonAsync<Ret>(cancellationToken: token);
+                logger.LogInformation("response = {}", body.info);
+                return body;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "catched after access AI!");
+                throw;
+            }
+        }
+
+        private static void DefaultArg(Text2Img arg)
+        {
+            arg.Sampler = "DPM++ 2M Karras";
+            arg.EnableLoraBlockWeight();
+            arg.NegativePrompt = NegativePrompt;
+            arg.EnableHiresScale(2.5f);
         }
 
         private async ValueTask<Ret> Request(string prompt, double cfg_scale = 8, int steps = 26, int width = 768, int height = 432, CancellationToken token = default)
@@ -647,37 +754,15 @@ namespace Mikibot.Analyze.Bot
             latestGenerateAt = DateTimeOffset.Now + TimeSpan.FromMinutes(1);
             isCdHintShown = false;
             logger.LogInformation("prompt: {}", prompt);
-            var res = await httpClient.PostAsync($"{WebUiEndpoint}", JsonContent.Create(new
+            return await Request((arg) =>
             {
-                prompt,
-                enable_hr = true,
-                denoising_strength = 0.6,
-                hr_scale = 2.5,
-                hr_upscaler = "Latent",
-                hr_second_pass_steps = 30,
-                cfg_scale,
-                steps,
-                sampler_index = "DPM++ 2M Karras",
-                width,
-                height,
-                negative_prompt = NegativePrompt,
-            }), token);
-            var isLarge = width * height >= LargeSize;
-            var cdModify = isLarge ? 15 : -10;
-            latestGenerateAt = DateTimeOffset.Now + TimeSpan.FromSeconds(cdModify);
-            try
-            {
-                var body = await res.Content.ReadFromJsonAsync<Ret>(cancellationToken: token);
-                var info = JsonSerializer.Deserialize<Info>(body.info);
-                logger.LogInformation("生成成功，种子: {}", info.seed);
-                return body;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "catched after access AI!");
-                logger.LogInformation(await res.Content.ReadAsStringAsync());
-                throw;
-            }
+                arg.Prompt = prompt;
+                arg.CfgScale = cfg_scale;
+                arg.Steps = steps;
+                arg.Width = width;
+                arg.Height = height;
+                DefaultArg(arg);
+            }, token);
         }
 
         private async ValueTask SendImage(Mirai.Net.Data.Shared.Group group, string prompt, Ret body, CancellationToken token)
@@ -764,6 +849,7 @@ namespace Mikibot.Analyze.Bot
         private readonly SemaphoreSlim _lock = new(1);
         private readonly Dictionary<string, CancellationTokenSource> controller = new();
 
+
         private async ValueTask Dequeue(CancellationToken token)
         {
             await foreach (var msg in messageQueue.Reader.ReadAllAsync(token))
@@ -814,6 +900,11 @@ namespace Mikibot.Analyze.Bot
                             {
                                 await ProcessManual(group, plain.Text, token);
                             }
+                            continue;
+                        }
+                        if (ParseTwinCommand(plain.Text, out var twinArg))
+                        {
+                            await ProcessTwin(group, twinArg, token);
                             continue;
                         }
                         var (style, character, sizeRange, useCustomWeigth) = ParseCommand(plain.Text);
@@ -890,7 +981,11 @@ namespace Mikibot.Analyze.Bot
         [GeneratedRegex("([ml]?[hvslw]?)!来张(..)(.*?)(@?)$")]
         private static partial Regex MatchRegex();
 
-        
+
+        [GeneratedRegex("([ml]?[hvslw]?)!双人(..)(..)(.*?)和(..)(.*?)(@?)$")]
+        private static partial Regex MatchRegexTwin();
+
+
         [GeneratedRegex("([ml]?[hvslw]?)!!(.) (.*?)(@?)$")]
         private static partial Regex MatchManualRegex();
     }

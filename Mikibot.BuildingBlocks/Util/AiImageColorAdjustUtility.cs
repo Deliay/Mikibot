@@ -34,6 +34,10 @@ namespace Mikibot.BuildingBlocks.Util
             
             image.Mutate((ctx) =>
             {
+                if (prompts == "")
+                {
+                    return;
+                }
                 if (prompts.Contains("night,"))
                 {
                     ctx.ApplyProcessor(NightTemperatrueProcessor);
