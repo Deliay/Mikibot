@@ -651,14 +651,14 @@ namespace Mikibot.Analyze.Bot
                 return false;
             }
 
-            arg.Size = NumbericHvs(match.Result("$1"));
-            arg.TwinStyle = match.Result("$2");
-            arg.FirstStyle = match.Result("$3");
-            arg.First = match.Result("$4");
-            arg.SecondStyle = match.Result("$5");
-            arg.Second = match.Result("$6");
-            arg.WeightControl = match.Result("$7") == "@";
-            arg.Couple = match.Result("$8") == "上下" ? "上下" : "左右";
+            arg.Couple = match.Result("$1") == "竖" ? "上下" : "左右";
+            arg.Size = NumbericHvs(match.Result("$2"));
+            arg.TwinStyle = match.Result("$3");
+            arg.FirstStyle = match.Result("$4");
+            arg.First = match.Result("$5");
+            arg.SecondStyle = match.Result("$6");
+            arg.Second = match.Result("$7");
+            arg.WeightControl = match.Result("$8") == "@";
             return true;
         }
 
@@ -686,8 +686,8 @@ namespace Mikibot.Analyze.Bot
 
         private async ValueTask ProcessTwin(Mirai.Net.Data.Shared.Group group, TwinArg twinArg, CancellationToken token)
         {
-            var (promptFirst, extraFirst, cfg_scale, steps, width, height) = GetPrompt(twinArg.FirstStyle, twinArg.First, twinArg.Size, twinArg.WeightControl, -0.3);
-            var (promptSecond, extraSecond, _, _, _, _) = GetPrompt(twinArg.SecondStyle, twinArg.Second, twinArg.Size, twinArg.WeightControl, -0.3);
+            var (promptFirst, extraFirst, cfg_scale, steps, width, height) = GetPrompt(twinArg.FirstStyle, twinArg.First, twinArg.Size, twinArg.WeightControl);
+            var (promptSecond, extraSecond, _, _, _, _) = GetPrompt(twinArg.SecondStyle, twinArg.Second, twinArg.Size, twinArg.WeightControl);
 
             promptFirst = promptFirst[BasicSinglePrompt.Length..];
             promptSecond = promptSecond[BasicSinglePrompt.Length..];
@@ -732,7 +732,7 @@ namespace Mikibot.Analyze.Bot
             logger.LogInformation("request = {}", await content.ReadAsStringAsync(token));
             var res = await httpClient.PostAsync($"{WebUiEndpoint}", content, token);
             var isLarge = arg.Width * arg.Height >= LargeSize;
-            var cdModify = isLarge ? 15 : -10;
+            var cdModify = isLarge ? 15 : -20;
             latestGenerateAt = DateTimeOffset.Now + TimeSpan.FromSeconds(cdModify);
             try
             {
@@ -996,11 +996,11 @@ namespace Mikibot.Analyze.Bot
             }
         }
 
-        [GeneratedRegex("([ml]?[hvslw]?)!来张(..)(.*?)(@?)(左右|上下)?$")]
+        [GeneratedRegex("([ml]?[hvslw]?)!来张(..)(.*?)(@?)$")]
         private static partial Regex MatchRegex();
 
 
-        [GeneratedRegex("([ml]?[hvslw]?)!双人(..)(..)(.*?)和(..)(.*?)(@?)$")]
+        [GeneratedRegex("([横竖]?)([ml]?[hvslw]?)!双人(..)(..)(.*?)和(..)(.*?)(@?)$")]
         private static partial Regex MatchRegexTwin();
 
 
