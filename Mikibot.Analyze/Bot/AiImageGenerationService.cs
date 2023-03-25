@@ -639,6 +639,7 @@ namespace Mikibot.Analyze.Bot
             public string First { get; set; }
             public string Second { get; set; }
             public bool WeightControl { get; set; }
+            public string Couple { get; set; }
         }
 
         private static bool ParseTwinCommand(string raw, out TwinArg arg)
@@ -657,7 +658,7 @@ namespace Mikibot.Analyze.Bot
             arg.SecondStyle = match.Result("$5");
             arg.Second = match.Result("$6");
             arg.WeightControl = match.Result("$7") == "@";
-
+            arg.Couple = match.Result("$8") == "上下" ? "上下" : "左右";
             return true;
         }
 
@@ -699,7 +700,11 @@ namespace Mikibot.Analyze.Bot
             var fullPrompt = $"2girl, {BasicTwinPrompt}{twinStylePrompt},\n" +
                 $"AND masterpiece, best quality, 2girl, {promptFirst},{twinStylePrompt}\n" +
                 $"AND masterpiece, best quality, 2girl, {promptSecond},{twinStylePrompt}";
-            await miraiService.SendMessageToGroup(group, token, GetGenerateMsg($"左：{twinArg.FirstStyle}{twinArg.First}\n右：{twinArg.SecondStyle}{twinArg.Second}").ToArray());
+            await miraiService.SendMessageToGroup(group, token, GetGenerateMsg($"左：{twinArg.FirstStyle}{twinArg.First}\n" +
+                $"右：{twinArg.SecondStyle}{twinArg.Second}\n" +
+                $"人物位置：{twinArg.Couple}\n" +
+                $"构图Prompt: {twinStylePrompt}").ToArray());
+
             var ret = await Request((arg) =>
             {
                 DefaultArg(arg);
@@ -707,7 +712,9 @@ namespace Mikibot.Analyze.Bot
                 arg.Steps = steps;
                 arg.Size(width, height);
                 arg.EnabledComposableLora();
-                arg.EnableLatentCouple(Extensions.LatentCouple.LeftRight(steps));
+
+                arg.EnableLatentCouple(twinArg.Couple == "上下" ? Extensions.LatentCouple.TopDown(steps) : Extensions.LatentCouple.LeftRight(steps));
+
                 arg.EnableHiresScale(2.5f);
                 arg.Prompt = fullPrompt;
             }, token);
@@ -801,8 +808,8 @@ namespace Mikibot.Analyze.Bot
             { "毬", 10 },
             { "岁", 5 },
         };
-        private static int Max = characterRandomWeight.Values.Sum();
-        private static List<string> allCharacters = characterRandomWeight.Keys.ToList();
+        private static readonly int Max = characterRandomWeight.Values.Sum();
+        private static readonly List<string> allCharacters = characterRandomWeight.Keys.ToList();
 
         private async Task Idle(Mirai.Net.Data.Shared.Group group, string requireCharacter = "随机", string requireStyle = "随机", CancellationToken token = default)
         {
@@ -904,7 +911,18 @@ namespace Mikibot.Analyze.Bot
                         }
                         if (ParseTwinCommand(plain.Text, out var twinArg))
                         {
-                            await ProcessTwin(group, twinArg, token);
+                            if (IsColdingDown())
+                            {
+                                if (!isCdHintShown)
+                                {
+                                    await miraiService.SendMessageToGroup(group, token, GetCdMessage().ToArray());
+                                    isCdHintShown = true;
+                                }
+                            }
+                            else
+                            {
+                                await ProcessTwin(group, twinArg, token);
+                            }
                             continue;
                         }
                         var (style, character, sizeRange, useCustomWeigth) = ParseCommand(plain.Text);
@@ -978,7 +996,7 @@ namespace Mikibot.Analyze.Bot
             }
         }
 
-        [GeneratedRegex("([ml]?[hvslw]?)!来张(..)(.*?)(@?)$")]
+        [GeneratedRegex("([ml]?[hvslw]?)!来张(..)(.*?)(@?)(左右|上下)?$")]
         private static partial Regex MatchRegex();
 
 

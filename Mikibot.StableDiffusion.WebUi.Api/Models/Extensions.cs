@@ -20,7 +20,7 @@ namespace Mikibot.StableDiffusion.WebUi.Api.Models
             return arg;
         }
 
-        public struct LatentCouple
+        public class LatentCouple
         {
             public string Divisions { get; set; }
             public string Positions { get; set; }
