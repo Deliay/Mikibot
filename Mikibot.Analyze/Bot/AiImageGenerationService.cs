@@ -691,11 +691,15 @@ namespace Mikibot.Analyze.Bot
 
             promptFirst = promptFirst[BasicSinglePrompt.Length..];
             promptSecond = promptSecond[BasicSinglePrompt.Length..];
-
+            if (twinArg.TwinStyle == "随机")
+            {
+                twinArg.TwinStyle = RandomOf(randomTwinStyles);
+            }
             if (!twinStyles.TryGetValue(twinArg.TwinStyle, out var twinStylePrompt))
             {
-                twinStylePrompt = twinStyles[RandomOf(randomTwinStyles)];
+                twinStylePrompt = "";
             }
+
 
             var fullPrompt = $"2girl, {BasicTwinPrompt}{twinStylePrompt},\n" +
                 $"AND masterpiece, best quality, 2girl, {promptFirst},{twinStylePrompt}\n" +
