@@ -679,15 +679,17 @@ namespace Mikibot.Analyze.Bot
 
         private static readonly Dictionary<string, string> twinStyles = new()
         {
-            { "啵嘴", " (kiss), looking at another, beautiful, looking at another, eye contact, facing another, " }
+            { "贴贴", " yuri, side-by-side, hand in hand, breast to breast, " },
+            { "啵嘴", " yuri, (kiss) " },
+            { "啵贴", " yuri, side-by-side, hand in hand, breast to breast, (kiss), " },
         };
 
-        private static readonly List<string> randomTwinStyles = new() { "啵嘴" };
+        private static readonly List<string> randomTwinStyles = new() { "啵嘴", "贴贴", "啵贴" };
 
         private async ValueTask ProcessTwin(Mirai.Net.Data.Shared.Group group, TwinArg twinArg, CancellationToken token)
         {
-            var (promptFirst, extraFirst, cfg_scale, steps, width, height) = GetPrompt(twinArg.FirstStyle, twinArg.First, twinArg.Size, twinArg.WeightControl);
-            var (promptSecond, extraSecond, _, _, _, _) = GetPrompt(twinArg.SecondStyle, twinArg.Second, twinArg.Size, twinArg.WeightControl);
+            var (promptFirst, extraFirst, cfg_scale, steps, width, height) = GetPrompt(twinArg.FirstStyle, twinArg.First, twinArg.Size, true);
+            var (promptSecond, extraSecond, _, _, _, _) = GetPrompt(twinArg.SecondStyle, twinArg.Second, twinArg.Size, true);
 
             promptFirst = promptFirst[BasicSinglePrompt.Length..];
             promptSecond = promptSecond[BasicSinglePrompt.Length..];
@@ -701,9 +703,9 @@ namespace Mikibot.Analyze.Bot
             }
 
 
-            var fullPrompt = $"2girl, {BasicTwinPrompt}{twinStylePrompt},\n" +
-                $"AND masterpiece, best quality, 2girl, {promptFirst},{twinStylePrompt}\n" +
-                $"AND masterpiece, best quality, 2girl, {promptSecond},{twinStylePrompt}";
+            var fullPrompt = $"yuri, 2girl, {BasicTwinPrompt}{twinStylePrompt},\n" +
+                $"AND yuri, masterpiece, best quality, 2girl, {promptFirst},{twinStylePrompt}\n" +
+                $"AND yuri, masterpiece, best quality, 2girl, {promptSecond},{twinStylePrompt}";
             await miraiService.SendMessageToGroup(group, token, GetGenerateMsg($"左：{twinArg.FirstStyle}{twinArg.First}\n" +
                 $"右：{twinArg.SecondStyle}{twinArg.Second}\n" +
                 $"人物位置：{twinArg.Couple}\n" +
