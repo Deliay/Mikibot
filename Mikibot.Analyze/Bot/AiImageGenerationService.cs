@@ -521,6 +521,7 @@ namespace Mikibot.Analyze.Bot
             { "真", new() { "139528984" } },
             { "悠", new() { "139528984" } },
             { "侑", new() { "139528984" } },
+            { "老版侑", new() { "139528984" } },
             { "炉", new() { "139528984" } },
             { "毬", new() { "139528984", "972488523" } },
             { "岁", new() { "139528984" } },
@@ -534,6 +535,7 @@ namespace Mikibot.Analyze.Bot
             { "真", "mahiru-v2" },
             { "悠", "yuaVirtuareal_v20" },
             { "侑", "KiyuuVirtuareal_v20" },
+            { "老版侑", "Kiyuu_" },
             { "炉", "kaoru-1.0-v5" },
             { "毬", "akumaria" },
             { "岁", "suiVirtuareal_suiVr" },
@@ -551,6 +553,7 @@ namespace Mikibot.Analyze.Bot
             { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, small demon horns, pointy ears, (small breast), (flat chest), " },
             { "悠", "(light blue eyes), black hair ribbon, silver hair, blue streaked hair, vr-yua, " },
             { "侑", "(white pink hair), (blue streaked hair), (cat ear headphone), <lora:Kiyuu_:0.15>, (small breast), " },
+            { "老版侑", "(white pink hair), (blue streaked hair), (cat ear headphone), (small breast), " },
             { "炉", "yellow eyes, (pink to blue gradient hair), (gradient hair), ahoge, (small breast), (flat chest), white colored eyelashes, (+ +), hat, " },
             { "毬", "red eyes, silver hair, red streaked hair, demon girl, demon tail, demon wings, demon horns, square pupils, (small breast), " },
             { "岁", "red eyes, silver hair, red hair robbon, (small breast), " },
@@ -682,6 +685,7 @@ namespace Mikibot.Analyze.Bot
             { "贴贴", " yuri, side-by-side, hand in hand, breast to breast, " },
             { "啵嘴", " yuri, (kiss) " },
             { "啵贴", " yuri, side-by-side, hand in hand, breast to breast, (kiss), " },
+            { "对视", " yuri, holding hands, looking at another, eye contact, facing another, kiss, " }
         };
 
         private static readonly List<string> randomTwinStyles = new() { "啵嘴", "贴贴", "啵贴" };
