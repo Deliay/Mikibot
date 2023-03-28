@@ -517,12 +517,13 @@ namespace Mikibot.Analyze.Bot
         {
             { "恶魔弥", new() { "139528984" } },
             { "弥", new() { "139528984" } },
-            { "弥(老lora)", new() { "139528984" } },
+            { "老版弥", new() { "139528984" } },
             { "真", new() { "139528984" } },
             { "悠", new() { "139528984" } },
             { "侑", new() { "139528984" } },
             { "老版侑", new() { "139528984" } },
             { "炉", new() { "139528984" } },
+            { "老版炉", new() { "139528984" } },
             { "毬", new() { "139528984", "972488523" } },
             { "岁", new() { "139528984" } },
         };
@@ -530,13 +531,14 @@ namespace Mikibot.Analyze.Bot
         private static readonly Dictionary<string, string> characterLore = new()
         {
             { "恶魔弥", "miki-4.0-v1" },
-            { "弥(老lora)", "miki-v2+v3" },
+            { "老版弥", "miki-v2+v3" },
             { "弥", "miki-2.0+3.0-v1-hd" },
             { "真", "mahiru-v2" },
             { "悠", "yuaVirtuareal_v20" },
             { "侑", "KiyuuVirtuareal_v20" },
             { "老版侑", "Kiyuu_" },
-            { "炉", "kaoru-1.0-v5" },
+            { "炉", "kaoru-1.0-v5-hd" },
+            { "老版炉", "kaoru-1.0-v5" },
             { "毬", "akumaria" },
             { "岁", "suiVirtuareal_suiVr" },
         };
@@ -548,13 +550,14 @@ namespace Mikibot.Analyze.Bot
 
         private static readonly Dictionary<string, string> characterPrefix = new()
         {
-            { "弥(老lora)", "purple eyes, black hair, [purple streaked hair], (small breast), " },
+            { "老版弥", "purple eyes, black hair, [purple streaked hair], (small breast), " },
             { "弥", "purple eyes, black hair, [purple streaked hair], (small breast), " },
             { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, small demon horns, pointy ears, (small breast), (flat chest), " },
             { "悠", "(light blue eyes), black hair ribbon, silver hair, blue streaked hair, vr-yua, " },
             { "侑", "(white pink hair), (blue streaked hair), (cat ear headphone), <lora:Kiyuu_:0.15>, (small breast), " },
             { "老版侑", "(white pink hair), (blue streaked hair), (cat ear headphone), (small breast), " },
             { "炉", "yellow eyes, (pink to blue gradient hair), (gradient hair), ahoge, (small breast), (flat chest), white colored eyelashes, (+ +), hat, " },
+            { "老版炉", "yellow eyes, (pink to blue gradient hair), (gradient hair), ahoge, (small breast), (flat chest), white colored eyelashes, (+ +), hat, " },
             { "毬", "red eyes, silver hair, red streaked hair, demon girl, demon tail, demon wings, demon horns, square pupils, (small breast), " },
             { "岁", "red eyes, silver hair, red hair robbon, (small breast), " },
             { "恶魔弥", "yellow eyes, black hair, purple horns, purple streaked hair, small breast, purple hair ornament, " }
@@ -567,6 +570,9 @@ namespace Mikibot.Analyze.Bot
                 { "白裙", "sandals, blush, collarbone, white footwear, miki bag summer, miki v2, " },
             } },
             { "炉", new() {
+                { "原版", "deep blue shorts, white shirt, (white capelet), [[hat]], black tie, long sleeves, " },
+            } },
+            { "老版炉", new() {
                 { "原版", "deep blue shorts, white shirt, (white capelet), [[hat]], black tie, long sleeves, " },
             } },
             { "真", new()
