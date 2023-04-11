@@ -1001,7 +1001,7 @@ namespace Mikibot.Analyze.Bot
 
                                 dict.Add(msg.Sender.Id, DateTime.Now.Date);
                                 logger.LogInformation("dict size = {}", dict.Count);
-                                await JsonSerializer.SerializeAsync(File.Open("lucky.json", FileMode.CreateNew), dict, cancellationToken: token);
+                                await JsonSerializer.SerializeAsync(File.Open("lucky.json", FileMode.Truncate), dict, cancellationToken: token);
                             }
                             finally
                             {

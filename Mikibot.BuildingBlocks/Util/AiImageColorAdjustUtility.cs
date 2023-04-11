@@ -84,7 +84,6 @@ namespace Mikibot.BuildingBlocks.Util
                 ctx.DrawText(name, userFont, Color.Black, userPoint);
             });
 
-            Console.WriteLine(string.Join("\n", fonts.Families.Select(f => f.Name)));
             using var ms = new MemoryStream(data.Length);
             image.SaveAsJpeg(ms, CustomJpegEncoder);
             adjustedImage = Convert.ToBase64String(ms.ToArray());
