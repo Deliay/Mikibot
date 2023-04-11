@@ -32,4 +32,10 @@
     <ProjectReference Include="..\Mikibot.StableDiffusion.WebUi.Api\Mikibot.StableDiffusion.WebUi.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="resources\transparent.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

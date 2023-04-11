@@ -24,7 +24,9 @@
     <!--<PackageReference Include="Tencent.QCloud.Cos.Sdk" Version="5.4.34" />-->
 	<PackageReference Include="SendGrid" Version="9.28.1" />
 	<!--<PackageReference Include="TencentCloudSDK" Version="3.0.682" />-->
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
+	<PackageReference Include="SixLabors.Fonts" Version="1.0.0-beta19" />
+	<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta15" />
   </ItemGroup>
 
 </Project>

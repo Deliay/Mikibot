@@ -37,6 +37,7 @@ namespace Mikibot.Analyze.Bot
             ILogger<AiImageGenerationService> logger,
             IMiraiService miraiService)
         {
+            AiImageColorAdjustUtility.Initialize();
             this.logger = logger;
             this.miraiService = miraiService;
             WebUiEndpoint = Environment.GetEnvironmentVariable("WEB_UI_ENDPOINT") ?? "http://127.0.0.1:7860/sdapi/v1/txt2img";
@@ -537,7 +538,7 @@ namespace Mikibot.Analyze.Bot
             { "悠", "yuaVirtuareal_v20" },
             { "侑", "KiyuuVirtuareal_v20" },
             { "老版侑", "Kiyuu_" },
-            { "炉", "kaoru-1.0-v5-hd" },
+            { "炉", "kaoru-1.0-v1-hd" },
             { "老版炉", "kaoru-1.0-v5" },
             { "毬", "akumaria" },
             { "岁", "suiVirtuareal_suiVr" },
@@ -809,7 +810,58 @@ namespace Mikibot.Analyze.Bot
                 };
 
                 await miraiService.SendMessageToGroup(group, token, messages.ToArray());
-            } 
+            }
+        }
+
+        private static readonly List<string> Lucky = new()
+        {
+            "大吉",
+            "吉", "吉",
+            "中吉", "中吉", "中吉",
+            "小吉", "小吉", "小吉", "小吉", 
+            "末吉", "末吉", "末吉",
+            "凶", "凶", 
+            "大凶"
+        };
+        private static string StringDayOfWeek(DayOfWeek dow)
+        {
+            return dow switch
+            {
+                DayOfWeek.Monday => "周一",
+                DayOfWeek.Tuesday => "周二",
+                DayOfWeek.Wednesday => "周三",
+                DayOfWeek.Thursday => "周四",
+                DayOfWeek.Friday => "周五",
+                DayOfWeek.Saturday => "周六",
+                DayOfWeek.Sunday => "周日",
+                _ => "?",
+            };
+        }
+        private async ValueTask SendLuckyImage(Mirai.Net.Data.Shared.Group group, string name, string uid, string prompt, Ret body, CancellationToken token)
+        {
+            var info = JsonSerializer.Deserialize<Info>(body.info);
+            logger.LogInformation("生成成功，种子:{}", info.seed);
+            if (body.images.Count != 0)
+            {
+                var imageBase64 = body.images[0];
+                var today = DateTime.Now;
+                var todayStr = $"{today.Year}年{today.Month}月{today.Day}日 {StringDayOfWeek(today.DayOfWeek)}";
+                AiImageColorAdjustUtility.TryAppendLucky(prompt, todayStr, RandomOf(Lucky), name, imageBase64, out var adjustedImage);
+                List<MessageBase> messages = new()
+                {
+                    new AtMessage() { Target = uid },
+                    new PlainMessage()
+                    {
+                        Text = $"生成成功，种子:{info.seed}"
+                    },
+                    new ImageMessage()
+                    {
+                        Base64 = adjustedImage,
+                    },
+                };
+
+                await miraiService.SendMessageToGroup(group, token, messages.ToArray());
+            }
         }
 
         private static readonly Dictionary<string, int> characterRandomWeight = new()
@@ -887,7 +939,7 @@ namespace Mikibot.Analyze.Bot
                         {
                             await miraiService.SendMessageToGroup(group, token, getHelpMsg(group.Id).ToArray());
                         }
-                        if (plain.Text.StartsWith("!idle"))
+                        if (plain.Text.StartsWith("!idle") && msg.Sender.Id == "644676751")
                         {
                             if (controller.TryGetValue(group.Id, out var value))
                             {
@@ -914,6 +966,46 @@ namespace Mikibot.Analyze.Bot
                                 {
                                     new PlainMessage() { Text = $"已开启本群的闲置跑图功能。\n角色：{reqCharacter}，风格：{reqStyle}" },
                                 });
+                            }
+                            continue;
+                        }
+                        if (plain.Text.StartsWith("!每日运势"))
+                        {
+                            await _lock.WaitAsync(token);
+                            try
+                            {
+                                if (!File.Exists("lucky.json"))
+                                {
+                                    await File.WriteAllTextAsync("lucky.json", "{}", token);
+                                }
+                                var dict = await JsonSerializer.DeserializeAsync<Dictionary<string, DateTime>>(File.OpenRead(("lucky.json")), cancellationToken: token) ?? new();
+                                if (dict.TryGetValue(msg.Sender.Id, out var lastDate))
+                                {
+                                    if (DateTime.Now.Date - lastDate == TimeSpan.Zero)
+                                    {
+                                        continue;
+                                    }
+                                    dict.Remove(msg.Sender.Id);
+                                }
+                                var category = RandomOf(categories);
+                                await miraiService.SendMessageToGroup(group, token, new MessageBase[]
+                                {
+                                    new AtMessage() { Target = msg.Sender.Id },
+                                    new PlainMessage() { Text = $" {category}弥弥正在为你计算今天的运势~" },
+                                });
+                                var (prompt, extra, cfg_scale, steps, width, height) = GetPrompt(category, "弥", 1);
+                                logger.LogInformation("prompt: {}", prompt);
+
+                                var body = await Request(prompt, cfg_scale, steps, width, height, token);
+                                await SendLuckyImage(group, msg.Sender.Name, msg.Sender.Id, prompt, body, token);
+
+                                dict.Add(msg.Sender.Id, DateTime.Now.Date);
+                                logger.LogInformation("dict size = {}", dict.Count);
+                                await JsonSerializer.SerializeAsync(File.Open("lucky.json", FileMode.CreateNew), dict, cancellationToken: token);
+                            }
+                            finally
+                            {
+                                _lock.Release();
                             }
                             continue;
                         }
