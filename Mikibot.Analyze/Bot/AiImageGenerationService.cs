@@ -969,7 +969,7 @@ namespace Mikibot.Analyze.Bot
                             }
                             continue;
                         }
-                        if (plain.Text.StartsWith("!每日运势"))
+                        if (plain.Text.StartsWith("!每日运势") || plain.Text.StartsWith("!今日运势") || plain.Text.StartsWith("!抽签"))
                         {
                             await _lock.WaitAsync(token);
                             try
@@ -1001,7 +1001,7 @@ namespace Mikibot.Analyze.Bot
 
                                 dict.Add(msg.Sender.Id, DateTime.Now.Date);
                                 logger.LogInformation("dict size = {}", dict.Count);
-                                await JsonSerializer.SerializeAsync(File.Open("lucky.json", FileMode.Truncate), dict, cancellationToken: token);
+                                await File.WriteAllTextAsync("lucky.json", JsonSerializer.Serialize(dict), token);
                             }
                             finally
                             {
