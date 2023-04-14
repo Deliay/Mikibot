@@ -58,14 +58,10 @@ namespace Mikibot.BuildingBlocks.Util
                 }
             }
 
-            Console.WriteLine($"Using font: {fontFamily.Name}");
-            var emoji = GetEmojiFont();
-            Console.WriteLine($"Using emoji: {emoji.Name}");
-            var textFallback = new List<FontFamily>() { fontFamily };
             basic = new TextOptions(new Font(fontFamily, 36));
-            weatherFont = new TextOptions(basic) { Origin = new Vector2(48, 950), Font = new Font(basic.Font, 36), FallbackFontFamilies = GetEmojiFallback() };
-            dateFont = new TextOptions(basic) { Origin = new Vector2(48, 760), Font = new Font(basic.Font, 48) };
-            userFont = new TextOptions(basic) { Origin = new Vector2(48, 840), Font = new Font(basic.Font, 36), FallbackFontFamilies = GetEmojiFallback() };
+            weatherFont = new TextOptions(basic) { Origin = new Vector2(48, 760), Font = new Font(basic.Font, 36), FallbackFontFamilies = GetEmojiFallback() };
+            dateFont = new TextOptions(basic) { Origin = new Vector2(48, 930), Font = new Font(basic.Font, 48) };
+            userFont = new TextOptions(basic) { Origin = new Vector2(48, 1010), Font = new Font(basic.Font, 36), FallbackFontFamilies = GetEmojiFallback() };
             luckyFont = new TextOptions(basic) { Origin = new Vector2(1650, 930), Font = new Font(basic.Font, 86) };
         }
 
