@@ -19,6 +19,9 @@ using Mikibot.BuildingBlocks.Util;
 using NPOI.Util;
 using Mikibot.StableDiffusion.WebUi.Api.Models;
 using NPOI.SS.Formula.Functions;
+using Mikibot.Analyze.Service;
+using QWeatherAPI.Result.WeatherDailyForecast;
+using QWeatherAPI.Result.GeoAPI.CityLookup;
 
 namespace Mikibot.Analyze.Bot
 {
@@ -30,7 +33,7 @@ namespace Mikibot.Analyze.Bot
         };
         private readonly ILogger<AiImageGenerationService> logger;
         private readonly IMiraiService miraiService;
-
+        private readonly QWeatherService weatherService;
         public string WebUiEndpoint { get; }
 
         public AiImageGenerationService(
@@ -41,6 +44,7 @@ namespace Mikibot.Analyze.Bot
             this.logger = logger;
             this.miraiService = miraiService;
             WebUiEndpoint = Environment.GetEnvironmentVariable("WEB_UI_ENDPOINT") ?? "http://127.0.0.1:7860/sdapi/v1/txt2img";
+            weatherService = new QWeatherService();
         }
 
         private readonly Channel<GroupMessageReceiver> messageQueue = Channel
@@ -837,7 +841,7 @@ namespace Mikibot.Analyze.Bot
                 _ => "?",
             };
         }
-        private async ValueTask SendLuckyImage(Mirai.Net.Data.Shared.Group group, string name, string uid, string prompt, Ret body, CancellationToken token)
+        private async ValueTask SendLuckyImage(Mirai.Net.Data.Shared.Group group, string name, string uid, string prompt, string weather, Ret body, CancellationToken token)
         {
             var info = JsonSerializer.Deserialize<Info>(body.info);
             logger.LogInformation("生成成功，种子:{}", info.seed);
@@ -846,7 +850,7 @@ namespace Mikibot.Analyze.Bot
                 var imageBase64 = body.images[0];
                 var today = DateTime.Now;
                 var todayStr = $"{today.Year}年{today.Month}月{today.Day}日 {StringDayOfWeek(today.DayOfWeek)}";
-                AiImageColorAdjustUtility.TryAppendLucky(prompt, todayStr, RandomOf(Lucky), name, imageBase64, out var adjustedImage);
+                AiImageColorAdjustUtility.TryAppendLucky(prompt, todayStr, RandomOf(Lucky), name, weather, imageBase64, out var adjustedImage);
                 List<MessageBase> messages = new()
                 {
                     new AtMessage() { Target = uid },
@@ -969,7 +973,7 @@ namespace Mikibot.Analyze.Bot
                             }
                             continue;
                         }
-                        if (plain.Text.StartsWith("!每日运势") || plain.Text.StartsWith("!今日运势") || plain.Text.StartsWith("!抽签"))
+                        if (plain.Text.StartsWith("!每日运势") || plain.Text.StartsWith("!今日运势") || plain.Text.StartsWith("!抽签") || plain.Text.StartsWith("!运势"))
                         {
                             await _lock.WaitAsync(token);
                             try
@@ -995,9 +999,23 @@ namespace Mikibot.Analyze.Bot
                                 });
                                 var (prompt, extra, cfg_scale, steps, width, height) = GetPrompt(category, "弥", 1);
                                 logger.LogInformation("prompt: {}", prompt);
-
-                                var body = await Request(prompt, cfg_scale, steps, width, height, token);
-                                await SendLuckyImage(group, msg.Sender.Name, msg.Sender.Id, prompt, body, token);
+                                var imgTask = Request(prompt, cfg_scale, steps, width, height, token);
+                                var weatherTask = plain.Text.Contains('+') switch
+                                {
+                                    true => weatherService.SearchTodayForecast(plain.Text[(plain.Text.IndexOf('+') + 1)..]),
+                                    _ => Task.FromResult<(Location, Daily)>((null!, null!)),
+                                };
+                                var (loc, weather) = await weatherTask;
+                                logger.LogInformation("{} weather: {}", loc, weather);
+                                var weatherStr = (weather != null) switch
+                                {
+                                    true => 
+                                            $"{loc.Adm2} {loc.Name} · {weather.TextDay} · {weather.TempMin}~{weather.TempMax}℃ \n" +
+                                            $"🌅{weather.Sunrise} 🌇{weather.Sunset} 💧{weather.Humidity} 🍃{weather.WindSpeedDay}级 {weather.WindDirDay}",
+                                    _ => "",
+                                };
+                                var body = await imgTask;
+                                await SendLuckyImage(group, msg.Sender.Name, msg.Sender.Id, prompt, weatherStr, body, token);
 
                                 dict.Add(msg.Sender.Id, DateTime.Now.Date);
                                 logger.LogInformation("dict size = {}", dict.Count);

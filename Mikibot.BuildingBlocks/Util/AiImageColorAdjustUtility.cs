@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using SixLabors.ImageSharp.Drawing.Processing;
+using System.Numerics;
 
 namespace Mikibot.BuildingBlocks.Util
 {
@@ -18,13 +19,30 @@ namespace Mikibot.BuildingBlocks.Util
         private static readonly Image transparent = Image.Load("resources/transparent.png");
         private static readonly FontCollection fonts = new();
         private static readonly FontFamily fontFamily;
-        private static readonly Font dateFont;
-        private static readonly Font userFont;
-        private static readonly Font luckyFont;
-        private static readonly PointF datePoint;
-        private static readonly PointF userPoint;
-        private static readonly PointF luckyPoint;
+        private static readonly TextOptions basic;
+        private static readonly TextOptions dateFont;
+        private static readonly TextOptions userFont;
+        private static readonly TextOptions luckyFont;
+        private static readonly TextOptions weatherFont;
         public static void Initialize() { }
+
+        private static IReadOnlyList<FontFamily> GetEmojiFallback()
+        {
+            return fonts.TryGet("Segoe UI Emoji", out var emojiFamily) switch
+            {
+                true => new List<FontFamily>() { emojiFamily },
+                _ => new List<FontFamily>(),
+            };
+        }
+
+        private static FontFamily GetEmojiFont()
+        {
+            return fonts.TryGet("Segoe UI Emoji", out var emojiFamily) switch
+            {
+                true => emojiFamily,
+                _ => default,
+            };
+        }
 
         static AiImageColorAdjustUtility()
         {
@@ -41,13 +59,14 @@ namespace Mikibot.BuildingBlocks.Util
             }
 
             Console.WriteLine($"Using font: {fontFamily.Name}");
-
-            dateFont = new Font(fontFamily, 48);
-            userFont = new Font(fontFamily, 36);
-            luckyFont = new Font(fontFamily, 86);
-            datePoint = new PointF(48, 760);
-            userPoint = new PointF(48, 840);
-            luckyPoint = new PointF(48, 930);
+            var emoji = GetEmojiFont();
+            Console.WriteLine($"Using emoji: {emoji.Name}");
+            var textFallback = new List<FontFamily>() { fontFamily };
+            basic = new TextOptions(new Font(fontFamily, 36));
+            weatherFont = new TextOptions(basic) { Origin = new Vector2(48, 950), Font = new Font(basic.Font, 36), FallbackFontFamilies = GetEmojiFallback() };
+            dateFont = new TextOptions(basic) { Origin = new Vector2(48, 760), Font = new Font(basic.Font, 48) };
+            userFont = new TextOptions(basic) { Origin = new Vector2(48, 840), Font = new Font(basic.Font, 36), FallbackFontFamilies = GetEmojiFallback() };
+            luckyFont = new TextOptions(basic) { Origin = new Vector2(1650, 930), Font = new Font(basic.Font, 86) };
         }
 
         private readonly static IImageProcessor NightTemperatrueProcessor = new TemperatureProcessor(-15);
@@ -56,7 +75,10 @@ namespace Mikibot.BuildingBlocks.Util
             Quality = 90,
         };
 
-        public static bool TryAppendLucky(string prompts, string date, string lucky, string name, string base64encodedImage, out string adjustedImage)
+        public static bool TryAppendLucky(string prompts,
+            string date, string lucky, string name,
+            string weather,
+            string base64encodedImage, out string adjustedImage)
         {
             var data = Convert.FromBase64String(base64encodedImage);
             using Image image = Image.Load(data);
@@ -79,9 +101,10 @@ namespace Mikibot.BuildingBlocks.Util
                 ctx.Contrast(1.15f);
                 ctx.Saturate(1.05f);
                 ctx.DrawImage(transparent, 1);
-                ctx.DrawText(date, dateFont, Color.Black, datePoint);
-                ctx.DrawText(lucky, luckyFont, Color.Black, luckyPoint);
-                ctx.DrawText(name, userFont, Color.Black, userPoint);
+                ctx.DrawText(weatherFont, weather, Color.Black);
+                ctx.DrawText(dateFont, date, Color.Black);
+                ctx.DrawText(luckyFont, lucky, Color.Black);
+                ctx.DrawText(userFont, name, Color.Black);
             });
 
             using var ms = new MemoryStream(data.Length);
