@@ -539,7 +539,7 @@ namespace Mikibot.Analyze.Bot
             { "老版弥", "miki-v2+v3" },
             { "弥", "miki-2.0+3.0-v1-hd" },
             { "真", "mahiru-v2" },
-            { "悠", "yuaVirtuareal_v20" },
+            { "悠", "yuaVirtuareal_v20A5" },
             { "侑", "KiyuuVirtuareal_v20" },
             { "老版侑", "Kiyuu_" },
             { "炉", "kaoru-1.0-v1-hd" },
@@ -694,9 +694,9 @@ namespace Mikibot.Analyze.Bot
         private static readonly Dictionary<string, string> twinStyles = new()
         {
             { "贴贴", " yuri, side-by-side, hand in hand, breast to breast, " },
-            { "啵嘴", " yuri, (kiss) " },
-            { "啵贴", " yuri, side-by-side, hand in hand, breast to breast, (kiss), " },
-            { "对视", " yuri, holding hands, looking at another, eye contact, facing another, kiss, " }
+            { "啵嘴", " yuri, (kiss), <lora:animeKisses_v1:0.8>, tongue kiss, " },
+            { "啵贴", " yuri, side-by-side, hand in hand, breast to breast, (kiss), <lora:animeKisses_v1:0.8>, tongue kiss,  " },
+            { "对视", " yuri, holding hands, looking at another, eye contact, facing another, " }
         };
 
         private static readonly List<string> randomTwinStyles = new() { "啵嘴", "贴贴", "啵贴" };
