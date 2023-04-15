@@ -544,7 +544,7 @@ namespace Mikibot.Analyze.Bot
             { "老版侑", "Kiyuu_" },
             { "炉", "kaoru-1.0-v1-hd" },
             { "老版炉", "kaoru-1.0-v5" },
-            { "毬", "akumaria" },
+            { "毬", "akumaria-2.0+3.0-hd-v1" },
             { "岁", "suiVirtuareal_suiVr" },
         };
 
