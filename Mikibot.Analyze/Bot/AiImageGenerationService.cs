@@ -997,12 +997,12 @@ namespace Mikibot.Analyze.Bot
                                     dict.Remove(msg.Sender.Id);
                                 }
                                 var category = RandomOf(categories);
+                                var luckyCharacter = allowCharacter.ContainsKey(msg.GroupId) ? RandomOf(allowCharacter[msg.GroupId]) : "弥";
                                 await miraiService.SendMessageToGroup(group, token, new MessageBase[]
                                 {
                                     new AtMessage() { Target = msg.Sender.Id },
-                                    new PlainMessage() { Text = $" {category}弥弥正在为你计算今天的运势~" },
+                                    new PlainMessage() { Text = $" {category}{luckyCharacter}正在为你计算今天的运势~" },
                                 });
-                                var luckyCharacter = allowCharacter.ContainsKey(msg.GroupId) ? RandomOf(allowCharacter[msg.GroupId]) : "弥";
                                 var (prompt, extra, cfg_scale, steps, width, height) = GetPrompt(category, luckyCharacter, 2);
                                 logger.LogInformation("prompt: {}", prompt);
                                 var imgTask = Request(prompt, cfg_scale, steps, width, height, token);
