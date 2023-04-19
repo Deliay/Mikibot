@@ -928,6 +928,10 @@ namespace Mikibot.Analyze.Bot
         private readonly SemaphoreSlim _lock = new(1);
         private readonly Dictionary<string, CancellationTokenSource> controller = new();
 
+        private readonly Dictionary<string, List<string>> allowCharacter = new()
+        {
+            { "314503649", new() { "弥", "弥", "弥", "真", "侑", "悠" }  },
+        };
 
         private async ValueTask Dequeue(CancellationToken token)
         {
@@ -973,7 +977,8 @@ namespace Mikibot.Analyze.Bot
                             }
                             continue;
                         }
-                        if (plain.Text.StartsWith("!每日运势") || plain.Text.StartsWith("!今日运势") || plain.Text.StartsWith("!抽签") || plain.Text.StartsWith("!运势"))
+                        if (plain.Text.StartsWith("!每日运势") || plain.Text.StartsWith("!今日运势") || plain.Text.StartsWith("!抽签") || plain.Text.StartsWith("!运势")
+                            || plain.Text.StartsWith("！每日运势") || plain.Text.StartsWith("！今日运势") || plain.Text.StartsWith("！抽签") || plain.Text.StartsWith("！运势"))
                         {
                             await _lock.WaitAsync(token);
                             try
@@ -997,7 +1002,8 @@ namespace Mikibot.Analyze.Bot
                                     new AtMessage() { Target = msg.Sender.Id },
                                     new PlainMessage() { Text = $" {category}弥弥正在为你计算今天的运势~" },
                                 });
-                                var (prompt, extra, cfg_scale, steps, width, height) = GetPrompt(category, "弥", 1);
+                                var luckyCharacter = allowCharacter.ContainsKey(msg.GroupId) ? RandomOf(allowCharacter[msg.GroupId]) : "弥";
+                                var (prompt, extra, cfg_scale, steps, width, height) = GetPrompt(category, luckyCharacter, 2);
                                 logger.LogInformation("prompt: {}", prompt);
                                 var imgTask = Request(prompt, cfg_scale, steps, width, height, token);
                                 var weatherTask = plain.Text.Contains('+') switch

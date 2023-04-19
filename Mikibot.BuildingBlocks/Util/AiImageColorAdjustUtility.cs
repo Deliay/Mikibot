@@ -24,6 +24,8 @@ namespace Mikibot.BuildingBlocks.Util
         private static readonly TextOptions userFont;
         private static readonly TextOptions luckyFont;
         private static readonly TextOptions weatherFont;
+        private static readonly TextOptions watermarkFont;
+        private static readonly Color watermarkColor = new (new Argb32(0, 0, 0, 50));
         public static void Initialize() { }
 
         private static IReadOnlyList<FontFamily> GetEmojiFallback()
@@ -31,7 +33,7 @@ namespace Mikibot.BuildingBlocks.Util
             return fonts.TryGet("Segoe UI Emoji", out var emojiFamily) switch
             {
                 true => new List<FontFamily>() { emojiFamily },
-                _ => new List<FontFamily>(),
+                _ => new List<FontFamily>()
             };
         }
 
@@ -59,10 +61,11 @@ namespace Mikibot.BuildingBlocks.Util
             }
 
             basic = new TextOptions(new Font(fontFamily, 36));
-            weatherFont = new TextOptions(basic) { Origin = new Vector2(48, 760), Font = new Font(basic.Font, 36), FallbackFontFamilies = GetEmojiFallback() };
-            dateFont = new TextOptions(basic) { Origin = new Vector2(48, 930), Font = new Font(basic.Font, 48) };
-            userFont = new TextOptions(basic) { Origin = new Vector2(48, 1010), Font = new Font(basic.Font, 36), FallbackFontFamilies = GetEmojiFallback() };
-            luckyFont = new TextOptions(basic) { Origin = new Vector2(1650, 930), Font = new Font(basic.Font, 86) };
+            weatherFont = new TextOptions(basic) { Origin = new Vector2(48, 1600), Font = new Font(basic.Font, 36), FallbackFontFamilies = GetEmojiFallback() };
+            dateFont = new TextOptions(basic) { Origin = new Vector2(48, 1770), Font = new Font(basic.Font, 48) };
+            userFont = new TextOptions(basic) { Origin = new Vector2(48, 1850), Font = new Font(basic.Font, 36), FallbackFontFamilies = GetEmojiFallback() };
+            luckyFont = new TextOptions(basic) { Origin = new Vector2(810, 1770), Font = new Font(basic.Font, 86) };
+            watermarkFont = new TextOptions(basic) { Origin = new Vector2(0, 0), Font = new Font(basic.Font, 24) };
         }
 
         private readonly static IImageProcessor NightTemperatrueProcessor = new TemperatureProcessor(-15);
@@ -101,6 +104,7 @@ namespace Mikibot.BuildingBlocks.Util
                 ctx.DrawText(dateFont, date, Color.Black);
                 ctx.DrawText(luckyFont, lucky, Color.Black);
                 ctx.DrawText(userFont, name, Color.Black);
+                ctx.DrawText(watermarkFont, "该背景图由AI生成", watermarkColor);
             });
 
             using var ms = new MemoryStream(data.Length);
@@ -131,6 +135,7 @@ namespace Mikibot.BuildingBlocks.Util
                 }
                 ctx.Contrast(1.15f);
                 ctx.Saturate(1.05f);
+                ctx.DrawText(watermarkFont, "该图片由AI生成", watermarkColor);
             });
 
             using var ms = new MemoryStream(data.Length);
