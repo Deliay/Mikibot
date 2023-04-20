@@ -930,7 +930,8 @@ namespace Mikibot.Analyze.Bot
         private readonly Dictionary<string, List<string>> allowCharacter = new()
         {
             { "314503649", new() { "弥", "弥", "弥", "真", "侑", "悠" }  },
-            { "139528984", allCharacters }
+            { "139528984", allCharacters },
+            { "972488523", new() { "毬"} },
         };
 
         private async ValueTask Dequeue(CancellationToken token)
