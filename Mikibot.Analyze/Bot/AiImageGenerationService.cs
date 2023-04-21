@@ -570,8 +570,8 @@ namespace Mikibot.Analyze.Bot
             { "悠", "(light blue eyes), black hair ribbon, silver hair, blue streaked hair, vr-yua, " },
             { "侑", "(white pink hair), (blue streaked hair), (cat ear headphone), <lora:Kiyuu_:0.15>, (small breast), " },
             { "老版侑", "(white pink hair), (blue streaked hair), (cat ear headphone), (small breast), " },
-            { "炉", "yellow eyes, (pink to blue gradient hair), (gradient hair), ahoge, (small breast), (flat chest), white colored eyelashes, (+ +), hat, " },
-            { "老版炉", "yellow eyes, (pink to blue gradient hair), (gradient hair), ahoge, (small breast), (flat chest), white colored eyelashes, (+ +), hat, " },
+            { "炉", "yellow eyes, (pink to blue gradient hair), (gradient hair), (small breast), white colored eyelashes, hat, " },
+            { "老版炉", "yellow eyes, (pink to blue gradient hair), (gradient hair), (small breast),  white colored eyelashes, hat, " },
             { "毬", "red eyes, silver hair, red streaked hair, (square pupils), (small breast), " },
             { "岁", "red eyes, silver hair, red hair robbon, (small breast), " },
             { "恶魔弥", "yellow eyes, black hair, purple horns, purple streaked hair, small breast, purple hair ornament, " }
