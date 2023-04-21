@@ -98,6 +98,8 @@ namespace Mikibot.Analyze.Bot
             { "臭脚", 0.6 },
             { "抱枕", 0.6 },
             { "油画", 0.3 },
+            { "天使", 0.6 },
+            { "猫娘", 0.6 },
         };
 
         private static readonly HashSet<string> disableExtraStyle = new() { "抱枕" };
@@ -577,8 +579,8 @@ namespace Mikibot.Analyze.Bot
 
         private static readonly string demon = "demon girl, demon tail, demon wings, demon horns, ";
         private static readonly Dictionary<string, string> demonSuffix = new() {
-            { "原版", demon}, { "jk", demon}, { "萝莉", demon}, { "Q版", demon}, { "衬衫", demon}, { "白裙", demon}, { "泳装", demon},
-            { "ol", demon}, { "lo", demon}, { "女仆", demon}, { "旗袍", demon}, { "水墨", demon}, { "机甲", demon}, { "原版", demon},
+            { "jk", demon}, { "萝莉", demon}, { "Q版", demon}, { "衬衫", demon}, { "白裙", demon}, { "泳装", demon},
+            { "ol", demon}, { "lo", demon}, { "女仆", demon}, { "旗袍", demon}, { "水墨", demon}, { "机甲", demon},
             { "立绘", demon}, { "电锯", demon}, { "日常", demon}, { "浴衣", demon}, { "臭脚", demon}, { "抱枕", demon}, { "油画", demon},
         };
 
@@ -604,7 +606,9 @@ namespace Mikibot.Analyze.Bot
                     "garter straps, black footwear, demon tail, heart ear ornament, black shorts," +
                     " bangs, " },
             } },
-            { "毬", new(demonSuffix) },
+            { "毬", new(demonSuffix) {
+                { "原版", demon}, 
+            } },
         };
 
         private static MessageChain getHelpMsg(string groupId) {
