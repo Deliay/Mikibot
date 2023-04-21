@@ -538,8 +538,11 @@ namespace Mikibot.Analyze.Bot
             { "老版侑", new() { "139528984" } },
             { "炉", new() { "139528984" } },
             { "老版炉", new() { "139528984" } },
-            { "毬", new() { "139528984", "972488523" } },
+            { "毬", new() { "139528984" } },
             { "岁", new() { "139528984" } },
+            { "史尔特尔", new() { "45587035" } },
+            { "伊蕾娜", new() { "45587035" } },
+            { "天宫心", new() { "45587035" } },
         };
 
         private static readonly Dictionary<string, string> characterLore = new()
@@ -555,11 +558,15 @@ namespace Mikibot.Analyze.Bot
             { "老版炉", "kaoru-1.0-v5" },
             { "毬", "akumaria-2.0+3.0-hd-v1" },
             { "岁", "suiVirtuareal_suiVr" },
+            { "史尔特尔", "ArknightsSurtr_20" },
+            { "伊蕾娜", "majoNoTabitabiElaina_v30" },
+            { "天宫心", "amamiyaKokoro_v10" },
         };
 
         private static readonly Dictionary<string, double> characterWeightOffset = new()
         {
             { "弥", 0.1 },
+            { "史尔特尔", -0.1 },
         };
 
         private static readonly Dictionary<string, string> characterPrefix = new()
@@ -574,7 +581,10 @@ namespace Mikibot.Analyze.Bot
             { "老版炉", "yellow eyes, (pink to blue gradient hair), (gradient hair), (small breast),  white colored eyelashes, hat, " },
             { "毬", "red eyes, silver hair, red streaked hair, (square pupils), (small breast), " },
             { "岁", "red eyes, silver hair, red hair robbon, (small breast), " },
-            { "恶魔弥", "yellow eyes, black hair, purple horns, purple streaked hair, small breast, purple hair ornament, " }
+            { "恶魔弥", "yellow eyes, black hair, purple horns, purple streaked hair, small breast, purple hair ornament, " },
+            { "史尔特尔", "red hair, long hair, medium breasts, (surtr \\(arknights\\)), purple eyes, " },
+            { "伊蕾娜", "purple eyes, (elaina \\(majo no tabitabi\\)), small breasts, " },
+            { "天宫心", "amamya, blue very long hair, yellow eyes, hair bell, hat, x hair ornament" },
         };
 
         private static readonly string demon = "demon girl, demon tail, demon wings, demon horns, ";
@@ -600,11 +610,23 @@ namespace Mikibot.Analyze.Bot
             {
                 { "原版", $"{demon}, twintails, bat hair ornament, cape, white shirt, white legwear, stuffed toy, stuffed animal toy, beret, gloves, bangs, hat, " },
             } },
+            { "史尔特尔", new()
+            {
+                { "原版", "black shirt, bare shoulders,  black gloves, black legwear, " },
+            } },
+            { "伊蕾娜", new()
+            {
+                { "原版", " majo costume, witch hat, white dress, white shirt ,(brooch), ribbon, " },
+            } },
+            { "天宫心", new()
+            {
+                { "原版", "black beret,grey jacket,ahoge,long sleeves,two side up,puffy sleeves,blue jacket,juliet sleeves,multicolored gradient hair, " },
+            } },
             { "恶魔弥", new() {
                 { "原版", "ero thletic leotard, ero thletic leotar, sleeves pass wrists, bare shoulders, off shoulder," +
                     "collarbone, fishnet legwear, long sleeves, thighhighs, black fishnets," +
-                    "garter straps, black footwear, demon tail, heart ear ornament, black shorts," +
-                    " bangs, " },
+                    "garter straps, black footwear, demon tail, heart ear ornament, black shorts, bangs, "
+                },
             } },
             { "毬", new(demonSuffix) {
                 { "原版", demon}, 
@@ -951,6 +973,7 @@ namespace Mikibot.Analyze.Bot
             { "314503649", new() { "弥", "弥", "弥", "真", "侑", "悠" }  },
             { "139528984", allCharacters },
             { "972488523", new() { "毬"} },
+            { "45587035", new() { "史尔特尔", "伊蕾娜", "天宫心" } },
         };
 
         private async ValueTask Dequeue(CancellationToken token)
