@@ -566,7 +566,7 @@ namespace Mikibot.Analyze.Bot
         {
             { "老版弥", "purple eyes, black hair, [purple streaked hair], (small breast), " },
             { "弥", "purple eyes, black hair, [purple streaked hair], (small breast), " },
-            { "真", "yellow eyes, red hair, small breast, demon girl, demon tail, demon wings, small demon horns, pointy ears, (small breast), (flat chest), " },
+            { "真", "yellow eyes, red hair, small breast, pointy ears, (small breast), (flat chest), " },
             { "悠", "(light blue eyes), black hair ribbon, silver hair, blue streaked hair, vr-yua, " },
             { "侑", "(white pink hair), (blue streaked hair), (cat ear headphone), <lora:Kiyuu_:0.15>, (small breast), " },
             { "老版侑", "(white pink hair), (blue streaked hair), (cat ear headphone), (small breast), " },
