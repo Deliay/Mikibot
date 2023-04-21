@@ -203,8 +203,8 @@ namespace Mikibot.Analyze.Bot
                 "(illustration), ((impasto)), ((oil painting)), (classicism), <lora:miki-v2+v3:-w->, (portrait), rembrandt lighting, brown background, detailed face, picture frame, "
             } },
             { "猫娘", new() {
-                "<lora:miki-v2+v3:-w->, (cat ears), (car tail), cat girl, white legwear, white thighhighs, (full body), ",
-                "<lora:miki-v2+v3:-w->, (cat ears), (car tail), cat girl, black legwear, black thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, (cat ears), (cat tail), cat girl, white legwear, white thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, (cat ears), (cat tail), cat girl, black legwear, black thighhighs, (full body), ",
             } },
             { "天使", new() {
                 "<lora:miki-v2+v3:-w->, (angel), (angel wings), ",
