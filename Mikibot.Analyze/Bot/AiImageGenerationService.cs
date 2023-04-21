@@ -182,9 +182,8 @@ namespace Mikibot.Analyze.Bot
             } },
             { "臭脚", new()
             {
-                "<lora:miki-v2+v3:-w->, sneakers, black legwear, thighhighs, (full body), ",
-                "<lora:miki-v2+v3:-w->, sneakers, white legwear, thighhighs, (full body), ",
-                "<lora:miki-v2+v3:-w->, sneakers, black legwear, thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, sneakers, black legwear, black thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, sneakers, white legwear, white thighhighs, (full body), ",
             } },
             { "日常", new() {
                 "<lora:miki-v2+v3:-w->, ",
@@ -200,6 +199,14 @@ namespace Mikibot.Analyze.Bot
             } },
             { "油画", new() {
                 "(illustration), ((impasto)), ((oil painting)), (classicism), <lora:miki-v2+v3:-w->, (portrait), rembrandt lighting, brown background, detailed face, picture frame, "
+            } },
+            { "猫娘", new() {
+                "<lora:miki-v2+v3:-w->, (cat ears), (car tail), cat girl, white legwear, white thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, (cat ears), (car tail), cat girl, black legwear, black thighhighs, (full body), ",
+            } },
+            { "天使", new() {
+                "<lora:miki-v2+v3:-w->, (angel), (angel wings), ",
+                "<lora:miki-v2+v3:-w->, (angel), (angel wings), halo",
             } },
         };
 
@@ -563,9 +570,16 @@ namespace Mikibot.Analyze.Bot
             { "老版侑", "(white pink hair), (blue streaked hair), (cat ear headphone), (small breast), " },
             { "炉", "yellow eyes, (pink to blue gradient hair), (gradient hair), ahoge, (small breast), (flat chest), white colored eyelashes, (+ +), hat, " },
             { "老版炉", "yellow eyes, (pink to blue gradient hair), (gradient hair), ahoge, (small breast), (flat chest), white colored eyelashes, (+ +), hat, " },
-            { "毬", "red eyes, silver hair, red streaked hair, demon girl, demon tail, demon wings, demon horns, square pupils, (small breast), " },
+            { "毬", "red eyes, silver hair, red streaked hair, (square pupils), (small breast), " },
             { "岁", "red eyes, silver hair, red hair robbon, (small breast), " },
             { "恶魔弥", "yellow eyes, black hair, purple horns, purple streaked hair, small breast, purple hair ornament, " }
+        };
+
+        private static readonly string demon = "demon girl, demon tail, demon wings, demon horns, ";
+        private static readonly Dictionary<string, string> demonSuffix = new() {
+            { "原版", demon}, { "jk", demon}, { "萝莉", demon}, { "Q版", demon}, { "衬衫", demon}, { "白裙", demon}, { "泳装", demon},
+            { "ol", demon}, { "lo", demon}, { "女仆", demon}, { "旗袍", demon}, { "水墨", demon}, { "机甲", demon}, { "原版", demon},
+            { "立绘", demon}, { "电锯", demon}, { "日常", demon}, { "浴衣", demon}, { "臭脚", demon}, { "抱枕", demon}, { "油画", demon},
         };
 
         private static readonly Dictionary<string, Dictionary<string, string>> characterSuffix = new()
@@ -580,9 +594,9 @@ namespace Mikibot.Analyze.Bot
             { "老版炉", new() {
                 { "原版", "deep blue shorts, white shirt, (white capelet), [[hat]], black tie, long sleeves, " },
             } },
-            { "真", new()
+            { "真", new(demonSuffix)
             {
-                { "原版", "twintails, bat hair ornament, cape, white shirt, white legwear, stuffed toy, stuffed animal toy, beret, gloves, bangs, hat, " },
+                { "原版", $"{demon}, twintails, bat hair ornament, cape, white shirt, white legwear, stuffed toy, stuffed animal toy, beret, gloves, bangs, hat, " },
             } },
             { "恶魔弥", new() {
                 { "原版", "ero thletic leotard, ero thletic leotar, sleeves pass wrists, bare shoulders, off shoulder," +
@@ -590,6 +604,7 @@ namespace Mikibot.Analyze.Bot
                     "garter straps, black footwear, demon tail, heart ear ornament, black shorts," +
                     " bangs, " },
             } },
+            { "毬", new(demonSuffix) },
         };
 
         private static MessageChain getHelpMsg(string groupId) {
