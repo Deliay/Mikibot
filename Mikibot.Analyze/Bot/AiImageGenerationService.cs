@@ -567,6 +567,7 @@ namespace Mikibot.Analyze.Bot
         {
             { "弥", 0.1 },
             { "史尔特尔", -0.1 },
+            { "毬", -0.2 },
         };
 
         private static readonly Dictionary<string, string> characterPrefix = new()
@@ -976,6 +977,8 @@ namespace Mikibot.Analyze.Bot
             { "45587035", new() { "史尔特尔", "伊蕾娜", "天宫心" } },
         };
 
+        private bool inTrain = false;
+
         private async ValueTask Dequeue(CancellationToken token)
         {
             await foreach (var msg in messageQueue.Reader.ReadAllAsync(token))
@@ -989,6 +992,34 @@ namespace Mikibot.Analyze.Bot
                         if (plain.Text == "!help")
                         {
                             await miraiService.SendMessageToGroup(group, token, getHelpMsg(group.Id).ToArray());
+                        }
+                        if (plain.Text.StartsWith("!train") && msg.Sender.Id == "644676751")
+                        {
+                            if (inTrain)
+                            {
+                                await miraiService.SendMessageToGroup(group, token, new MessageBase[]
+                                {
+                                    new PlainMessage() { Text = "已解除训练模式" },
+                                });
+                                inTrain = false;
+                            }
+                            else
+                            {
+                                await miraiService.SendMessageToGroup(group, token, new MessageBase[]
+                                {
+                                    new PlainMessage() { Text = "已进入训练模式" },
+                                });
+                                inTrain = true;
+                            }
+                            break;
+                        }
+                        if (inTrain)
+                        {
+                            await miraiService.SendMessageToGroup(group, token, new MessageBase[]
+                            {
+                                new PlainMessage() { Text = "目前正在训练新的模型，请稍后再试" },
+                            });
+                            break;
                         }
                         if (plain.Text.StartsWith("!idle") && msg.Sender.Id == "644676751")
                         {
@@ -1033,7 +1064,7 @@ namespace Mikibot.Analyze.Bot
                                 var dict = await JsonSerializer.DeserializeAsync<Dictionary<string, DateTime>>(File.OpenRead(("lucky.json")), cancellationToken: token) ?? new();
                                 if (dict.TryGetValue(msg.Sender.Id, out var lastDate))
                                 {
-                                    if (DateTime.Now.Date - lastDate == TimeSpan.Zero)
+                                    if (DateTime.Now.Date + TimeSpan.FromHours(5) - lastDate == TimeSpan.Zero)
                                     {
                                         continue;
                                     }
@@ -1049,9 +1080,10 @@ namespace Mikibot.Analyze.Bot
                                 var (prompt, extra, cfg_scale, steps, width, height) = GetPrompt(category, luckyCharacter, 2);
                                 logger.LogInformation("prompt: {}", prompt);
                                 var imgTask = Request(prompt, cfg_scale, steps, width, height, token);
+                                var locStr = plain.Text[(plain.Text.IndexOf('+') + 1)..];
                                 var weatherTask = plain.Text.Contains('+') switch
                                 {
-                                    true => weatherService.SearchTodayForecast(plain.Text[(plain.Text.IndexOf('+') + 1)..]),
+                                    true => weatherService.SearchTodayForecast(locStr),
                                     _ => Task.FromResult<(Location, Daily)>((null!, null!)),
                                 };
                                 var (loc, weather) = await weatherTask;
@@ -1061,12 +1093,12 @@ namespace Mikibot.Analyze.Bot
                                     true => 
                                             $"{loc.Adm2} {loc.Name} · {weather.TextDay} · {weather.TempMin}~{weather.TempMax}℃ \n" +
                                             $"🌅{weather.Sunrise} 🌇{weather.Sunset} 💧{weather.Humidity} 🍃{weather.WindSpeedDay}级 {weather.WindDirDay}",
-                                    _ => "",
+                                    _ => $"未查询到 {locStr} 的天气信息",
                                 };
                                 var body = await imgTask;
                                 await SendLuckyImage(group, msg.Sender.Name, msg.Sender.Id, prompt, weatherStr, body, token);
 
-                                dict.Add(msg.Sender.Id, DateTime.Now.Date);
+                                dict.Add(msg.Sender.Id, DateTime.Now.Date + TimeSpan.FromHours(5));
                                 logger.LogInformation("dict size = {}", dict.Count);
                                 await File.WriteAllTextAsync("lucky.json", JsonSerializer.Serialize(dict), token);
                             }
