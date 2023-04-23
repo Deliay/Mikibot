@@ -582,7 +582,7 @@ namespace Mikibot.Analyze.Bot
             { "毬", "red eyes, silver hair, red streaked hair, (square pupils), (small breast), " },
             { "岁", "red eyes, silver hair, red hair robbon, (small breast), " },
             { "恶魔弥", "yellow eyes, black hair, purple horns, purple streaked hair, small breast, purple hair ornament, " },
-            { "史尔特尔", "red hair, long hair, medium breasts, (surtr \\(arknights\\)), purple eyes, " },
+            { "史尔特尔", "red hair, long hair, (surtr \\(arknights\\)), purple eyes, " },
             { "伊蕾娜", "purple eyes, (elaina \\(majo no tabitabi\\)), small breasts, witch hat," },
             { "天宫心", "amamya, blue very long hair, yellow eyes, hair bell, hat, x hair ornament" },
         };
