@@ -100,6 +100,7 @@ namespace Mikibot.Analyze.Bot
             { "油画", 0.3 },
             { "天使", 0.6 },
             { "猫娘", 0.6 },
+            { "骑空", 0.6 },
         };
 
         private static readonly HashSet<string> disableExtraStyle = new() { "抱枕" };
@@ -182,13 +183,15 @@ namespace Mikibot.Analyze.Bot
             { "立绘", new() {
                 "<lora:miki-v2+v3:-w->, [(white background:1.5),::5], hexagon, mid shot, full body, <lora:gachaSplashLORA_gachaSplash31:1>, ",
             } },
+            { "骑空", new() {
+                "<lora:miki-v2+v3:-w->, <lora:granblueFantasyStyle_ver10:0.85>, mid shot, full body, ",
+            } },
             { "臭脚", new()
             {
                 "<lora:miki-v2+v3:-w->, sneakers, black legwear, black thighhighs, (full body), ",
                 "<lora:miki-v2+v3:-w->, sneakers, white legwear, white thighhighs, (full body), ",
             } },
             { "日常", new() {
-                "<lora:miki-v2+v3:-w->, ",
                 "<lora:miki-v2+v3:-w->, ",
             } },
             { "抱枕", new() {
@@ -592,6 +595,7 @@ namespace Mikibot.Analyze.Bot
             { "jk", demon}, { "萝莉", demon}, { "Q版", demon}, { "衬衫", demon}, { "白裙", demon}, { "泳装", demon},
             { "ol", demon}, { "lo", demon}, { "女仆", demon}, { "旗袍", demon}, { "水墨", demon}, { "机甲", demon},
             { "立绘", demon}, { "电锯", demon}, { "日常", demon}, { "浴衣", demon}, { "臭脚", demon}, { "抱枕", demon}, { "油画", demon},
+            { "骑空", demon }
         };
 
         private static readonly Dictionary<string, Dictionary<string, string>> characterSuffix = new()
