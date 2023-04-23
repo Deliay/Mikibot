@@ -1014,10 +1014,6 @@ namespace Mikibot.Analyze.Bot
                         }
                         if (inTrain)
                         {
-                            await miraiService.SendMessageToGroup(group, token, new MessageBase[]
-                            {
-                                new PlainMessage() { Text = "目前正在训练新的模型，请稍后再试" },
-                            });
                             break;
                         }
                         if (plain.Text.StartsWith("!idle") && msg.Sender.Id == "644676751")
@@ -1063,7 +1059,7 @@ namespace Mikibot.Analyze.Bot
                                 var dict = await JsonSerializer.DeserializeAsync<Dictionary<string, DateTime>>(File.OpenRead(("lucky.json")), cancellationToken: token) ?? new();
                                 if (dict.TryGetValue(msg.Sender.Id, out var lastDate))
                                 {
-                                    if (DateTime.Now.Date + TimeSpan.FromHours(5) - lastDate == TimeSpan.Zero)
+                                    if (lastDate > (DateTime.Now.Date + TimeSpan.FromHours(5)))
                                     {
                                         continue;
                                     }
@@ -1092,12 +1088,12 @@ namespace Mikibot.Analyze.Bot
                                     true => 
                                             $"{loc.Adm2} {loc.Name} · {weather.TextDay} · {weather.TempMin}~{weather.TempMax}℃ \n" +
                                             $"🌅{weather.Sunrise} 🌇{weather.Sunset} 💧{weather.Humidity} 🍃{weather.WindSpeedDay}级 {weather.WindDirDay}",
-                                    _ => $"未查询到 {locStr} 的天气信息",
+                                    _ => $"",
                                 };
                                 var body = await imgTask;
                                 await SendLuckyImage(group, msg.Sender.Name, msg.Sender.Id, prompt, weatherStr, body, token);
 
-                                dict.Add(msg.Sender.Id, DateTime.Now.Date + TimeSpan.FromHours(5));
+                                dict.Add(msg.Sender.Id, DateTime.Now);
                                 logger.LogInformation("dict size = {}", dict.Count);
                                 await File.WriteAllTextAsync("lucky.json", JsonSerializer.Serialize(dict), token);
                             }
