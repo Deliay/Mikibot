@@ -103,7 +103,7 @@ namespace Mikibot.Analyze.Bot
             { "骑空", 0.6 },
         };
 
-        private static readonly HashSet<string> disableExtraStyle = new() { "抱枕" };
+        private static readonly HashSet<string> disableExtraStyle = new() { "抱枕", "骑空" };
 
 
         private static readonly Dictionary<string, List<string>> promptMap = new()
@@ -181,7 +181,7 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, ",
             } },
             { "立绘", new() {
-                "<lora:miki-v2+v3:-w->, [(white background:1.5),::5], hexagon, mid shot, full body, <lora:gachaSplashLORA_gachaSplash31:1>, ",
+                "<lora:miki-v2+v3:-w->, [(white background:1.5)::5], hexagon, mid shot, full body, <lora:gachaSplashLORA_gachaSplash31:1>, ",
             } },
             { "骑空", new() {
                 "<lora:miki-v2+v3:-w->, <lora:granblueFantasyStyle_ver10:0.85>, mid shot, full body, ",
@@ -568,7 +568,7 @@ namespace Mikibot.Analyze.Bot
 
         private static readonly Dictionary<string, double> characterWeightOffset = new()
         {
-            { "弥", 0.1 },
+            //{ "弥", 0.1 },
             { "毬", -0.1 },
         };
 
@@ -580,7 +580,7 @@ namespace Mikibot.Analyze.Bot
             { "悠", "(light blue eyes), black hair ribbon, silver hair, blue streaked hair, vr-yua, " },
             { "侑", "(white pink hair), (blue streaked hair), (cat ear headphone), <lora:Kiyuu_:0.15>, (small breast), " },
             { "老版侑", "(white pink hair), (blue streaked hair), (cat ear headphone), (small breast), " },
-            { "炉", "yellow eyes, (pink to blue gradient hair), (gradient hair), (small breast), white colored eyelashes, hat, " },
+            { "炉", "yellow eyes, pink hair, (pink to blue gradient hair), (gradient hair), (small breast), white colored eyelashes, hat, " },
             { "老版炉", "yellow eyes, (pink to blue gradient hair), (gradient hair), (small breast),  white colored eyelashes, hat, " },
             { "毬", "red eyes, silver hair, red streaked hair, (square pupils), (small breast), " },
             { "岁", "red eyes, silver hair, red hair robbon, (small breast), " },
@@ -1063,7 +1063,8 @@ namespace Mikibot.Analyze.Bot
                                 var dict = await JsonSerializer.DeserializeAsync<Dictionary<string, DateTime>>(File.OpenRead(("lucky.json")), cancellationToken: token) ?? new();
                                 if (dict.TryGetValue(msg.Sender.Id, out var lastDate))
                                 {
-                                    if (lastDate > (DateTime.Now.Date + TimeSpan.FromHours(5)))
+                                    var lastRefreshAt = DateTime.Now.Date + TimeSpan.FromHours(5) - (DateTime.Now.Hour < 5 ? TimeSpan.FromDays(1) : TimeSpan.Zero);
+                                    if (lastDate > lastRefreshAt)
                                     {
                                         continue;
                                     }
