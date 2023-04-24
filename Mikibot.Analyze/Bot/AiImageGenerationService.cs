@@ -103,7 +103,7 @@ namespace Mikibot.Analyze.Bot
             { "骑空", 0.6 },
         };
 
-        private static readonly HashSet<string> disableExtraStyle = new() { "抱枕", "骑空" };
+        private static readonly HashSet<string> disableExtraStyle = new() { "抱枕" };
 
 
         private static readonly Dictionary<string, List<string>> promptMap = new()
