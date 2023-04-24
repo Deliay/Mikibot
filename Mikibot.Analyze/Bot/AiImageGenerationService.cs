@@ -184,7 +184,7 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, [(white background:1.5)::5], hexagon, mid shot, full body, <lora:gachaSplashLORA_gachaSplash31:1>, ",
             } },
             { "骑空", new() {
-                "<lora:miki-v2+v3:-w->, <lora:granblueFantasyStyle_ver10:0.85>, mid shot, full body, ",
+                "<lora:miki-v2+v3:-w->, <lora:granblueFantasyStyle_ver10:0.85>, full body, ",
             } },
             { "臭脚", new()
             {
@@ -569,7 +569,7 @@ namespace Mikibot.Analyze.Bot
         private static readonly Dictionary<string, double> characterWeightOffset = new()
         {
             //{ "弥", 0.1 },
-            { "毬", -0.1 },
+            // { "毬", -0.1 },
         };
 
         private static readonly Dictionary<string, string> characterPrefix = new()
