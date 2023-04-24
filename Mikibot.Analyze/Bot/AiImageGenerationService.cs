@@ -158,7 +158,7 @@ namespace Mikibot.Analyze.Bot
             } },
             { "水墨", new() {
                 "<lora:miki-v2+v3:-w->, (ink painting), illustration, (Chinese ink painting)," +
-                "(Ink dyeing), (watercolor), (Chinese Brush Painting), (Chinese style), ink background, petals, (soaked), (flowing)"
+                "<lora:miki-v2+v3:-w->, (Ink dyeing), (watercolor), (Chinese Brush Painting), (Chinese style), ink background, petals, (soaked), (flowing)"
             } },
             { "浴衣", new() {
                 "<lora:miki-v2+v3:-w->, japanese kimono, obi, ",
@@ -238,6 +238,17 @@ namespace Mikibot.Analyze.Bot
 
         private static readonly Dictionary<string, List<string>> mainClothes = new()
         {
+            { "骑空", new() {
+                "",
+                "",
+                "",
+                "maid, maid headdress, maid apron, ",
+                "china dress, chinese clothes, ",
+                "(angel), (angel wings), halo," ,
+                "(cat ears), (cat tail), cat girl, legwear, thighhighs, ",
+                "japanese kimono, obi, japanese yukata, ",
+                "(white dress), skirt, off-shoulder dress, bare shoulders, bag, ",
+            } },
             { "ol", new(){
                 "office uniform", "police uniform", "military uniform", "business suit", "dress shirt", "shirt",
             } },
