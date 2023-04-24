@@ -543,9 +543,9 @@ namespace Mikibot.Analyze.Bot
             { "老版炉", new() { "139528984" } },
             { "毬", new() { "139528984" } },
             { "岁", new() { "139528984" } },
-            { "史尔特尔", new() { "45587035" } },
-            { "伊蕾娜", new() { "45587035" } },
-            { "天宫心", new() { "45587035" } },
+            { "史尔特尔", new() { "139528984" } },
+            { "伊蕾娜", new() { "139528984" } },
+            { "天宫心", new() { "139528984" } },
         };
 
         private static readonly Dictionary<string, string> characterLore = new()
