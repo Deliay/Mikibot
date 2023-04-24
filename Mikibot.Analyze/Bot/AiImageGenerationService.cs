@@ -184,7 +184,7 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, [(white background:1.5)::5], hexagon, mid shot, full body, <lora:gachaSplashLORA_gachaSplash31:1>, ",
             } },
             { "骑空", new() {
-                "<lora:miki-v2+v3:-w->, <lora:granblueFantasyStyle_ver10:0.85>, full body, ",
+                "<lora:miki-v2+v3:-w->, <lora:granblueFantasyStyle_ver10:0.85>, ",
             } },
             { "臭脚", new()
             {
