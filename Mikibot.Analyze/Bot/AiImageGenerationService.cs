@@ -96,6 +96,7 @@ namespace Mikibot.Analyze.Bot
             { "日常", 0.6 },
             { "浴衣", 0.6 },
             { "臭脚", 0.6 },
+            { "睡衣", 0.6 },
             { "抱枕", 0.6 },
             { "油画", 0.3 },
             { "天使", 0.6 },
@@ -622,7 +623,7 @@ namespace Mikibot.Analyze.Bot
             { "jk", demon}, { "萝莉", demon}, { "Q版", demon}, { "衬衫", demon}, { "白裙", demon}, { "泳装", demon},
             { "ol", demon}, { "lo", demon}, { "女仆", demon}, { "旗袍", demon}, { "水墨", demon}, { "机甲", demon},
             { "立绘", demon}, { "电锯", demon}, { "日常", demon}, { "浴衣", demon}, { "臭脚", demon}, { "抱枕", demon}, { "油画", demon},
-            { "骑空", demon }
+            { "骑空", demon }, { "睡衣", demon}
         };
 
         private static readonly Dictionary<string, Dictionary<string, string>> characterSuffix = new()
