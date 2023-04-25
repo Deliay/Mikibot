@@ -194,14 +194,14 @@ namespace Mikibot.Analyze.Bot
             } },
             { "睡衣", new()
             {
-                "<lora:miki-v2+v3:-w->, indoors, slippers, white legwear, white thighhighs, (full body), ",
-                "<lora:miki-v2+v3:-w->, indoors, slippers, black legwear, black thighhighs, (full body), ",
-                "<lora:miki-v2+v3:-w->, indoors, slippers, thighhighs, (full body), ",
-                "<lora:miki-v2+v3:-w->, indoors, slippers, pantyhose, (full body), ",
-                "<lora:miki-v2+v3:-w->, yawning, indoors, slippers, white legwear, white thighhighs, (full body), ",
-                "<lora:miki-v2+v3:-w->, yawning, indoors, slippers, black legwear, black thighhighs, (full body), ",
-                "<lora:miki-v2+v3:-w->, yawning, indoors, slippers, thighhighs, (full body), ",
-                "<lora:miki-v2+v3:-w->, yawning, indoors, slippers, pantyhose, (full body), ",
+                "<lora:miki-v2+v3:-w->, sleepwear, indoors, slippers, white legwear, white thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, sleepwear, indoors, slippers, black legwear, black thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, sleepwear, indoors, slippers, thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, sleepwear, indoors, slippers, pantyhose, (full body), ",
+                "<lora:miki-v2+v3:-w->, sleepwear, yawning, indoors, slippers, white legwear, white thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, sleepwear, yawning, indoors, slippers, black legwear, black thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, sleepwear, yawning, indoors, slippers, thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, sleepwear, yawning, indoors, slippers, pantyhose, (full body), ",
             } },
             { "日常", new() {
                 "<lora:miki-v2+v3:-w->, ",
@@ -313,7 +313,6 @@ namespace Mikibot.Analyze.Bot
             {
                 "oversized clothes, ",
                 "oversized shirt, ",
-                "sleepwear, ",
             } },
         };
 
