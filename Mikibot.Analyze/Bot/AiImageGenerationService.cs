@@ -194,14 +194,10 @@ namespace Mikibot.Analyze.Bot
             } },
             { "睡衣", new()
             {
-                "<lora:miki-v2+v3:-w->, sleepwear, indoors, slippers, white legwear, white thighhighs, (full body), ",
-                "<lora:miki-v2+v3:-w->, sleepwear, indoors, slippers, black legwear, black thighhighs, (full body), ",
-                "<lora:miki-v2+v3:-w->, sleepwear, indoors, slippers, thighhighs, (full body), ",
-                "<lora:miki-v2+v3:-w->, sleepwear, indoors, slippers, pantyhose, (full body), ",
-                "<lora:miki-v2+v3:-w->, sleepwear, yawning, indoors, slippers, white legwear, white thighhighs, (full body), ",
-                "<lora:miki-v2+v3:-w->, sleepwear, yawning, indoors, slippers, black legwear, black thighhighs, (full body), ",
-                "<lora:miki-v2+v3:-w->, sleepwear, yawning, indoors, slippers, thighhighs, (full body), ",
-                "<lora:miki-v2+v3:-w->, sleepwear, yawning, indoors, slippers, pantyhose, (full body), ",
+                "<lora:miki-v2+v3:-w->, sleepwear, indoors, slippers, (full body), ",
+                "<lora:miki-v2+v3:-w->, sleepwear, yawning, indoors, slippers, (full body), ",
+                "<lora:miki-v2+v3:-w->, sleepwear, indoors, (full body), ",
+                "<lora:miki-v2+v3:-w->, sleepwear, yawning, indoors, (full body), ",
             } },
             { "日常", new() {
                 "<lora:miki-v2+v3:-w->, ",
@@ -245,6 +241,11 @@ namespace Mikibot.Analyze.Bot
                 "pantylines",  "alternate legwear",  "seamed legwear",  "ribbed legwear",  "fur-trimmed legwear",  "strappy heels",  
                 "ankle socks",  "see-through legwear",  "fine fabric emphasis",  "legwear garter",  "stiletto heels",  "back-seamed legwear",  
                 "boots removed",  "two-tone legwear",  "bow legwear",  "leg cutout",
+            } },
+            { "睡衣", new(){
+                "legwear", "thighhighs", "pantyhose", "pantyhose",
+                "black legwear", "white legwear",
+                "white thighhighs", "black thighhighs",
             } },
         };
 
