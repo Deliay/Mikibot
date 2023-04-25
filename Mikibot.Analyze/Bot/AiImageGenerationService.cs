@@ -190,8 +190,17 @@ namespace Mikibot.Analyze.Bot
             {
                 "<lora:miki-v2+v3:-w->, sneakers, black legwear, black thighhighs, (full body), ",
                 "<lora:miki-v2+v3:-w->, sneakers, white legwear, white thighhighs, (full body), ",
-                "<lora:miki-v2+v3:-w->, slippers, white legwear, white thighhighs, (full body), ",
-                "<lora:miki-v2+v3:-w->, slippers, black legwear, black thighhighs, (full body), ",
+            } },
+            { "睡衣", new()
+            {
+                "<lora:miki-v2+v3:-w->, indoors, slippers, white legwear, white thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, indoors, slippers, black legwear, black thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, indoors, slippers, thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, indoors, slippers, pantyhose, (full body), ",
+                "<lora:miki-v2+v3:-w->, yawning, indoors, slippers, white legwear, white thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, yawning, indoors, slippers, black legwear, black thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, yawning, indoors, slippers, thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, yawning, indoors, slippers, pantyhose, (full body), ",
             } },
             { "日常", new() {
                 "<lora:miki-v2+v3:-w->, ",
@@ -241,7 +250,6 @@ namespace Mikibot.Analyze.Bot
         private static readonly Dictionary<string, List<string>> mainClothes = new()
         {
             { "骑空", new() {
-                "",
                 "",
                 "",
                 "maid, maid headdress, maid apron, ",
@@ -299,6 +307,12 @@ namespace Mikibot.Analyze.Bot
                 "full body, sportswear, sports bra, short pants, on stomach",
                 "shirt, short pants",
                 "full body, shirt, short pants, on stomach",
+            } },
+            { "睡衣", new()
+            {
+                "oversized clothes, ",
+                "oversized shirt, ",
+                "sleepwear, ",
             } },
         };
 
