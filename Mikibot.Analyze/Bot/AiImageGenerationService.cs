@@ -190,6 +190,8 @@ namespace Mikibot.Analyze.Bot
             {
                 "<lora:miki-v2+v3:-w->, sneakers, black legwear, black thighhighs, (full body), ",
                 "<lora:miki-v2+v3:-w->, sneakers, white legwear, white thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, slippers, white legwear, white thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, slippers, black legwear, black thighhighs, (full body), ",
             } },
             { "日常", new() {
                 "<lora:miki-v2+v3:-w->, ",
