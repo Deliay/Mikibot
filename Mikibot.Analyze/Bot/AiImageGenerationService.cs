@@ -159,7 +159,7 @@ namespace Mikibot.Analyze.Bot
             } },
             { "水墨", new() {
                 "<lora:miki-v2+v3:-w->, (ink painting), illustration, (Chinese ink painting)," +
-                "<lora:miki-v2+v3:-w->, (Ink dyeing), (watercolor), (Chinese Brush Painting), (Chinese style), ink background, petals, (soaked), (flowing)"
+                    "(Ink dyeing), (watercolor), (Chinese Brush Painting), (Chinese style), ink background, petals, (soaked), (flowing)"
             } },
             { "浴衣", new() {
                 "<lora:miki-v2+v3:-w->, japanese kimono, obi, ",
@@ -608,7 +608,7 @@ namespace Mikibot.Analyze.Bot
             { "悠", "(light blue eyes), black hair ribbon, silver hair, blue streaked hair, vr-yua, " },
             { "侑", "(white pink hair), (blue streaked hair), (cat ear headphone), <lora:Kiyuu_:0.15>, (small breast), " },
             { "老版侑", "(white pink hair), (blue streaked hair), (cat ear headphone), (small breast), " },
-            { "炉", "yellow eyes, pink hair, (short hair), (pink to blue gradient hair), (gradient hair), (small breast), white colored eyelashes, hat, " },
+            { "炉", "<lora:kaoru-1.0-v1-hd:0.2>, yellow eyes, pink hair, (short hair), (pink to blue gradient hair), (gradient hair), (small breast), white colored eyelashes, hat, " },
             { "老版炉", "yellow eyes, (pink to blue gradient hair), (gradient hair), (small breast),  white colored eyelashes, hat, " },
             { "毬", "red eyes, silver hair, red streaked hair, (square pupils), (small breast), " },
             { "岁", "red eyes, silver hair, red hair robbon, (small breast), " },
