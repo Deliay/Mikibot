@@ -312,8 +312,8 @@ namespace Mikibot.Analyze.Bot
             } },
             { "睡衣", new()
             {
-                "oversized clothes, ",
-                "oversized shirt, ",
+                "((pajamas)), oversized clothes, ",
+                "((pajamas)), oversized shirt, ",
             } },
         };
 
@@ -610,7 +610,7 @@ namespace Mikibot.Analyze.Bot
             { "老版侑", "(white pink hair), (blue streaked hair), (cat ear headphone), (small breast), " },
             { "炉", "<lora:kaoru-1.0-v1-hd:0.2>, yellow eyes, pink hair, (short hair), (pink to blue gradient hair), (gradient hair), (small breast), white colored eyelashes, hat, " },
             { "老版炉", "yellow eyes, (pink to blue gradient hair), (gradient hair), (small breast),  white colored eyelashes, hat, " },
-            { "毬", "red eyes, silver hair, red streaked hair, (square pupils), (small breast), " },
+            { "毬", "red eyes, silver hair, red streaked hair, (square pupils), (small breast), fang, " },
             { "岁", "red eyes, silver hair, red hair robbon, (small breast), " },
             { "恶魔弥", "yellow eyes, black hair, purple horns, purple streaked hair, small breast, purple hair ornament, " },
             { "史尔特尔", "red hair, long hair, (surtr \\(arknights\\)), purple eyes, " },
@@ -660,8 +660,8 @@ namespace Mikibot.Analyze.Bot
                     "garter straps, black footwear, demon tail, heart ear ornament, black shorts, bangs, "
                 },
             } },
-            { "毬", new(demonSuffix) {
-                { "原版", demon}, 
+            { "毬", new() {
+                { "原版", $"{demon}, highleg, leotard, twintails, pointy ears, square_pupils, necklace, breasts, bare_shoulders, wristband, toenail polish, nail polish, toenails, smile, standing, handcuffs, navel, sandals" }, 
             } },
         };
 
