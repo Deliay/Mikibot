@@ -130,9 +130,9 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, shirt, cardigan, ",
             } },
             { "白裙", new () {
-                "<lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, bag, ",
-                "<lora:miki-v2+v3:-w->, (white dress), skirt, off-shoulder dress, bare shoulders, ",
-                "<lora:miki-v2+v3:-w->, (white dress), strap slip, off-shoulder dress, bare shoulders, ",
+                "<lora:miki-v2+v3:-w->, (white dress), white skirt, white off-shoulder dress, bare shoulders, bag, ",
+                "<lora:miki-v2+v3:-w->, (white dress), white skirt, white off-shoulder dress, bare shoulders, ",
+                "<lora:miki-v2+v3:-w->, (white dress), white strap slip, white off-shoulder dress, bare shoulders, ",
             } },
             { "泳装", new () {
                 "<lora:miki-v2+v3:-w->, school swimsuit, ",

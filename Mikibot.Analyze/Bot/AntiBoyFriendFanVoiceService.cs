@@ -89,7 +89,7 @@ namespace Mikibot.Analyze.Bot
                         ":吃我,:发病,:晚安,:早安,:花呗,:飞扑,:女鬼,:星降,:漏了,:奶,:喜欢弥人,:大坏蛋,:亚撒西"),
                     }, new Regex(":help")),
                     QVoice.Of(new MessageBase[] {
-                        new PlainMessage("mxmk歌单：夏天的风、心墙、下雨天、求佛、メンヘラじゃないもん/地雷、十月表、陀螺人、勇者王（使用::歌名点歌，如果有/，可以用/后面的简写点歌）"),
+                        new PlainMessage("mxmk歌单：夏天的风、心墙、下雨天、求佛、メンヘラじゃないもん/地雷、十月表、陀螺人、勇者王、可愛くてごめん/这么可爱真是抱歉/可爱（使用::歌名点歌，如果有/，可以用/后面的简写点歌）"),
                     }, new Regex("::歌单")),
                     QVoice.Of(LoadVoice("mxmk_xtdf.amr"), new Regex("::夏天的风")),
                     QVoice.Of(LoadVoice("mxmk_xinqiang.amr"), new Regex("::心墙")),
@@ -99,6 +99,7 @@ namespace Mikibot.Analyze.Bot
                     QVoice.Of(LoadVoice("mxmk_songs_shi_yue_biao.amr"), new Regex("::十月表")),
                     QVoice.Of(LoadVoice("mxmk_songs_tuoluo_ren_huanxiang.amr"), new Regex("::陀螺人")),
                     QVoice.Of(LoadVoice("mxmk_songs_yong_zhe_wang.amr"), new Regex("::勇者王")),
+                    QVoice.Of(LoadVoice("mxmk-songs-kawaikute.amr"), new Regex("::可爱|::这么可爱真是抱歉|::可愛くてごめん")),
                 };
             } catch (Exception e)
             {
