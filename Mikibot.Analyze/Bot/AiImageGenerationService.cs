@@ -587,7 +587,7 @@ namespace Mikibot.Analyze.Bot
             { "老版侑", "Kiyuu_" },
             { "炉", "kaoru-1.0-v1-hd" },
             { "老版炉", "kaoru-1.0-v5" },
-            { "毬", "akumaria-2.0+3.0-hd-v1" },
+            { "毬", "akumaria-2.0+3.0-hd-v3" },
             { "岁", "suiVirtuareal_suiVr" },
             { "史尔特尔", "ArknightsSurtr_20" },
             { "伊蕾娜", "majoNoTabitabiElaina_v30" },
