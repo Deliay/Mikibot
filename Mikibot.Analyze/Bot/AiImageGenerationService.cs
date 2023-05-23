@@ -102,6 +102,7 @@ namespace Mikibot.Analyze.Bot
             { "天使", 0.6 },
             { "猫娘", 0.6 },
             { "骑空", 0.6 },
+            { "护士", 0.6 },
         };
 
         private static readonly HashSet<string> disableExtraStyle = new() { "抱枕" };
@@ -203,6 +204,11 @@ namespace Mikibot.Analyze.Bot
             } },
             { "日常", new() {
                 "<lora:miki-v2+v3:-w->, ",
+            } },
+            { "护士", new() {
+                "<lora:miki-v2+v3:-w->, (full body), outdoors, nurse, nurse cap, ",
+                "<lora:miki-v2+v3:-w->, (full body), indoors, nurse, nurse cap, ",
+                "<lora:miki-v2+v3:-w->, (full body), indoors, hospital bed, nurse, nurse cap, ",
             } },
             { "抱枕", new() {
                 "<lora:miki-v2+v3:-w->, dakimakura, (lie on the bed), (white bed sheet background)",
@@ -623,7 +629,7 @@ namespace Mikibot.Analyze.Bot
         private static readonly string demon = "demon girl, demon tail, demon wings, demon horns, ";
         private static readonly Dictionary<string, string> demonSuffix = new() {
             { "jk", demon}, { "萝莉", demon}, { "Q版", demon}, { "衬衫", demon}, { "白裙", demon}, { "泳装", demon},
-            { "ol", demon}, { "lo", demon}, { "女仆", demon}, { "旗袍", demon}, { "水墨", demon}, { "机甲", demon},
+            { "ol", demon}, { "lo", demon}, { "女仆", demon}, { "旗袍", demon}, { "水墨", demon}, { "机甲", demon}, { "护士", demon },
             { "立绘", demon}, { "电锯", demon}, { "日常", demon}, { "浴衣", demon}, { "臭脚", demon}, { "抱枕", demon}, { "油画", demon},
             { "骑空", demon }, { "睡衣", demon}
         };
