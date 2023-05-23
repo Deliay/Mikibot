@@ -198,6 +198,8 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, sleepwear, yawning, indoors, slippers, (full body), ",
                 "<lora:miki-v2+v3:-w->, sleepwear, indoors, (full body), ",
                 "<lora:miki-v2+v3:-w->, sleepwear, yawning, indoors, (full body), ",
+                "<lora:miki-v2+v3:-w->, sleepwear, hospital, (full body), ",
+                "<lora:miki-v2+v3:-w->, sleepwear, yawning, hospital, (full body), ",
             } },
             { "日常", new() {
                 "<lora:miki-v2+v3:-w->, ",
