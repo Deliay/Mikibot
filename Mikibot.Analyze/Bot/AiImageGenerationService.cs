@@ -243,9 +243,9 @@ namespace Mikibot.Analyze.Bot
                 "boots removed",  "two-tone legwear",  "bow legwear",  "leg cutout",
             } },
             { "睡衣", new(){
-                "legwear", "thighhighs", "pantyhose", "pantyhose",
+                "legwear", //"thighhighs", "pantyhose", "pantyhose",
                 "black legwear", "white legwear",
-                "white thighhighs", "black thighhighs",
+                //"white thighhighs", "black thighhighs",
             } },
         };
 
