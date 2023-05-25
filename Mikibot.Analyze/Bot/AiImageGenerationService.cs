@@ -111,10 +111,10 @@ namespace Mikibot.Analyze.Bot
         private static readonly Dictionary<string, List<string>> promptMap = new()
         {
             { "jk", new () {
-                "plant, <lora:miki-v2+v3:-w->, jk, school uniform, ",
-                "jk, plant, <lora:miki-v2+v3:-w->, jk, school uniform, ",
-                "jk, <lora:miki-v2+v3:-w->, school uniform, ",
-                "<lora:miki-v2+v3:-w->, jk, school uniform, ",
+                "plant, <lora:miki-v2+v3:-w->, jk, (school uniform), ",
+                "jk, plant, <lora:miki-v2+v3:-w->, jk, (school uniform,) ",
+                "jk, <lora:miki-v2+v3:-w->, (school uniform), ",
+                "<lora:miki-v2+v3:-w->, jk, (school uniform), ",
             } },
             { "萝莉", new () {
                 "plant, (loli), <lora:miki-v2+v3:-w->, js, loli, ",
@@ -127,8 +127,8 @@ namespace Mikibot.Analyze.Bot
                 "(loli), <lora:miki-v2+v3:-w->, js, (chibi), loli, ",
             } },
             { "衬衫", new () {
-                "<lora:miki-v2+v3:-w->, shirt, ",
-                "<lora:miki-v2+v3:-w->, shirt, cardigan, ",
+                "<lora:miki-v2+v3:-w->, (shirt), ",
+                "<lora:miki-v2+v3:-w->, (shirt), cardigan, ",
             } },
             { "白裙", new () {
                 "<lora:miki-v2+v3:-w->, (white dress), white skirt, white off-shoulder dress, bare shoulders, bag, ",
@@ -152,7 +152,7 @@ namespace Mikibot.Analyze.Bot
                 "(loli), <lora:miki-v2+v3:-w->, (gothic lolita, lolita fashion), mesugaki, loli, ",
             } },
             { "女仆", new() {
-                "<lora:miki-v2+v3:-w->, maid, maid headdress, maid apron, ",
+                "<lora:miki-v2+v3:-w->, (maid), (maid headdress), (maid apron), ",
             } },
             { "旗袍", new() {
                 "<lora:miki-v2+v3:-w->, ",
@@ -163,10 +163,10 @@ namespace Mikibot.Analyze.Bot
                     "(Ink dyeing), (watercolor), (Chinese Brush Painting), (Chinese style), ink background, petals, (soaked), (flowing)"
             } },
             { "浴衣", new() {
-                "<lora:miki-v2+v3:-w->, japanese kimono, obi, ",
-                "<lora:miki-v2+v3:-w->, japanese kimono, ",
-                "<lora:miki-v2+v3:-w->, japanese yukata, obi, ",
-                "<lora:miki-v2+v3:-w->, japanese yukata, ",
+                "<lora:miki-v2+v3:-w->, (japanese kimono), obi, ",
+                "<lora:miki-v2+v3:-w->, (japanese kimono), ",
+                "<lora:miki-v2+v3:-w->, (japanese yukata), obi, ",
+                "<lora:miki-v2+v3:-w->, (japanese yukata), ",
             } },
             { "机甲", new() {
                 "<lora:miki-v2+v3:-w->, kabuto, holding tantou, (machine:1.2),false limb, prosthetic weapon, ",
@@ -190,13 +190,13 @@ namespace Mikibot.Analyze.Bot
             } },
             { "臭脚", new()
             {
-                "<lora:miki-v2+v3:-w->, sneakers, black legwear, black thighhighs, (full body), ",
-                "<lora:miki-v2+v3:-w->, sneakers, white legwear, white thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, (sneakers), (black legwear), (black thighhighs), (full body), ",
+                "<lora:miki-v2+v3:-w->, (sneakers), (white legwear), (white thighhighs), (full body), ",
             } },
             { "睡衣", new()
             {
-                "<lora:miki-v2+v3:-w->, sleepwear, indoors, slippers, (full body), ",
-                "<lora:miki-v2+v3:-w->, sleepwear, yawning, indoors, slippers, (full body), ",
+                "<lora:miki-v2+v3:-w->, sleepwear, indoors, (full body), ",
+                "<lora:miki-v2+v3:-w->, sleepwear, yawning, indoors, (full body), ",
                 "<lora:miki-v2+v3:-w->, sleepwear, indoors, (full body), ",
                 "<lora:miki-v2+v3:-w->, sleepwear, yawning, indoors, (full body), ",
                 "<lora:miki-v2+v3:-w->, sleepwear, hospital, (full body), ",
@@ -206,9 +206,9 @@ namespace Mikibot.Analyze.Bot
                 "<lora:miki-v2+v3:-w->, ",
             } },
             { "护士", new() {
-                "<lora:miki-v2+v3:-w->, (full body), outdoors, nurse, nurse cap, ",
-                "<lora:miki-v2+v3:-w->, (full body), indoors, nurse, nurse cap, ",
-                "<lora:miki-v2+v3:-w->, (full body), indoors, hospital bed, nurse, nurse cap, ",
+                "<lora:miki-v2+v3:-w->, (full body), outdoors, (nurse), (nurse cap), ",
+                "<lora:miki-v2+v3:-w->, (full body), indoors, (nurse), (nurse cap), ",
+                "<lora:miki-v2+v3:-w->, (full body), indoors, hospital bed, (nurse), (nurse cap), ",
             } },
             { "抱枕", new() {
                 "<lora:miki-v2+v3:-w->, dakimakura, (lie on the bed), (white bed sheet background)",
@@ -222,8 +222,10 @@ namespace Mikibot.Analyze.Bot
                 "(illustration), ((impasto)), ((oil painting)), (classicism), <lora:miki-v2+v3:-w->, (portrait), rembrandt lighting, brown background, detailed face, picture frame, "
             } },
             { "猫娘", new() {
-                "<lora:miki-v2+v3:-w->, (cat ears), (cat tail), cat girl, white legwear, white thighhighs, (full body), ",
-                "<lora:miki-v2+v3:-w->, (cat ears), (cat tail), cat girl, black legwear, black thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, (cat ears), (cat tail), (cat girl), white legwear, white thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, (cat ears), (cat tail), (cat girl), black legwear, black thighhighs, (full body), ",
+                "<lora:miki-v2+v3:-w->, (cat ears), (cat tail), (cat girl), (full body), ",
+                "<lora:miki-v2+v3:-w->, (cat ears), (cat tail), (cat girl), (full body), ",
             } },
             { "天使", new() {
                 "<lora:miki-v2+v3:-w->, (angel), (angel wings), ",
@@ -270,7 +272,7 @@ namespace Mikibot.Analyze.Bot
                 "(white dress), skirt, off-shoulder dress, bare shoulders, bag, ",
             } },
             { "ol", new(){
-                "office uniform", "police uniform", "military uniform", "business suit", "dress shirt", "shirt",
+                "(office uniform)", "(police uniform)", "(military uniform)", "(business suit)", "(dress shirt)", "(shirt)",
             } },
             { "旗袍", new() {
                 "(red china dress)", "(white china dress)", "(blue china dress)", "(cyan china dress)",
