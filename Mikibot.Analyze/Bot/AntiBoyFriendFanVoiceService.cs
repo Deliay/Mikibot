@@ -82,6 +82,7 @@ namespace Mikibot.Analyze.Bot
                     QVoice.Of(LoadVoice("mxmk_love_mi_ren.amr"), new Regex(":喜欢弥人")),
                     QVoice.Of(LoadVoice("mxmk_mi_ren_baka.amr"), new Regex(":大坏蛋")),
                     QVoice.Of(LoadVoice("mxmk_mi_ren_yasaxi.amr"), new Regex(":亚撒西")),
+                    QVoice.Of(LoadVoice("mxmk_mua.amr"), new Regex(":mua", RegexOptions.IgnoreCase)),
                     QVoice.Of(new MessageBase[] {
                         new PlainMessage("弥BOT按钮" +
                         ":女朋友|:女友,:河豚,:岁,:恶,:色,:伤心,:笨蛋,:男同,:阉割|:性转," +
