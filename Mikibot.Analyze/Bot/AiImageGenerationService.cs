@@ -910,6 +910,18 @@ namespace Mikibot.Analyze.Bot
             "凶", "凶", 
             "大凶"
         };
+
+        private static readonly Dictionary<string, string> appendEmojiPrompt = new()
+        {
+            { "大吉", "(🥰),(😀)" },
+            { "吉", "(😆),(😄)" },
+            { "中吉", "(😊),(😋)" },
+            { "小吉", "(🙂),(🤔)" },
+            { "末吉", "(😑),(😶)" },
+            { "凶", "(😵),(😩),(😔),(😕)" },
+            { "大凶", "(😭),(😫),(😰),(😱),(😨)" },
+        };
+
         private static string StringDayOfWeek(DayOfWeek dow)
         {
             return dow switch
@@ -924,7 +936,7 @@ namespace Mikibot.Analyze.Bot
                 _ => "?",
             };
         }
-        private async ValueTask SendLuckyImage(Mirai.Net.Data.Shared.Group group, string name, string uid, string prompt, string weather, Ret body, CancellationToken token)
+        private async ValueTask SendLuckyImage(Mirai.Net.Data.Shared.Group group, string name, string uid, string prompt, string weather, string lucky, Ret body, CancellationToken token)
         {
             var info = JsonSerializer.Deserialize<Info>(body.info);
             logger.LogInformation("生成成功，种子:{}", info.seed);
@@ -933,7 +945,7 @@ namespace Mikibot.Analyze.Bot
                 var imageBase64 = body.images[0];
                 var today = DateTime.Now;
                 var todayStr = $"{today.Year}年{today.Month}月{today.Day}日 {StringDayOfWeek(today.DayOfWeek)}";
-                AiImageColorAdjustUtility.TryAppendLucky(prompt, todayStr, RandomOf(Lucky), name, weather, imageBase64, out var adjustedImage);
+                AiImageColorAdjustUtility.TryAppendLucky(prompt, todayStr, lucky, name, weather, imageBase64, out var adjustedImage);
                 List<MessageBase> messages = new()
                 {
                     new AtMessage() { Target = uid },
@@ -1117,6 +1129,9 @@ namespace Mikibot.Analyze.Bot
                                 });
                                 var (prompt, extra, cfg_scale, steps, width, height) = GetPrompt(category, luckyCharacter, 2);
                                 logger.LogInformation("prompt: {}", prompt);
+                                var lucky = RandomOf(Lucky);
+                                var extraPrompt = appendEmojiPrompt[lucky];
+                                prompt = $"{prompt},{extraPrompt}";
                                 var imgTask = Request(prompt, cfg_scale, steps, width, height, token);
                                 var locStr = plain.Text[(plain.Text.IndexOf('+') + 1)..];
                                 var weatherTask = plain.Text.Contains('+') switch
@@ -1134,7 +1149,7 @@ namespace Mikibot.Analyze.Bot
                                     _ => $"",
                                 };
                                 var body = await imgTask;
-                                await SendLuckyImage(group, msg.Sender.Name, msg.Sender.Id, prompt, weatherStr, body, token);
+                                await SendLuckyImage(group, msg.Sender.Name, msg.Sender.Id, prompt, weatherStr, lucky, body, token);
 
                                 dict.Add(msg.Sender.Id, DateTime.Now);
                                 logger.LogInformation("dict size = {}", dict.Count);
