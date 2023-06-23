@@ -20,7 +20,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand
         [JsonConverter(typeof(UnixSecondOffsetConverter))]
         public DateTimeOffset SentAt { get; set; }
         [JsonPropertyName("uid")]
-        public int SenderUid { get; set; }
+        public long SenderUid { get; set; }
         [JsonPropertyName("uname")]
         public string SenderName { get; set; }
     }

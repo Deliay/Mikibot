@@ -17,7 +17,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand
         [JsonPropertyName("gift_name")]
         public string GiftName { get; set; }
         [JsonPropertyName("uid")]
-        public int SenderUid { get; set; }
+        public long SenderUid { get; set; }
         [JsonPropertyName("uname")]
         public string SenderName { get; set; }
         [JsonPropertyName("combo_total_coin")]

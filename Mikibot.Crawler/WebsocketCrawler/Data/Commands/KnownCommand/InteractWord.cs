@@ -12,7 +12,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand
         [JsonPropertyName("uname")]
         public string UserName { get; set; }
         [JsonPropertyName("uid")]
-        public int UserId { get; set; }
+        public long UserId { get; set; }
         [JsonPropertyName("timestamp")]
         [JsonConverter(typeof(UnixSecondOffsetConverter))]
         public DateTimeOffset InteractAt { get; set; }

@@ -18,10 +18,10 @@ namespace Mikibot.Crawler.Http.Bilibili.Model
             public int Level { get; set; }
         }
         [JsonPropertyName("uid")]
-        public int Uid { get; set; }
+        public long Uid { get; set; }
 
         [JsonPropertyName("ruid")]
-        public int RoomUid { get; set; }
+        public long RoomUid { get; set; }
 
         [JsonPropertyName("username")]
         public string UserName { get; set; }

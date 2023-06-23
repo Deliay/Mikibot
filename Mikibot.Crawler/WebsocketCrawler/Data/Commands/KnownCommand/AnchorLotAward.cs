@@ -35,7 +35,7 @@ public struct AnchorLotAward
     public struct AwardUser
     {
         [JsonPropertyName("uid")]
-        public int UserId { get; set; }
+        public long UserId { get; set; }
 
         [JsonPropertyName("uname")]
         public string UserName { get; set; }

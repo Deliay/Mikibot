@@ -20,7 +20,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand
         [JsonPropertyName("medal_info")]
         public SuperChatMedalInfo MedalInfo { get; set; }
         [JsonPropertyName("uid")]
-        public int UserId { get; set; }
+        public long UserId { get; set; }
 
     }
 }

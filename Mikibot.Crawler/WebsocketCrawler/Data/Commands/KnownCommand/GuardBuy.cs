@@ -9,7 +9,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand
 {
     public struct GuardBuy
     {
-        public int Uid { get; set; }
+        public long Uid { get; set; }
         [JsonPropertyName("username")]
         public string UserName { get; set; }
         [JsonPropertyName("guard_level")]

@@ -62,13 +62,13 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
             }
 
             reader.Read(); var msg = reader.GetString();
-            var userId = 0;
+            var userId = 0l;
             var userName = string.Empty;
             while (reader.Read())
             {
                 if (reader.TokenType == JsonTokenType.StartArray)
                 {
-                    reader.Read(); userId = reader.GetInt32();
+                    reader.Read(); userId = reader.GetInt64();
                     reader.Read(); userName = reader.GetString();
                 }
 
@@ -77,7 +77,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
             }
             var fansTag = string.Empty;
             var fansLevel = 0;
-            var fansUserId = 0;
+            var fansUserId = 0l;
             var fansUserName = string.Empty;
             while (reader.Read())
             {
@@ -95,7 +95,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
                                 case 0: fansLevel = reader.GetInt32(); break;
                                 case 1: fansTag = reader.GetString(); break;
                                 case 2: fansUserName = reader.GetString(); break;
-                                case 12: fansUserId = reader.GetInt32(); break;
+                                case 12: fansUserId = reader.GetInt64(); break;
                                 default:
                                     break;
                             }
@@ -107,6 +107,11 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
                     break;
             }
 
+            while (reader.Read())
+            {
+                if (reader.TokenType == JsonTokenType.EndArray)
+                    break;
+            }
             while (reader.Read())
             {
                 if (reader.TokenType == JsonTokenType.EndArray)

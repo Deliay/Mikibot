@@ -97,5 +97,9 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
         COMMON_NOTICE_DANMAKU,
         PK_BATTLE_PRE_NEW,
         HOT_RANK_SETTLEMENT_V2,
+        LIKE_INFO_V3_UPDATE,
+        LIKE_INFO_V3_CLICK,
+        LIKE_V3_UPDATE,
+        POPULAR_RANK_CHANGED,
     }
 }

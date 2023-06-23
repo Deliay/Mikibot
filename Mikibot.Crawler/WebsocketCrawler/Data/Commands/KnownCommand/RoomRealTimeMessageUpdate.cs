@@ -10,7 +10,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand
     public struct RoomRealTimeMessageUpdate
     {
         [JsonPropertyName("roomid")]
-        public int RoomId { get; set; }
+        public long RoomId { get; set; }
         [JsonPropertyName("fans")]
         public int Fans { get; set; }
         [JsonPropertyName("fans_club")]

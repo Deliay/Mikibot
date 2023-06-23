@@ -10,7 +10,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand
     public struct SuperChatMedalInfo
     {
         [JsonPropertyName("target_id")]
-        public int MedalUserId { get; set; }
+        public long MedalUserId { get; set; }
         [JsonPropertyName("medal_name")]
         public string Name { get; set; }
         [JsonPropertyName("medal_level")]

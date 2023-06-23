@@ -44,7 +44,7 @@ public struct AnchorLotStart
     public int GoodsId { get; set; }
 
     [JsonPropertyName("id")]
-    public int Id { get; set; }
+    public long Id { get; set; }
 
     [JsonPropertyName("is_broadcast")]
     public int IsBroadcast { get; set; }

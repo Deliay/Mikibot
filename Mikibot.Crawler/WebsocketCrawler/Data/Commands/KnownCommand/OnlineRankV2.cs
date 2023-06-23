@@ -14,7 +14,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand
             [JsonPropertyName("uname")]
             public string UserName { get; set; }
             [JsonPropertyName("uid")]
-            public int UserId { get; set; }
+            public long UserId { get; set; }
             public int Rank { get; set; }
             public string Score { get; set; }
             [JsonPropertyName("guard_level")]

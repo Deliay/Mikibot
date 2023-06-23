@@ -8,7 +8,7 @@ public struct PopularityRedPocketStart
     public int LotId { get; set; }
 
     [JsonPropertyName("sender_uid")]
-    public int SenderUserId { get; set; }
+    public long SenderUserId { get; set; }
 
     [JsonPropertyName("sender_name")]
     public string SenderName { get; set; }

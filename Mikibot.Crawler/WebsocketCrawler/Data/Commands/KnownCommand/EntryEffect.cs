@@ -10,7 +10,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand
     public struct EntryEffect
     {
         [JsonPropertyName("uid")]
-        public int UserId { get; set; }
+        public long UserId { get; set; }
         [JsonPropertyName("privilege_type")]
         public int GuardLevel { get; set; }
         [JsonPropertyName("copy_writing")]
