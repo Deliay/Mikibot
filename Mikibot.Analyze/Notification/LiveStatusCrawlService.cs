@@ -44,7 +44,7 @@ namespace Mikibot.Analyze.Notification
                 Cover = info.Background,
                 Notified = false,
                 Status = info.LiveStatus,
-                FollowerCount = await Crawler.GetFollowerCount(BiliLiveCrawler.mxmk, token),
+                FollowerCount = (int)await Crawler.GetFollowerCount(BiliLiveCrawler.mxmk, token),
                 StatusChangedAt = DateTimeOffset.Now,
                 UpdatedAt = DateTimeOffset.Now,
                 Title = info.Title,

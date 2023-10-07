@@ -43,7 +43,7 @@ namespace Mikibot.Analyze.Service
                 {
                     using var wsClient = new WebsocketClient();
 
-                    await wsClient.ConnectAsync(spectatorHost.Host, spectatorHost.WssPort, realRoomId, spectatorEndpoint.Token, "wss", cancellationToken: token);
+                    await wsClient.ConnectAsync(spectatorHost.Host, spectatorHost.WssPort, realRoomId, realRoomId, spectatorEndpoint.Token, "wss", cancellationToken: token);
                     Logger.LogInformation("弹幕连接到房间: wss://{}:{}....连接成功", spectatorHost.Host, spectatorHost.Port);
 
                     await foreach (var @event in wsClient.Events(token))

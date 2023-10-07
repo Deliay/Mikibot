@@ -35,8 +35,8 @@ namespace Mikibot.Analyze.Bot
         public AiVoiceGenerationService(IMiraiService miraiService, ILogger<AiVoiceGenerationService> logger)
         {
             this.miraiService = miraiService;
-            WebUiEndpoint = Environment.GetEnvironmentVariable("WEB_UI_ENDPOINT") ?? "http://127.0.0.1:7860/run/predict";
-            WebUiFileEndpoint = Environment.GetEnvironmentVariable("WEB_UI_ENDPOINT") ?? "http://127.0.0.1:7860/file=";
+            WebUiEndpoint = "http://127.0.0.1:7002/run/predict";
+            WebUiFileEndpoint = "http://127.0.0.1:7002/file=";
             this.logger = logger;
         }
 
@@ -76,8 +76,8 @@ namespace Mikibot.Analyze.Bot
         {
             return voice switch
             {
-                "akumaria" => (0.2f, 0.6f, 0.8f, 0.8f),
-                _ => (0.2f, 0.6f, 0.8f, 1f),
+                "akumaria" => (0.2f, 0.5f, 0.9f, 0.9f),
+                _ => (0.2f, 0.5f, 0.9f, 1f),
             };
         }
 
@@ -117,37 +117,49 @@ namespace Mikibot.Analyze.Bot
                         {
                             if (msg.Sender.Id == "644676751" || msg.Sender.Id == "1441685502")
                             {
+                                var payload = GetPredictPayload(GroupVoicerMapping[group.Id], plain.Text);
+                                var generateResponse = await httpClient.PostAsJsonAsync(WebUiEndpoint, payload, token);
+
+                                var str = await generateResponse.Content.ReadAsStringAsync(token);
+                                var wavTmp = $"{Path.GetTempFileName()}.wav";
+                                var amrTmp = $"{Path.GetTempFileName()}.amr";
                                 try
                                 {
-                                    var payload = GetPredictPayload(GroupVoicerMapping[group.Id], plain.Text);
-                                    var generateResponse = await httpClient.PostAsJsonAsync(WebUiEndpoint, payload, token);
-
-                                    using var stream = await generateResponse.Content.ReadAsStreamAsync(token);
-                                    var json = await JsonSerializer.DeserializeAsync<JsonDocument>(stream, cancellationToken: token);
+                                    var json = JsonSerializer.Deserialize<JsonDocument>(str);
 
                                     var data = json.RootElement.GetProperty("data");
                                     var result = data[1];
                                     var path = result.GetProperty("name");
 
-                                    using var aacStream = new MemoryStream();
-                                    var wavStream = await httpClient.GetStreamAsync($"{WebUiFileEndpoint}{path}", token);
+                                    var wavData = await httpClient.GetByteArrayAsync($"{WebUiFileEndpoint}{path}", token);
+                                    await File.WriteAllBytesAsync(wavTmp, wavData, token);
+                                    logger.LogInformation($"wave: {wavTmp}, amr: {amrTmp}");
                                     await FFMpegArguments
-                                        .FromPipeInput(new StreamPipeSource(wavStream), opt => opt.ForceFormat("wav"))
-                                        .OutputToPipe(new StreamPipeSink(aacStream), opt => opt.ForceFormat("aac"))
+                                        .FromFileInput(wavTmp)
+                                        .OutputToFile(amrTmp, true, opt => opt
+                                            .WithAudioSamplingRate(8000)
+                                            .ForceFormat("amr"))
                                         .CancellableThrough(token)
+                                        .WithLogLevel(FFMpegCore.Enums.FFMpegLogLevel.Verbose)
+                                        .NotifyOnOutput(Console.WriteLine)
                                         .ProcessAsynchronously(throwOnError: true);
-
                                     await group.SendGroupMessageAsync(new()
                                     {
                                         new VoiceMessage()
                                         {
-                                            Base64 = Convert.ToBase64String(aacStream.GetBuffer())
+                                            Path = amrTmp,
                                         }
                                     });
                                 }
                                 catch(Exception e)
                                 {
+                                    logger.LogInformation(str);
                                     logger.LogError(e, "报错力");
+                                }
+                                finally
+                                {
+                                    File.Delete(wavTmp);
+                                    File.Delete(amrTmp);
                                 }
                             }
                         }

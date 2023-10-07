@@ -99,7 +99,7 @@ namespace Mikibot.Analyze.Notification
             return memoryStream;
         }
 
-        private static readonly HashSet<int> allowList = new() { 477317922, 403496 };
+        private static readonly HashSet<long> allowList = new() { 477317922, 403496 };
         private static readonly string mxmke = "1154727918@qq.com";
 
 

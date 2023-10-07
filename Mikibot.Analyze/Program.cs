@@ -42,6 +42,7 @@ appBuilder.RegisterType<MikiLiveEventProxyService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<BiliBiliVideoLinkShareProxerService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<AntiBoyFriendFanVoiceService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<AiImageGenerationService>().AsSelf().SingleInstance();
+appBuilder.RegisterType<AiVoiceGenerationService>().AsSelf().SingleInstance();
 
 var appContainer = appBuilder.Build();
 
@@ -73,6 +74,7 @@ using (var app = appContainer.BeginLifetimeScope())
     var danmakuCrawler = app.Resolve<DanmakuCollectorService>();
     var danmakuExportGuard = app.Resolve<DanmakuExportGuardList>();
 
+    var aiVoice = app.Resolve<AiVoiceGenerationService>();
     var aiImage = app.Resolve<AiImageGenerationService>();
     var bffAnti = app.Resolve<AntiBoyFriendFanVoiceService>();
     var mxmkDanmakuProxy = app.Resolve<MikiDanmakuProxyService>();
@@ -92,5 +94,6 @@ using (var app = appContainer.BeginLifetimeScope())
         followerStat.Run(token),
         eventService.Run(token),
         bffAnti.Run(token),
-        aiImage.Run(token));
+        aiImage.Run(token),
+        aiVoice.Run(token));
 }

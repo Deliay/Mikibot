@@ -124,7 +124,7 @@ namespace Mikibot.Analyze.Notification
             }
         }
 
-        private readonly HashSet<int> AllowList = new()
+        private readonly HashSet<long> AllowList = new()
         {
             403496,
             1829374,

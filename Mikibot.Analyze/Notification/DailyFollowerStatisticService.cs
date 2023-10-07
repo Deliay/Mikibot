@@ -47,7 +47,7 @@ namespace Mikibot.Analyze.Notification
                     {
                         Bid = BiliLiveCrawler.mxmks,
                         CreatedAt = DateTimeOffset.Now,
-                        FollowerCount = count,
+                        FollowerCount = (int)count,
                     }, token);
                     await db.SaveChangesAsync(token);
                     Logger.LogInformation("当前你弥粉丝数量 {}", count);

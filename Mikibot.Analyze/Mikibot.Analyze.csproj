@@ -24,12 +24,12 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
     <PackageReference Include="QWeatherAPI" Version="1.3.3" />
 	<PackageReference Include="FFMpegCore" Version="5.1.0" />
+	<PackageReference Include="Mikibot.Crawler" Version="1.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Mikibot.AutoClipper.Abstract\Mikibot.AutoClipper.Abstract.csproj" />
     <ProjectReference Include="..\Mikibot.BuildingBlocks\Mikibot.BuildingBlocks.csproj" />
-    <ProjectReference Include="..\Mikibot.Crawler\Mikibot.Crawler.csproj" />
     <ProjectReference Include="..\Mikibot.Database\Mikibot.Database.csproj" />
     <ProjectReference Include="..\Mikibot.StableDiffusion.WebUi.Api\Mikibot.StableDiffusion.WebUi.Api.csproj" />
   </ItemGroup>

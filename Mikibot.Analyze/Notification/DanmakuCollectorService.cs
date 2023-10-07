@@ -54,11 +54,11 @@ namespace Mikibot.Analyze.Notification
             await db.LiveDanmakus.AddAsync(new LiveDanmaku()
             {
                 Bid = LiveStreamEventService.mxmk,
-                UserId = msg.UserId,
+                UserId = (int)msg.UserId,
                 UserName = msg.UserName,
                 FansLevel = msg.FansLevel,
                 FansTag = msg.FansTag,
-                FansTagUserId = msg.FansTagUserId,
+                FansTagUserId = (int)msg.FansTagUserId,
                 FansTagUserName = msg.FansTagUserName,
                 SentAt = msg.SentAt,
                 Msg = msg.Msg,
@@ -72,7 +72,7 @@ namespace Mikibot.Analyze.Notification
             await db.LiveBuyGuardLogs.AddAsync(new LiveBuyGuardLog()
             {
                 Bid = LiveStreamEventService.mxmk,
-                Uid = msg.Uid,
+                Uid = (int)msg.Uid,
                 UserName = msg.UserName,
                 BoughtAt = msg.StartedAt,
                 GiftName = msg.GiftName,
@@ -87,7 +87,7 @@ namespace Mikibot.Analyze.Notification
             Logger.LogInformation("[礼物] ({}){}: ({})￥{}, 付费:{}", msg.SenderUid, msg.SenderName, msg.GiftName, msg.DiscountPrice, msg.CoinType);
             await db.AddAsync(new LiveGift()
             {
-                Uid = msg.SenderUid,
+                Uid = (int)msg.SenderUid,
                 Action = msg.Action,
                 Bid = LiveStreamEventService.mxmk,
                 CoinType = msg.CoinType,
@@ -111,7 +111,7 @@ namespace Mikibot.Analyze.Notification
                 ComboNum = msg.ComboNum,
                 GiftName = msg.GiftName,
                 TotalCoin = msg.TotalCoin,
-                Uid = msg.SenderUid,
+                Uid = (int)msg.SenderUid,
                 UserName = msg.SenderName,
             });
             await db.SaveChangesAsync();
@@ -126,7 +126,7 @@ namespace Mikibot.Analyze.Notification
                 CopyWriting = msg.CopyWriting,
                 EnteredAt = msg.EnteredAt,
                 GuardLevel = msg.GuardLevel,
-                UserId = msg.UserId,
+                UserId = (int)msg.UserId,
             });
             await db.SaveChangesAsync();
         }
@@ -137,8 +137,8 @@ namespace Mikibot.Analyze.Notification
             await db.AddAsync(new LiveUserInteractiveLog()
             {
                 Bid = LiveStreamEventService.mxmk,
-                UserId = msg.UserId,
-                FansTagUserId = msg.FansMedal.FansTagUserId,
+                UserId = (int)msg.UserId,
+                FansTagUserId = (int)msg.FansMedal.FansTagUserId,
                 GuardLevel = msg.FansMedal.GuardLevel,
                 InteractedAt = msg.InteractAt,
                 MedalLevel = msg.FansMedal.MedalLevel,
@@ -159,10 +159,10 @@ namespace Mikibot.Analyze.Notification
                 MedalGuardLevel = msg.MedalInfo.GuardLevel,
                 MedalLevel = msg.MedalInfo.Level,
                 MedalName = msg.MedalInfo.Name,
-                MedalUserId = msg.MedalInfo.MedalUserId,
+                MedalUserId = (int)msg.MedalInfo.MedalUserId,
                 UserName = msg.User.UserName,
                 SentAt = msg.SendAt,
-                Uid = msg.UserId,
+                Uid = (int)msg.UserId,
             });
             await db.SaveChangesAsync();
         }
