@@ -178,8 +178,6 @@ namespace Mikibot.Analyze.Bot
                     .WithAudioSamplingRate(8000)
                     .ForceFormat("amr"))
                 .CancellableThrough(token)
-                .WithLogLevel(FFMpegCore.Enums.FFMpegLogLevel.Verbose)
-                .NotifyOnOutput(Console.WriteLine)
                 .ProcessAsynchronously(throwOnError: true);
         }
 
