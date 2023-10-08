@@ -97,6 +97,91 @@ namespace Mikibot.Analyze.Bot
             };
         }
 
+        private static readonly SemaphoreSlim _dailyRestrict = new(1);
+        private const string CONST_VoiceDailyFile = "voice_records.json";
+
+        private async ValueTask<Dictionary<string, Dictionary<string, int>>> Read(CancellationToken token)
+        {
+            if (!File.Exists(CONST_VoiceDailyFile))
+            {
+                await File.WriteAllTextAsync(CONST_VoiceDailyFile, "{}", token);
+            }
+            using var readStream = File.OpenRead(CONST_VoiceDailyFile);
+            return await JsonSerializer.DeserializeAsync<Dictionary<string, Dictionary<string, int>>>(readStream, cancellationToken: token) ?? new();
+        }
+
+        private async ValueTask Write(Dictionary<string, Dictionary<string, int>> records, CancellationToken token)
+        {
+            using var writeStream = File.OpenWrite(CONST_VoiceDailyFile);
+
+            await JsonSerializer.SerializeAsync(writeStream, records);
+        }
+
+        private async Task<bool> CanSendVoice(string senderId, CancellationToken token) {
+            await _dailyRestrict.WaitAsync(token);
+            try
+            {
+                var today = DateTime.Now.ToString("yyyy-MM-dd");
+                var records = await Read(token);
+                if (!records.ContainsKey(today))
+                {
+                    records.Add(today, new());
+                }
+                var todayRecords = records[today];
+                if (!todayRecords.ContainsKey(senderId))
+                {
+                    todayRecords.Add(senderId, 1);
+                }
+                
+                var result = (todayRecords[senderId] += 1) <= 3;
+
+                await Write(records, token);
+
+                return result;
+            }
+            finally
+            {
+                _dailyRestrict.Release();
+            }
+        }
+
+        private static readonly HashSet<string> voiceWhiteList = new()
+        {
+            "644676751",
+            "1441685502",
+        };
+
+        private async ValueTask GenerateVoiceToFile(string file, string voicer, string content, CancellationToken token)
+        {
+            var payload = GetPredictPayload(voicer, content);
+            var generateResponse = await httpClient.PostAsJsonAsync(WebUiEndpoint, payload, token);
+
+            var str = await generateResponse.Content.ReadAsStringAsync(token);
+
+            var json = JsonSerializer.Deserialize<JsonDocument>(str);
+
+            var data = json.RootElement.GetProperty("data");
+            var result = data[1];
+            var path = result.GetProperty("name");
+
+            var wavData = await httpClient.GetByteArrayAsync($"{WebUiFileEndpoint}{path}", token);
+            await File.WriteAllBytesAsync(file, wavData, token);
+        }
+
+        private async ValueTask FfmpegConvert(string wav, string amr, CancellationToken token)
+        {
+            await FFMpegArguments
+                .FromFileInput(wav)
+                .OutputToFile(amr, true, opt => opt
+                    .WithAudioSamplingRate(8000)
+                    .ForceFormat("amr"))
+                .CancellableThrough(token)
+                .WithLogLevel(FFMpegCore.Enums.FFMpegLogLevel.Verbose)
+                .NotifyOnOutput(Console.WriteLine)
+                .ProcessAsynchronously(throwOnError: true);
+        }
+
+
         private async ValueTask Dequeue(CancellationToken token)
         {
 
@@ -111,58 +196,55 @@ namespace Mikibot.Analyze.Bot
 
                 foreach (var rawMsg in msg.MessageChain)
                 {
-                    if (rawMsg is PlainMessage plain)
+                    // 只处理纯文本消息
+                    if (rawMsg is not PlainMessage plain)
                     {
-                        if (plain.Text.Trim().StartsWith("#"))
+                        continue;
+                    }
+                    // 超长不处理，消息必须以#开头
+                    if (plain.Text.Length > 500 || !plain.Text.Trim().StartsWith("#"))
+                    {
+                        continue;
+                    }
+                    var senderId = msg.Sender.Id;
+                    // 不在白名单，且每日超过3次，则不允许再发
+                    if (!voiceWhiteList.Contains(senderId) && !await CanSendVoice(senderId, token))
+                    {
+                        continue;
+                    }
+                    // 群没有指定语音角色
+                    if (!GroupVoicerMapping.ContainsKey(group.Id))
+                    {
+                        continue;
+                    }
+                    // 生成语音
+
+                    var wavTmp = $"{Path.GetTempFileName()}.wav";
+                    var amrTmp = $"{Path.GetTempFileName()}.amr";
+                    try
+                    {
+                        await GenerateVoiceToFile(wavTmp, GroupVoicerMapping[group.Id], plain.Text, token);
+
+                        await FfmpegConvert(wavTmp, amrTmp, token);
+
+                        logger.LogInformation($"sending AI voice from {senderId}, content: {plain.Text}, wave: {wavTmp}, amr: {amrTmp}");
+
+                        await group.SendGroupMessageAsync(new()
                         {
-                            if (msg.Sender.Id == "644676751" || msg.Sender.Id == "1441685502")
+                            new VoiceMessage()
                             {
-                                var payload = GetPredictPayload(GroupVoicerMapping[group.Id], plain.Text);
-                                var generateResponse = await httpClient.PostAsJsonAsync(WebUiEndpoint, payload, token);
-
-                                var str = await generateResponse.Content.ReadAsStringAsync(token);
-                                var wavTmp = $"{Path.GetTempFileName()}.wav";
-                                var amrTmp = $"{Path.GetTempFileName()}.amr";
-                                try
-                                {
-                                    var json = JsonSerializer.Deserialize<JsonDocument>(str);
-
-                                    var data = json.RootElement.GetProperty("data");
-                                    var result = data[1];
-                                    var path = result.GetProperty("name");
-
-                                    var wavData = await httpClient.GetByteArrayAsync($"{WebUiFileEndpoint}{path}", token);
-                                    await File.WriteAllBytesAsync(wavTmp, wavData, token);
-                                    logger.LogInformation($"wave: {wavTmp}, amr: {amrTmp}");
-                                    await FFMpegArguments
-                                        .FromFileInput(wavTmp)
-                                        .OutputToFile(amrTmp, true, opt => opt
-                                            .WithAudioSamplingRate(8000)
-                                            .ForceFormat("amr"))
-                                        .CancellableThrough(token)
-                                        .WithLogLevel(FFMpegCore.Enums.FFMpegLogLevel.Verbose)
-                                        .NotifyOnOutput(Console.WriteLine)
-                                        .ProcessAsynchronously(throwOnError: true);
-                                    await group.SendGroupMessageAsync(new()
-                                    {
-                                        new VoiceMessage()
-                                        {
-                                            Path = amrTmp,
-                                        }
-                                    });
-                                }
-                                catch(Exception e)
-                                {
-                                    logger.LogInformation(str);
-                                    logger.LogError(e, "报错力");
-                                }
-                                finally
-                                {
-                                    File.Delete(wavTmp);
-                                    File.Delete(amrTmp);
-                                }
+                                Path = amrTmp,
                             }
-                        }
+                        });
+                    }
+                    catch(Exception e)
+                    {
+                        logger.LogError(e, "报错力");
+                    }
+                    finally
+                    {
+                        File.Delete(wavTmp);
+                        File.Delete(amrTmp);
                     }
                 }
             }
