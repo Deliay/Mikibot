@@ -35,8 +35,8 @@ namespace Mikibot.Analyze.Bot
         public AiVoiceGenerationService(IMiraiService miraiService, ILogger<AiVoiceGenerationService> logger)
         {
             this.miraiService = miraiService;
-            WebUiEndpoint = "http://127.0.0.1:7002/run/predict";
-            WebUiFileEndpoint = "http://127.0.0.1:7002/file=";
+            WebUiEndpoint = Environment.GetEnvironmentVariable("BERT_VITS_PREDICT_ENDPOINT") ?? "http://127.0.0.1:7002/run/predict";
+            WebUiFileEndpoint = Environment.GetEnvironmentVariable("BERT_VITS_GET_FILE_ENDPOINT") ?? "http://127.0.0.1:7002/file=";
             this.logger = logger;
         }
 
