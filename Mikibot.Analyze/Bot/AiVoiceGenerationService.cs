@@ -70,12 +70,14 @@ namespace Mikibot.Analyze.Bot
             { "972488523", "akumaria" },
             { "314503649", "miki" },
             { "139528984", "miki" },
+            { "1097589845", "ayelet" },
         };
 
         private static (float, float, float, float) GetVoiceArguments(string voice)
         {
             return voice switch
             {
+                "ayelet" => (0.1f, 0.5f, 0.9f, 0.9f),
                 "akumaria" => (0.2f, 0.5f, 0.9f, 0.9f),
                 _ => (0.2f, 0.5f, 0.9f, 1f),
             };
