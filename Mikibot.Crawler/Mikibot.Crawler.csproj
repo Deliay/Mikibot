@@ -6,14 +6,14 @@
     <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
     <Title>Mikibot Bilibili Crawler</Title>
-    <Authors>ZeroASh</Authors>
-    <PackageProjectUrl>https://github.com/Deliay/Zast/tree/main/Mikibot.Crawler</PackageProjectUrl>
+    <Authors>ZeroAsh</Authors>
+    <PackageProjectUrl>https://github.com/Deliay/Mikibot</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/Deliay/Zast</RepositoryUrl>
+    <RepositoryUrl>https://github.com/Deliay/Mikibot</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <AssemblyVersion>1.0.3</AssemblyVersion>
-    <FileVersion>1.0.3</FileVersion>
-    <Version>1.0.3</Version>
+    <AssemblyVersion>1.0.4</AssemblyVersion>
+    <FileVersion>1.0.4</FileVersion>
+    <Version>1.0.4</Version>
   </PropertyGroup>
 
   <ItemGroup>
