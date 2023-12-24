@@ -13,15 +13,17 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 8.0.x
-    - name: Move to crawler folder
-      run: cd Mikibot.Crawler
     - name: Restore dependencies
       run: dotnet restore
+      working-directory: ./Mikibot.Crawler
     - name: Build
       run: dotnet pack
+      working-directory: ./Mikibot.Crawler
     - name: publish-to-nuget
       run: dotnet nuget push **/*.nupkg --api-key=${{secrets.NUGET_KEY}} --skip-duplicate --source=https://api.nuget.org/v3/index.json
+      working-directory: ./Mikibot.Crawler
     - name: publish-to-github
       run: dotnet nuget push **/*.nupkg --api-key=${{secrets.GH_PACKAGE_KEY}} --skip-duplicate --source=https://nuget.pkg.github.com/Deliay/index.json
+      working-directory: ./Mikibot.Crawler
       
         
