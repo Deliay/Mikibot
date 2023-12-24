@@ -71,6 +71,7 @@ namespace Mikibot.Analyze.Bot
             { "314503649", "miki" },
             { "139528984", "miki" },
             { "1097589845", "ayelet" },
+            { "45587035", "miki" },
         };
 
         private static (float, float, float, float) GetVoiceArguments(string voice)
@@ -196,6 +197,7 @@ namespace Mikibot.Analyze.Bot
 
                 foreach (var rawMsg in msg.MessageChain)
                 {
+                    var senderId = msg.Sender.Id;
                     // 只处理纯文本消息
                     if (rawMsg is not PlainMessage plain)
                     {
@@ -206,10 +208,10 @@ namespace Mikibot.Analyze.Bot
                     {
                         continue;
                     }
-                    var senderId = msg.Sender.Id;
                     // 不在白名单，且每日超过3次，则不允许再发
                     if (!voiceWhiteList.Contains(senderId) && !await CanSendVoice(senderId, token))
                     {
+                        logger.LogInformation("{} - {} 超过限制", group.Id, senderId);
                         continue;
                     }
                     // 群没有指定语音角色
