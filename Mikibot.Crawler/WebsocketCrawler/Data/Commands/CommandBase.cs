@@ -54,7 +54,9 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
             try
             {
                 var cmd = JsonSerializer.Deserialize<CommandBase<JsonElement>>(raw, JsonSerializerOptions);
-                // Console.WriteLine($"Command: {cmd.Command}");
+#if DEBUG
+                Debug.WriteLine($"cmd: {cmd.Command}, data: {cmd.Data}, info {cmd.Info}");
+#endif
                 if (CommandMapping.ContainsKey(cmd.Command))
                 {
                     var type = CommandMapping[cmd.Command];
@@ -71,9 +73,6 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
 
                     return (ICommandBase)instance;
                 }
-#if DEBUG
-                //Console.WriteLine($"cmd: {cmd.Command}, data: {cmd.Data}");
-#endif
                 return cmd;
             }
             catch (Exception ex)

@@ -16,7 +16,7 @@ namespace Mikibot.Crawler.Http.Bilibili.Model
             public string Url { get; set; }
             public string Cover { get; set; }
             [JsonPropertyName("roomid")]
-            public int RoomId { get; set; }
+            public long RoomId { get; set; }
         }
 
         [JsonPropertyName("live_room")]

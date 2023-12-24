@@ -19,5 +19,6 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand
         public string FansTagUserName { get; set; }
         public DateTimeOffset SentAt { get; set; }
         public string MemeUrl { get; set; }
+        public string HexColor { get; set; }
     }
 }

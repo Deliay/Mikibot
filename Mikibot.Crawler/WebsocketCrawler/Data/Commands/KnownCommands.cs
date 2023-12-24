@@ -101,5 +101,16 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
         LIKE_INFO_V3_CLICK,
         LIKE_V3_UPDATE,
         POPULAR_RANK_CHANGED,
+        FULL_SCREEN_SPECIAL_EFFECT,
+        AREA_RANK_CHANGED,
+        WIDGET_GIFT_STAR_PROCESS,
+        GIFT_STAR_PROCESS,
+        LIVE_PANEL_CHANGE,
+        GUARD_HONOR_THOUSAND,
+        TRADING_SCORE,
+        POPULARITY_RED_POCKET_NEW,
+        RECOMMEND_CARD,
+        GOTO_BUY_FLOW,
+        LIVE_MULTI_VIEW_CHANGE,
     }
 }

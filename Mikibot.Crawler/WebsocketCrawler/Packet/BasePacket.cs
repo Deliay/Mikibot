@@ -46,13 +46,13 @@ namespace Mikibot.Crawler.WebsocketCrawler.Packet
             Version = 0,
         };
 
-        public static BasePacket Auth(int roomId, string auth)
+        public static BasePacket Auth(long roomId, long uid, string auth)
         {
             var authPacket = JsonSerializer.Serialize(new
             {
-                uid = 0,
+                uid,
                 roomid = roomId,
-                protover = 0,
+                protover = 3,
                 platform = "web",
                 type = 2,
                 key = auth,

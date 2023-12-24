@@ -19,6 +19,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
             }
             var sentAt = 0L;
             string memeUrl = string.Empty;
+            var hexColor = "#000000";
             while (reader.Read())
             {
                 if (reader.TokenType == JsonTokenType.StartArray)
@@ -62,7 +63,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
             }
 
             reader.Read(); var msg = reader.GetString();
-            var userId = 0l;
+            var userId = 0L;
             var userName = string.Empty;
             while (reader.Read())
             {
@@ -77,7 +78,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
             }
             var fansTag = string.Empty;
             var fansLevel = 0;
-            var fansUserId = 0l;
+            var fansUserId = 0L;
             var fansUserName = string.Empty;
             while (reader.Read())
             {
@@ -139,6 +140,7 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
                 FansTagUserId = fansUserId,
                 FansTagUserName = fansUserName!,
                 MemeUrl = memeUrl,
+                HexColor = hexColor,
             };
         }
 

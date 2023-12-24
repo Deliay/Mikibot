@@ -7,20 +7,21 @@ using System.Threading.Tasks;
 
 namespace Mikibot.Crawler.Http.Bilibili.Model
 {
-    public struct LiveRoomInfo
+    public struct LiveStreamAddressesV2
     {
-
-        public string Title { get; set; }
-        public string Url { get; set; }
-        public string Background { get; set; }
-
-        [JsonPropertyName("user_cover")]
-        public string UserCover { get; set; }
-
         [JsonPropertyName("room_id")]
         public long RoomId { get; set; }
 
+        [JsonPropertyName("uid")]
+        public long Uid { get; set; }
+
         [JsonPropertyName("live_status")]
         public int LiveStatus { get; set; }
+
+        [JsonPropertyName("live_time")]
+        public long LiveTime { get; set; }
+
+        [JsonPropertyName("playurl_info")]
+        public LiveStreamPlayUrlInfoV2 PlayUrlInfo { get; set; }
     }
 }

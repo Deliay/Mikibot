@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Mikibot.Crawler.Http.Bilibili.Model
 {
-    public struct StatInfo
+    public struct LiveStreamPlayUrlV2
     {
-        public long Follower { get; set; }
+        [JsonPropertyName("stream")]
+        public List<LiveStreamV2> Streams { get; set; }
     }
 }

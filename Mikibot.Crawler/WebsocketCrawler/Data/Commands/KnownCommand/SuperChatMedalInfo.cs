@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand
 {
-    public struct SuperChatMedalInfo
+    public class SuperChatMedalInfo
     {
         [JsonPropertyName("target_id")]
         public long MedalUserId { get; set; }

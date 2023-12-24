@@ -10,7 +10,23 @@ namespace Mikibot.Crawler.Http
 {
     public class HttpCrawler : IDisposable
     {
-        private readonly HttpClient client = new();
+        protected readonly HttpClient client = new();
+
+        public HttpCrawler()
+        {
+            AddHeader("Origin", "https://live.bilibili.com/");
+            AddHeader("Referer", "https://live.bilibili.com/");
+        }
+
+        protected void AddHeader(string key, string value)
+        {
+            client.DefaultRequestHeaders.Add(key, value);
+        }
+
+        public void SetCookie(string cookie)
+        {
+            AddHeader("cookie", cookie);
+        }
 
         protected JsonSerializerOptions JsonParseOptions { get; set; } = new JsonSerializerOptions()
         {

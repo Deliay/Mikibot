@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Mikibot.Crawler.Http.Bilibili.Model
 {
-    public struct StatInfo
+    public struct Emoticon
     {
-        public long Follower { get; set; }
+
     }
 }

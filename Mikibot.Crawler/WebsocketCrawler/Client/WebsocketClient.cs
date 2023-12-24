@@ -10,6 +10,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Mikibot.Crawler.WebsocketCrawler.Client
@@ -24,12 +25,16 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
             _csc = new();
         }
 
-        public int RoomId { get; private set; }
+        public long RoomId { get; private set; }
 
-        public async ValueTask<bool> ConnectAsync(string host, int port, int roomId, string liveToken, string protocol = "ws", CancellationToken cancellationToken = default)
+        public ValueTask<bool> ConnectAsync(string host, int port, long roomId, long uid, string liveToken, string protocol = "ws", CancellationToken cancellationToken = default)
+        {
+            return ConnectAsync(null!, host, port, roomId, uid, liveToken, protocol, cancellationToken);
+        }
+        public async ValueTask<bool> ConnectAsync(HttpMessageInvoker invoker, string host, int port, long roomId, long uid, string liveToken, string protocol = "ws", CancellationToken cancellationToken = default)
         {
             var connectCsc = CancellationTokenSource.CreateLinkedTokenSource(_csc.Token, cancellationToken);
-            await _worker.ConnectAsync(host, port, roomId, liveToken, protocol, connectCsc.Token);
+            await _worker.ConnectAsync(invoker, host, port, roomId, uid, liveToken, protocol, connectCsc.Token);
             return true;
         }
 
@@ -94,6 +99,8 @@ namespace Mikibot.Crawler.WebsocketCrawler.Client
             {
                 foreach (var data in ProcessPacket(raw))
                 {
+                    if (token.IsCancellationRequested) yield break;
+
                     yield return data;
                 }
             }
