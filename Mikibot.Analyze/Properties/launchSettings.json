@@ -10,6 +10,9 @@
         "QWEATHER_API_KEY": "114514"
       },
       "remoteDebugEnabled": false
+    },
+    "Docker": {
+      "commandName": "Docker"
     }
   }
 }
