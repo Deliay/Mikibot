@@ -1,16 +1,16 @@
 #See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/runtime:8.0-jammy AS run
+FROM mcr.microsoft.com/dotnet/runtime:8.0-alpine AS run
 USER root
-RUN apt update
-RUN apt install -y ffmpeg
+RUN apk update
+RUN apk add ffmpeg 
 
 
-FROM mcr.microsoft.com/dotnet/runtime:8.0-jammy AS base
+FROM mcr.microsoft.com/dotnet/runtime:8.0-alpine AS base
 USER app
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0-jammy AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Mikibot.Analyze/Mikibot.Analyze.csproj", "Mikibot.Analyze/"]
