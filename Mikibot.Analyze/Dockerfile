@@ -1,11 +1,10 @@
 #See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/runtime:8.0-alpine AS run
+FROM archlinux/archlinux as run
 USER root
-RUN apk update
-RUN apk add ffmpeg
-RUN apk add opencore-amr
-
+RUN pacman -S dotnet-runtime
+RUN pacman -S ffmpeg
+RUN pacman -S opencore-amr
 
 FROM mcr.microsoft.com/dotnet/runtime:8.0-alpine AS base
 USER app
