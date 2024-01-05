@@ -33,12 +33,31 @@ namespace Mikibot.Analyze.Notification
         public IMiraiService Mirai { get; }
         public ILogger<LiveStatusCrawlService> Logger { get; }
 
-        public async Task<LiveStatus> GetCurrentStatus(CancellationToken token)
-        => await db.LiveStatuses.OrderBy(s => s.Id).LastOrDefaultAsync(token);
+        public async Task<LiveStatus> GetCurrentStatus(string roomId, CancellationToken token)
+        {
+            var bid = GetBid(roomId);
+            return await db.LiveStatuses.Where(s => s.Bid == bid).OrderBy(s => s.Id).LastOrDefaultAsync(token);
+        }
 
         private readonly Random random = new();
 
-        private async ValueTask<LiveStatus> GenerateStatus(LiveRoomInfo info, CancellationToken token)
+        private static readonly Dictionary<string, List<string>> GroupMapping = new()
+        {
+            { $"{BiliLiveCrawler.mxmkr}", ["314503649", "139528984"] },
+            { $"{22323445}", ["650042418"] },
+        };
+
+        private const string AkumariaRid = "22323445";
+        private const string AkumariaBid = "576858552";
+        private const string MxmkRid = "21672023";
+
+        private static string GetBid(string roomId) => roomId switch {
+            AkumariaRid => AkumariaBid,
+            MxmkRid => BiliLiveCrawler.mxmks,
+            _ => throw new InvalidOperationException()
+        };
+
+        private async ValueTask<LiveStatus> GenerateStatus(string bid, LiveRoomInfo info, CancellationToken token)
             => new()
             {
                 Cover = info.Background,
@@ -48,7 +67,7 @@ namespace Mikibot.Analyze.Notification
                 StatusChangedAt = DateTimeOffset.Now,
                 UpdatedAt = DateTimeOffset.Now,
                 Title = info.Title,
-                Bid = $"{BiliLiveCrawler.mxmk}",
+                Bid = bid,
             };
 
         private async ValueTask InsertStatus(LiveStatus status, CancellationToken token)
@@ -65,11 +84,11 @@ namespace Mikibot.Analyze.Notification
             string url() => newly.Status == 1 ? $"https://live.bilibili.com/{info.RoomId}" : "";
             var msg = $"{status()}啦~ {info.Title}\n{url()}{fans()}";
             Logger.LogInformation("Message composed {}", msg);
-            return new MessageBase[]
-            {
-                new ImageMessage() { Url = info.Background },
+            return
+            [
+                new ImageMessage() { Url = info.UserCover },
                 new PlainMessage(msg),
-            };
+            ];
         }
 
         public async Task Run(CancellationToken token)
@@ -84,7 +103,7 @@ namespace Mikibot.Analyze.Notification
                 try
                 {
                     var latest = await db.LiveStatuses.OrderBy(s => s.Id).LastOrDefaultAsync(token);
-                    var info = (await Crawler.GetLiveRoomInfo(BiliLiveCrawler.mxmkr, token));
+                    var info = await Crawler.GetLiveRoomInfo(BiliLiveCrawler.mxmkr, token);
                     // 发通知咯！
                     if (latest == null || (latest.Status != info.LiveStatus))
                     {
