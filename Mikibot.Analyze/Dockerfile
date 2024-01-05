@@ -2,6 +2,7 @@
 
 FROM archlinux/archlinux as run
 USER root
+RUN pacman -Sy
 RUN pacman -S dotnet-runtime
 RUN pacman -S ffmpeg
 RUN pacman -S opencore-amr
