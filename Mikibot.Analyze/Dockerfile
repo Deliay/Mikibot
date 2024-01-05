@@ -7,10 +7,6 @@ RUN pacman -S --noconfirm dotnet-runtime
 RUN pacman -S --noconfirm ffmpeg
 RUN pacman -S --noconfirm opencore-amr
 
-FROM mcr.microsoft.com/dotnet/runtime:8.0-alpine AS base
-USER app
-WORKDIR /app
-
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
@@ -29,7 +25,6 @@ ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./Mikibot.Analyze.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM run AS final
-USER app
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Mikibot.Analyze.dll"]
