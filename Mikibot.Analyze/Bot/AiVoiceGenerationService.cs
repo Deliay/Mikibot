@@ -67,7 +67,7 @@ namespace Mikibot.Analyze.Bot
 
         private static readonly Dictionary<string, string> GroupVoicerMapping = new()
         {
-            { "972488523", "akumaria" },
+            { "650042418", "akumaria" },
             { "314503649", "miki" },
             { "139528984", "miki" },
             { "1097589845", "ayelet" },
