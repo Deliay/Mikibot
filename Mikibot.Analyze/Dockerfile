@@ -3,9 +3,9 @@
 FROM archlinux/archlinux as run
 USER root
 RUN pacman -Sy
-RUN pacman -Sy dotnet-runtime
-RUN pacman -Sy ffmpeg
-RUN pacman -Sy opencore-amr
+RUN pacman -S --noconfirm dotnet-runtime
+RUN pacman -S --noconfirm ffmpeg
+RUN pacman -S --noconfirm opencore-amr
 
 FROM mcr.microsoft.com/dotnet/runtime:8.0-alpine AS base
 USER app
