@@ -3,7 +3,8 @@
 FROM mcr.microsoft.com/dotnet/runtime:8.0-alpine AS run
 USER root
 RUN apk update
-RUN apk add ffmpeg 
+RUN apk add ffmpeg
+RUN apk add opencore-amr
 
 
 FROM mcr.microsoft.com/dotnet/runtime:8.0-alpine AS base
