@@ -231,13 +231,13 @@ namespace Mikibot.Analyze.Bot
 
                         logger.LogInformation($"sending AI voice from {senderId}, content: {plain.Text}, wave: {wavTmp}, amr: {amrTmp}");
 
-                        await group.SendGroupMessageAsync(new()
-                        {
+                        await group.SendGroupMessageAsync(
+                        [
                             new VoiceMessage()
                             {
-                                Path = amrTmp,
+                                Base64 = Convert.ToBase64String(await File.ReadAllBytesAsync(amrTmp, token)),
                             }
-                        });
+                        ]);
                     }
                     catch(Exception e)
                     {
