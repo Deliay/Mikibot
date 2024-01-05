@@ -136,7 +136,7 @@ namespace Mikibot.Analyze.Bot
                     todayRecords.Add(senderId, 1);
                 }
                 
-                var result = (todayRecords[senderId] += 1) <= 3;
+                var result = (todayRecords[senderId] += 1) <= 10;
 
                 await Write(records, token);
 
