@@ -83,6 +83,7 @@ using (var app = appContainer.BeginLifetimeScope())
     var mxmkLiveEventProxy = app.Resolve<MikiLiveEventProxyService>();
     var biliParser = app.Resolve<BiliBiliVideoLinkShareProxerService>();
     var randomImage = app.Resolve<RandomImageService>();
+    var optionaSelector = app.Resolve<OptionaSelectorService>();
 
     eventService.CmdHandler.Register(danmakuCrawler);
     eventService.CmdHandler.Register(mxmkLiveEventProxy);
@@ -102,5 +103,6 @@ using (var app = appContainer.BeginLifetimeScope())
         randomImage.Run(token),
         //aiImage.Run(token),
         aiVoice.Run(token),   
+        optionaSelector.Run(token),
     ]);
 }
