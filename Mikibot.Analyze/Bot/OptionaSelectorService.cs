@@ -65,15 +65,16 @@ public partial class OptionaSelectorService(IMiraiService miraiService, ILogger<
                 else
                 {
                     var allOptions = options
-                        .Select(option => (option, Random.Next(1, 101)))
-                        .OrderByDescending(option => option.Item2);
+                        .Select(option => (option, chance: Random.Next(1, 101)))
+                        .OrderByDescending(item => item.chance)
+                        .ToList();
 
-                    var selectedText = string.Join(' ', allOptions.Take(selectCount));
-                    var optionWithPercentText = string.Join('\n', allOptions.Select(option => $"{option.option}: {option.Item2}%"));
+                    var selectedText = string.Join(' ', allOptions.Take(selectCount).Select(item => item.option));
+                    var optionWithPercentText = string.Join('\n', allOptions.Select(option => $"{option.option}: {option.chance}%"));
 
                     await MiraiService.SendMessageToGroup(messages.Sender.Group, token,
                     [
-                        new PlainMessage($"从 {options.Length} 中选 {selectCount} 个\n{optionWithPercentText}\n\n我选: {selectedText}"),
+                        new PlainMessage($"从 {options.Length} 个选项中中选 {selectCount} 个\n{optionWithPercentText}\n\n我选: {selectedText}"),
                     ]);
                     return;
                 }
