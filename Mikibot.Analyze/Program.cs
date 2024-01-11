@@ -45,6 +45,7 @@ appBuilder.RegisterType<AntiBoyFriendFanVoiceService>().AsSelf().SingleInstance(
 //appBuilder.RegisterType<AiImageGenerationService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<AiVoiceGenerationService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<RandomImageService>().AsSelf().SingleInstance();
+appBuilder.RegisterType<OptionaSelectorService>().AsSelf().SingleInstance();
 
 var appContainer = appBuilder.Build();
 
