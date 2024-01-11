@@ -35,8 +35,8 @@ public partial class OptionaSelectorService(IMiraiService miraiService, ILogger<
 
                 var (selectCount, optionsText) = matches.Cast<Match>()
                     .Select(m => (
-                        m.Groups[3].Success ? int.Parse(m.Groups[3].Value) : 1,
-                        m.Groups[4].Value))
+                        m.Groups[2].Success ? int.Parse(m.Groups[3].Value) : 1,
+                        m.Groups[3].Value))
                     .FirstOrDefault();
                 
                 // 选个屁
