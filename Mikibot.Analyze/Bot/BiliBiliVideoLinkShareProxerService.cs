@@ -14,24 +14,14 @@ using System.Threading.Tasks;
 
 namespace Mikibot.Analyze.Bot
 {
-    public class BiliBiliVideoLinkShareProxerService
+    public class BiliBiliVideoLinkShareProxerService(
+        IMiraiService miraiService,
+        ILogger<BiliBiliVideoLinkShareProxerService> logger,
+        BiliVideoCrawler crawler)
     {
-        public BiliBiliVideoLinkShareProxerService(
-            IMiraiService miraiService,
-            ILogger<BiliBiliVideoLinkShareProxerService> logger,
-            BiliVideoCrawler crawler)
-        {
-            MiraiService = miraiService;
-            Logger = logger;
-            Crawler = crawler;
-        }
-
-        private IMiraiService MiraiService { get; }
-        private ILogger<BiliBiliVideoLinkShareProxerService> Logger { get; }
-        private BiliVideoCrawler Crawler { get; }
-
-        private SemaphoreSlim semaphoreSlim = new(1);
-
+        private IMiraiService MiraiService => miraiService;
+        private ILogger<BiliBiliVideoLinkShareProxerService> Logger =>  logger;
+        private BiliVideoCrawler Crawler =>  crawler;
 
         private readonly Channel<GroupMessageReceiver> messageQueue = Channel
         .CreateUnbounded<GroupMessageReceiver>(new UnboundedChannelOptions()
@@ -61,16 +51,16 @@ namespace Mikibot.Analyze.Bot
             }
         }
 
-        private static readonly HashSet<char> ValidBv = new() {
+        private static readonly HashSet<char> ValidBv = [
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
             'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
             'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
             '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'
-        };
-        private static readonly HashSet<char> ValidAv = new() {
+        ];
+        private static readonly HashSet<char> ValidAv = [
             '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'
-        };
+        ];
         private static string Fetch(string raw, int startIndex, HashSet<char> allow)
         {
             for (int i = startIndex + 1; i < raw.Length; i++)
@@ -88,7 +78,7 @@ namespace Mikibot.Analyze.Bot
 
                 foreach (var rawMsg in msg.MessageChain)
                 {
-                    if (rawMsg is PlainMessage plain)
+                    if (rawMsg is PlainMessage plain && plain.Text.StartsWith('!'))
                     {
                         var text = plain.Text;
                         var bvStart = text.IndexOf("/BV");

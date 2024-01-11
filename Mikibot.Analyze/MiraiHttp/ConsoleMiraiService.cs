@@ -42,6 +42,11 @@ namespace Mikibot.Analyze.MiraiHttp
             return SendMessageToAllGroup(token, messages);
         }
 
+        public ValueTask SendMessageToSomeGroup(HashSet<string> groupIds, CancellationToken token, params MessageBase[] messages)
+        {
+            return SendMessageToAllGroup(token, messages);
+        }
+
         public void SubscribeMessage(Action<GroupMessageReceiver> next, CancellationToken token)
         {
             Task.Run(async () =>

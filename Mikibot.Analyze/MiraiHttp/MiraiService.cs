@@ -11,6 +11,7 @@ using System.Text;
 using System.Reactive;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
+using Mikibot.Crawler.Http.Bilibili;
 
 namespace Mikibot.Analyze.MiraiHttp
 {
@@ -91,6 +92,21 @@ namespace Mikibot.Analyze.MiraiHttp
                 if (token.IsCancellationRequested) break;
 
                 if (allowGroups.Contains(group.Id)) {
+                    await SendMessageToGroup(group, token, messages);
+                }
+            }
+        }
+        
+        public async ValueTask SendMessageToSomeGroup(HashSet<string> groupIds, CancellationToken token, params MessageBase[] messages)
+        {
+            foreach (var group in Bot.Groups.Value)
+            {
+#if DEBUG
+                if (group.Id != "139528984") continue;
+#endif
+                if (token.IsCancellationRequested) break;
+
+                if (groupIds.Contains(group.Id)) {
                     await SendMessageToGroup(group, token, messages);
                 }
             }

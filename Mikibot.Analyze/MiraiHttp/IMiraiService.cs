@@ -11,5 +11,6 @@ namespace Mikibot.Analyze.MiraiHttp
         ValueTask SendMessageToGroup(Group group, CancellationToken token, params MessageBase[] messages);
         ValueTask SendMessageToSliceManGroup(CancellationToken token, params MessageBase[] messages);
         public void SubscribeMessage(Action<GroupMessageReceiver> next, CancellationToken token);
+        ValueTask SendMessageToSomeGroup(HashSet<string> groupIds, CancellationToken token, params MessageBase[] messages);
     }
 }

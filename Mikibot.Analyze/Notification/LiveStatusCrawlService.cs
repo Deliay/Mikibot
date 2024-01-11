@@ -18,27 +18,44 @@ namespace Mikibot.Analyze.Notification
     /// <summary>
     /// 开播、下播通知
     /// </summary>
-    public class LiveStatusCrawlService
+    public class LiveStatusCrawlService(BiliLiveCrawler crawler, IMiraiService mirai, ILogger<LiveStatusCrawlService> logger)
     {
         private readonly MikibotDatabaseContext db = new (MySqlConfiguration.FromEnviroment());
 
-        public LiveStatusCrawlService(BiliLiveCrawler crawler, IMiraiService mirai, ILogger<LiveStatusCrawlService> logger)
+        public BiliLiveCrawler Crawler => crawler;
+        public IMiraiService Mirai => mirai;
+        public ILogger<LiveStatusCrawlService> Logger => logger;
+
+        public async Task<LiveStatus?> GetCurrentStatus(string roomId = MxmkRid, CancellationToken token = default)
         {
-            Crawler = crawler;
-            Mirai = mirai;
-            Logger = logger;
+            var bid = GetBid(roomId);
+            return await db.LiveStatuses.Where(s => s.Bid == bid).OrderBy(s => s.Id).LastOrDefaultAsync(token);
         }
-
-        public BiliLiveCrawler Crawler { get; }
-        public IMiraiService Mirai { get; }
-        public ILogger<LiveStatusCrawlService> Logger { get; }
-
-        public async Task<LiveStatus> GetCurrentStatus(CancellationToken token)
-        => await db.LiveStatuses.OrderBy(s => s.Id).LastOrDefaultAsync(token);
 
         private readonly Random random = new();
 
-        private async ValueTask<LiveStatus> GenerateStatus(LiveRoomInfo info, CancellationToken token)
+        private static readonly Dictionary<string, HashSet<string>> GroupMapping = new()
+        {
+            { $"{BiliLiveCrawler.mxmkr}", ["314503649", "139528984"] },
+            { $"{22323445}", ["650042418"] },
+        };
+
+        private const string AkumariaRid = "22323445";
+        private const string AkumariaBid = "576858552";
+        private const string MxmkRid = "21672023";
+
+        private static string GetBid(string roomId) => roomId switch {
+            AkumariaRid => AkumariaBid,
+            MxmkRid => BiliLiveCrawler.mxmks,
+            _ => throw new InvalidOperationException()
+        };
+        private static long GetRid(string bid) => bid switch {
+            AkumariaBid => long.Parse(AkumariaRid),
+            BiliLiveCrawler.mxmks => long.Parse(MxmkRid),
+            _ => throw new InvalidOperationException()
+        };
+
+        private async ValueTask<LiveStatus> GenerateStatus(string bid, LiveRoomInfo info, CancellationToken token)
             => new()
             {
                 Cover = info.Background,
@@ -48,7 +65,7 @@ namespace Mikibot.Analyze.Notification
                 StatusChangedAt = DateTimeOffset.Now,
                 UpdatedAt = DateTimeOffset.Now,
                 Title = info.Title,
-                Bid = $"{BiliLiveCrawler.mxmk}",
+                Bid = bid,
             };
 
         private async ValueTask InsertStatus(LiveStatus status, CancellationToken token)
@@ -65,11 +82,11 @@ namespace Mikibot.Analyze.Notification
             string url() => newly.Status == 1 ? $"https://live.bilibili.com/{info.RoomId}" : "";
             var msg = $"{status()}啦~ {info.Title}\n{url()}{fans()}";
             Logger.LogInformation("Message composed {}", msg);
-            return new MessageBase[]
-            {
+            return
+            [
                 new ImageMessage() { Url = info.Background },
                 new PlainMessage(msg),
-            };
+            ];
         }
 
         public async Task Run(CancellationToken token)
@@ -80,31 +97,46 @@ namespace Mikibot.Analyze.Notification
                 Logger.LogInformation("{} 秒后开始同步状态", next);
                 // 每15~30秒收集一次数据
                 await Task.Delay(TimeSpan.FromSeconds(next), token);
-                Logger.LogInformation("开始同步状态");
-                try
+                foreach (var bid in GroupMapping.Keys)
                 {
-                    var latest = await db.LiveStatuses.OrderBy(s => s.Id).LastOrDefaultAsync(token);
-                    var info = (await Crawler.GetLiveRoomInfo(BiliLiveCrawler.mxmkr, token));
-                    // 发通知咯！
-                    if (latest == null || (latest.Status != info.LiveStatus))
+                    Logger.LogInformation($"开始同步 {bid} 状态");
+                    await Task.Delay(TimeSpan.FromSeconds(random.Next(1, 5)), token);
+                    try
                     {
-                        // 将最新数据入库
-                        var newly = await GenerateStatus(info, token);
-                        await InsertStatus(newly, token);
-                        Logger.LogInformation("写入数据库完成");
-                        // 发开播消息
-                        await Mirai.SendMessageToAllGroup(token, ComposeMessage(info, latest, newly));
-                        Logger.LogInformation("同步QQ消息完成");
+                        var latest = await db.LiveStatuses.Where(s => s.Bid == bid).OrderBy(s => s.Id).LastOrDefaultAsync(token);
+                        var info = await Crawler.GetLiveRoomInfo(GetRid(bid), token);
+                        // 发通知咯！
+                        if (latest == null || (latest.Status != info.LiveStatus))
+                        {
+                            // 将最新数据入库
+                            var newly = await GenerateStatus(bid, info, token);
+                            await InsertStatus(newly, token);
+                            Logger.LogInformation("写入数据库完成");
+                            // 发开播消息
+                            if (latest != null)
+                            {
+                                await Mirai.SendMessageToSomeGroup(GroupMapping[bid], token, ComposeMessage(info, latest, newly));
+                            }
+                            else
+                            {
+                                await Mirai.SendMessageToSomeGroup(GroupMapping[bid], token,
+                                [
+                                    new ImageMessage() { Url = info.Background },
+                                    new PlainMessage($"诶嘿，开始为您持续关注 {info.RoomId} 的开播信息~\n{info.Url}"),
+                                ]);
+                            }
+                            Logger.LogInformation("同步QQ消息完成");
+                        }
+                        else
+                        {
+                            Logger.LogInformation("直播状态没有发生变化");
+                        }
+                        Logger.LogInformation("状态同步完成");
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        Logger.LogInformation("直播状态没有发生变化");
+                        Logger.LogError(ex, "状态同步失败");
                     }
-                    Logger.LogInformation("状态同步完成");
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogError(ex, "状态同步失败");
                 }
             }
         }
