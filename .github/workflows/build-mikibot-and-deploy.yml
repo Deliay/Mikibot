@@ -17,7 +17,7 @@ jobs:
       run: docker login ${{secrets.DOCKER_ENDPOINT}} -u ${{secrets.DOCKER_USER}} -p ${{secrets.DOCKER_PASSWORD}}
     
     - name: Pull history build
-      run: docker build --pull ${{secrets.DOCKER_ENDPOINT}}/zero-tools/mikibot:latest
+      run: docker pull ${{secrets.DOCKER_ENDPOINT}}/zero-tools/mikibot:latest
 
     - name: Build the Docker image
       run: docker build --pull -f Mikibot.Analyze/Dockerfile . -t ${{secrets.DOCKER_ENDPOINT}}/zero-tools/mikibot:latest
