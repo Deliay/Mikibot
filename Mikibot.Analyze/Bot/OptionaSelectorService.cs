@@ -16,7 +16,7 @@ public partial class OptionaSelectorService(IMiraiService miraiService, ILogger<
     private readonly static MessageBase[] JustOneOption = [new PlainMessage("单选，还要问？")];
     private readonly static MessageBase[] OptionNotEnough = [new PlainMessage("选项不够！老缠？")];
 
-    [GeneratedRegex("帮我选|帮我选(\\d+)个")]
+    [GeneratedRegex("帮我选((\\d+)个)?\\s*(.*)$")]
     private static partial Regex GenerateMatchRegex();
 
     private readonly static Regex MatchRegex = GenerateMatchRegex();
