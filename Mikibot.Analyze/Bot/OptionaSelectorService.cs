@@ -73,7 +73,7 @@ public partial class OptionaSelectorService(IMiraiService miraiService, ILogger<
 
                     await MiraiService.SendMessageToGroup(messages.Sender.Group, token,
                     [
-                        new PlainMessage($"从 {options.Length} 中选 {selectCount} 个\n{optionWithPercentText}\n\n我选: {selectedText}");
+                        new PlainMessage($"从 {options.Length} 中选 {selectCount} 个\n{optionWithPercentText}\n\n我选: {selectedText}"),
                     ]);
                     return;
                 }
