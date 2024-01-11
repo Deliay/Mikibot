@@ -9,6 +9,7 @@ using Mikibot.BuildingBlocks.Util;
 using Mikibot.Crawler.Http.Bilibili;
 using Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 using Mikibot.Analyze.Bot;
+using Mikibot.Analyze.Bot.RandomImage;
 
 var appBuilder = ContainerInitializer.Create();
 
@@ -43,6 +44,7 @@ appBuilder.RegisterType<BiliBiliVideoLinkShareProxerService>().AsSelf().SingleIn
 appBuilder.RegisterType<AntiBoyFriendFanVoiceService>().AsSelf().SingleInstance();
 //appBuilder.RegisterType<AiImageGenerationService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<AiVoiceGenerationService>().AsSelf().SingleInstance();
+appBuilder.RegisterType<RandomImageService>().AsSelf().SingleInstance();
 
 var appContainer = appBuilder.Build();
 
@@ -79,7 +81,8 @@ using (var app = appContainer.BeginLifetimeScope())
     var bffAnti = app.Resolve<AntiBoyFriendFanVoiceService>();
     var mxmkDanmakuProxy = app.Resolve<MikiDanmakuProxyService>();
     var mxmkLiveEventProxy = app.Resolve<MikiLiveEventProxyService>();
-    // var biliParser = app.Resolve<BiliBiliVideoLinkShareProxerService>();
+    var biliParser = app.Resolve<BiliBiliVideoLinkShareProxerService>();
+    var randomImage = app.Resolve<RandomImageService>();
 
     eventService.CmdHandler.Register(danmakuCrawler);
     eventService.CmdHandler.Register(mxmkLiveEventProxy);
@@ -90,10 +93,14 @@ using (var app = appContainer.BeginLifetimeScope())
 
     logger.LogInformation("Starting schedule module...");
     await Task.WhenAll(
+    [
         statusCrawler.Run(token),
         followerStat.Run(token),
         eventService.Run(token),
         bffAnti.Run(token),
+        biliParser.Run(token),
+        randomImage.Run(token),
         //aiImage.Run(token),
-        aiVoice.Run(token));
+        aiVoice.Run(token),   
+    ]);
 }
