@@ -73,7 +73,7 @@ public partial class OptionaSelectorService(IMiraiService miraiService, ILogger<
                 }
 
                 var selectedText = string.Join(' ', allOptions.Take(selectCount).Select(item => item.option));
-                var optionWithPercentText = string.Join('\n', allOptions.Select(option => $"- {option.option} [(x{option.rank}) {option.chance}%/]"));
+                var optionWithPercentText = string.Join('\n', allOptions.Select(option => $"- {option.option} [x{option.rank} {option.chance}%]"));
 
                 await MiraiService.SendMessageToGroup(messages.Sender.Group, token,
                 [
