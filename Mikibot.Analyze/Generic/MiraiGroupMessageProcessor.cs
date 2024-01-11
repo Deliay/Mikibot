@@ -17,16 +17,16 @@ public abstract class MiraiGroupMessageProcessor<T>(IMiraiService miraiService, 
         AllowSynchronousContinuations = false,
     });
 
-    protected virtual void FilterMessage(GroupMessageReceiver message)
+    private void FilterMessage(GroupMessageReceiver message)
     {
         _ = messageQueue.Writer.WriteAsync(message);
     }
 
-    protected virtual async ValueTask Dequeue(CancellationToken token)
+    private async ValueTask Dequeue(CancellationToken token)
     {
         await foreach (var msg in this.messageQueue.Reader.ReadAllAsync(token))
         {
-            await Process(msg);
+            await Process(msg, token);
         }
     }
 
