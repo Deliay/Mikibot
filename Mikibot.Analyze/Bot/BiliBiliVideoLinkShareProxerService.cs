@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Mikibot.Analyze.Generic;
 using Mikibot.Analyze.MiraiHttp;
 using Mikibot.Crawler.Http.Bilibili;
 using Mirai.Net.Data.Messages;
@@ -17,18 +18,9 @@ namespace Mikibot.Analyze.Bot
     public class BiliBiliVideoLinkShareProxerService(
         IMiraiService miraiService,
         ILogger<BiliBiliVideoLinkShareProxerService> logger,
-        BiliVideoCrawler crawler)
+        BiliVideoCrawler crawler) : MiraiGroupMessageProcessor<BiliBiliVideoLinkShareProxerService>(miraiService, logger)
     {
-        private IMiraiService MiraiService => miraiService;
-        private ILogger<BiliBiliVideoLinkShareProxerService> Logger =>  logger;
         private BiliVideoCrawler Crawler =>  crawler;
-
-        private readonly Channel<GroupMessageReceiver> messageQueue = Channel
-        .CreateUnbounded<GroupMessageReceiver>(new UnboundedChannelOptions()
-        {
-            SingleWriter = true,
-            AllowSynchronousContinuations = false,
-        });
 
         public async ValueTask TrySend(Group group, string? bv, string? av, CancellationToken token)
         {
@@ -36,14 +28,14 @@ namespace Mikibot.Analyze.Bot
             {
                 var result = await Crawler.GetVideoInfo(bv, av == null ? null : int.Parse(av!), token);
 
-                await MiraiService.SendMessageToGroup(group, token, new MessageBase[]
-                {
+                await MiraiService.SendMessageToGroup(group, token,
+                [
                     new ImageMessage()
                     {
                         Url = result.CoverUrl,
                     },
                     new PlainMessage($"{result.Title} (作者: {result.Owner.Name}) \n https://bilibili.com/{result.BvId}"),
-                });
+                ]);
             }
             catch (Exception ex)
             {
@@ -70,60 +62,33 @@ namespace Mikibot.Analyze.Bot
             }
             return raw[startIndex..];
         }
-        private async ValueTask Dequeue(CancellationToken token)
-        {
-            await foreach (var msg in this.messageQueue.Reader.ReadAllAsync(token))
-            {
-                var group = msg.Sender.Group;
 
-                foreach (var rawMsg in msg.MessageChain)
+        protected override async ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
+        {
+            var group = message.Sender.Group;
+
+            foreach (var rawMsg in message.MessageChain)
+            {
+                if (rawMsg is PlainMessage plain && plain.Text.StartsWith('!'))
                 {
-                    if (rawMsg is PlainMessage plain && plain.Text.StartsWith('!'))
+                    var text = plain.Text;
+                    var bvStart = text.IndexOf("/BV");
+                    if (bvStart > -1)
                     {
-                        var text = plain.Text;
-                        var bvStart = text.IndexOf("/BV");
-                        if (bvStart > -1)
-                        {
-                            var bv = Fetch(text, bvStart + 1, ValidBv);
-                            Logger.LogInformation("准备发送bv {}", bv);
-                            await TrySend(group, bv, null, token);
-                            break;
-                        }
-
-                        var avStart = text.IndexOf("/av");
-                        if (avStart > -1)
-                        {
-                            var av = Fetch(text, avStart + 3, ValidAv);
-                            Logger.LogInformation("准备发送av {}", av);
-                            await TrySend(group, null, av, token);
-                            break;
-                        }
+                        var bv = Fetch(text, bvStart + 1, ValidBv);
+                        Logger.LogInformation("准备发送bv {}", bv);
+                        await TrySend(group, bv, null, token);
+                        break;
                     }
-                }
 
-            }
-        }
-
-        private void FilterMessage(GroupMessageReceiver message)
-        {
-            _ = messageQueue.Writer.WriteAsync(message);
-        }
-
-        public async Task Run(CancellationToken token)
-        {
-            Logger.LogInformation("B站连接parser");
-            MiraiService.SubscribeMessage(FilterMessage, token);
-            while (!token.IsCancellationRequested)
-            {
-                try
-                {
-                    await messageQueue.Reader.WaitToReadAsync(token);
-                    Logger.LogInformation("started B站连接parser...");
-                    await Dequeue(token);
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogError("B站连接parserr！", ex);
+                    var avStart = text.IndexOf("/av");
+                    if (avStart > -1)
+                    {
+                        var av = Fetch(text, avStart + 3, ValidAv);
+                        Logger.LogInformation("准备发送av {}", av);
+                        await TrySend(group, null, av, token);
+                        break;
+                    }
                 }
             }
         }
