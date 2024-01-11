@@ -35,7 +35,7 @@ public partial class OptionaSelectorService(IMiraiService miraiService, ILogger<
 
                 var (selectCount, optionsText) = matches.Cast<Match>()
                     .Select(m => (
-                        m.Groups[2].Success ? int.Parse(m.Groups[3].Value) : 1,
+                        m.Groups[2].Success ? int.Parse(m.Groups[2].Value) : 1,
                         m.Groups[3].Value))
                     .FirstOrDefault();
                 
@@ -45,39 +45,41 @@ public partial class OptionaSelectorService(IMiraiService miraiService, ILogger<
                     await MiraiService.SendMessageToGroup(messages.Sender.Group, token, NoOptions);
                     return;
                 }
-                
-                var options = optionsText.Split(' ');
+                var options = optionsText
+                    .Split(' ')
+                    .Select(option => option.Trim())
+                    .Where(option => option.Length > 0)
+                    .ToList();
 
-                // 单选
-                if (options.Length == 1)
+                var allOptions = options
+                    .GroupBy(option => option)
+                    .Select(group => (option: group.Key, rank: group.Count(), rolls: group.Select((_) => Random.Next(1, 101))))
+                    .Select(optionGroup => (
+                        optionGroup.option,
+                        optionGroup.rank,
+                        chance: optionGroup.rolls.Sum()))
+                    .OrderByDescending(item => item.chance)
+                    .ToList();
+
+                if (allOptions.Count == 1)
                 {
                     await MiraiService.SendMessageToGroup(messages.Sender.Group, token, JustOneOption);
                     return;
                 }
-
-                // 选项不够或者全选
-                else if (selectCount >= options.Length)
+                else if (selectCount >= options.Count)
                 {
                     await MiraiService.SendMessageToGroup(messages.Sender.Group, token, OptionNotEnough);
                     return;
                 }
-                // x选y
-                else
-                {
-                    var allOptions = options
-                        .Select(option => (option, chance: Random.Next(1, 101)))
-                        .OrderByDescending(item => item.chance)
-                        .ToList();
 
-                    var selectedText = string.Join(' ', allOptions.Take(selectCount).Select(item => item.option));
-                    var optionWithPercentText = string.Join('\n', allOptions.Select(option => $"{option.option}: {option.chance}%"));
+                var selectedText = string.Join(' ', allOptions.Take(selectCount).Select(item => item.option));
+                var optionWithPercentText = string.Join('\n', allOptions.Select(option => $"- {option.option} [(x{option.rank}) {option.chance}%/]"));
 
-                    await MiraiService.SendMessageToGroup(messages.Sender.Group, token,
-                    [
-                        new PlainMessage($"从 {options.Length} 个选项中中选 {selectCount} 个\n{optionWithPercentText}\n\n我选: {selectedText}"),
-                    ]);
-                    return;
-                }
+                await MiraiService.SendMessageToGroup(messages.Sender.Group, token,
+                [
+                    new PlainMessage($"从 {options.Count} 个选项中中选 {selectCount} 个\n{optionWithPercentText}\n\n我选: {selectedText}"),
+                ]);
+                return;
             }
         }
     }
