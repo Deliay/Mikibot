@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Mikibot.Analyze.Generic;
 using Mikibot.Analyze.MiraiHttp;
 using Mirai.Net.Data.Messages;
 using Mirai.Net.Data.Messages.Concretes;
@@ -28,21 +29,19 @@ namespace Mikibot.Analyze.Bot
         }
     }
 
-    public class AntiBoyFriendFanVoiceService
+    public class AntiBoyFriendFanVoiceService : MiraiGroupMessageProcessor<AntiBoyFriendFanVoiceService>
     {
         public AntiBoyFriendFanVoiceService(
             IMiraiService miraiService,
-            ILogger<AntiBoyFriendFanVoiceService> logger)
+            ILogger<AntiBoyFriendFanVoiceService> logger) : base(miraiService, logger)
         {
-            MiraiService = miraiService;
-            Logger = logger;
             VoiceBaseDir = Environment.GetEnvironmentVariable("MIKI_VOICE_DIR") ?? Path.GetTempPath();
 
             Logger.LogInformation("弥弥语音包位置：{}", VoiceBaseDir);
             try
             {
-                voices = new()
-                {
+                Voices =
+                [
                     QVoice.Of(LoadVoice("mxmk_is_not_your_gf.amr"), new Regex(":女朋友|:女友")),
                     QVoice.Of(LoadVoice("mxmk_laugh_hetun.amr"), new Regex(":河豚")),
                     QVoice.Of(LoadVoice("mxmk_16yrs_old.amr"), new Regex(":岁")),
@@ -89,9 +88,9 @@ namespace Mikibot.Analyze.Bot
                         ":awsl,:🐕|:🐶|:狗|:dog,:为什么|:为甚么,:变态,:病,:小红书,:上当,:寄,:jb,:懒,:笑,:填满,:外卖" +
                         ":吃我,:发病,:晚安,:早安,:花呗,:飞扑,:女鬼,:星降,:漏了,:奶,:喜欢弥人,:大坏蛋,:亚撒西"),
                     }, new Regex(":help")),
-                    QVoice.Of(new MessageBase[] {
+                    QVoice.Of([
                         new PlainMessage("mxmk歌单：夏天的风、心墙、下雨天、求佛、メンヘラじゃないもん/地雷、十月表、陀螺人、勇者王、可愛くてごめん/这么可爱真是抱歉/可爱（使用::歌名点歌，如果有/，可以用/后面的简写点歌）"),
-                    }, new Regex("::歌单")),
+                    ], new Regex("::歌单")),
                     QVoice.Of(LoadVoice("mxmk_xtdf.amr"), new Regex("::夏天的风")),
                     QVoice.Of(LoadVoice("mxmk_xinqiang.amr"), new Regex("::心墙")),
                     QVoice.Of(LoadVoice("mxmk_xiayutian.amr"), new Regex("::下雨天")),
@@ -101,51 +100,37 @@ namespace Mikibot.Analyze.Bot
                     QVoice.Of(LoadVoice("mxmk_songs_tuoluo_ren_huanxiang.amr"), new Regex("::陀螺人")),
                     QVoice.Of(LoadVoice("mxmk_songs_yong_zhe_wang.amr"), new Regex("::勇者王")),
                     QVoice.Of(LoadVoice("mxmk-songs-kawaikute.amr"), new Regex("::可爱|::这么可爱真是抱歉|::可愛くてごめん")),
-                };
+                ];
             } catch (Exception e)
             {
                 logger.LogWarning(e, "语音包加载失败");
             }
         }
 
-        private List<QVoice> voices { get; } = new();
-        private IMiraiService MiraiService { get; }
-        private ILogger<AntiBoyFriendFanVoiceService> Logger { get; }
+        private List<QVoice> Voices { get; } = [];
         public string VoiceBaseDir { get; }
 
-        private readonly Channel<GroupMessageReceiver> messageQueue = Channel
-        .CreateUnbounded<GroupMessageReceiver>(new UnboundedChannelOptions()
-            {
-                SingleWriter = true,
-                AllowSynchronousContinuations = false,
-            });
-
-        private void FilterMessage(GroupMessageReceiver message)
-        {
-            _ = messageQueue.Writer.WriteAsync(message);
-        }
-
-        private readonly Dictionary<string, DateTimeOffset> lastSentAt = new();
-        private readonly Dictionary<QVoice, DateTimeOffset> lastVoiceSentAt = new();
+        private readonly Dictionary<string, DateTimeOffset> lastSentAt = [];
+        private readonly Dictionary<QVoice, DateTimeOffset> lastVoiceSentAt = [];
 
         private MessageBase[] LoadVoice(string filename)
         {
             var path = Path.Combine(VoiceBaseDir, filename);
             Logger.LogInformation("加载语音：{}", path);
-            return new MessageBase[]
-            {
+            return
+            [
                 new VoiceMessage()
                 {
                     Base64 = Convert.ToBase64String(File.ReadAllBytes(path)),
                 }
-            };
+            ];
         }
 
         private bool CheckTime<T>(Dictionary<T, DateTimeOffset> set, T id, TimeSpan duration) where T : notnull
         {
-            if (set.ContainsKey(id))
+            if (set.TryGetValue(id, out DateTimeOffset value))
             {
-                var time = DateTimeOffset.Now - set[id];
+                var time = DateTimeOffset.Now - value;
                 Logger.LogInformation("上次发送间隔：{}s", time.TotalSeconds);
                 if (time < duration)
                 {
@@ -184,43 +169,19 @@ namespace Mikibot.Analyze.Bot
             return true;
         }
 
-
-        private async ValueTask Dequeue(CancellationToken token)
+        protected override async ValueTask Process(GroupMessageReceiver msg, CancellationToken token = default)
         {
-            await foreach (var msg in this.messageQueue.Reader.ReadAllAsync(token))
-            {
-                var group = msg.Sender.Group;
+            var group = msg.Sender.Group;
 
-                foreach (var rawMsg in msg.MessageChain)
+            foreach (var rawMsg in msg.MessageChain)
+            {
+                if (rawMsg is PlainMessage plain)
                 {
-                    if (rawMsg is PlainMessage plain)
+                    Logger.LogInformation("[QQ群] {}({}) 发言：{}", msg.Sender.Name, msg.Sender.Id, plain.Text);
+                    foreach (var item in Voices)
                     {
-                        Logger.LogInformation("[QQ群] {}({}) 发言：{}", msg.Sender.Name, msg.Sender.Id, plain.Text);
-                        foreach (var item in voices)
-                        {
-                            if (await MatchMessage(group, plain, item, token)) return;
-                        }
+                        if (await MatchMessage(group, plain, item, token)) return;
                     }
-                }
-
-            }
-        }
-
-        public async Task Run(CancellationToken token)
-        {
-            Logger.LogInformation("Anti男友粉机器人启动中");
-            MiraiService.SubscribeMessage(FilterMessage, token);
-            while (!token.IsCancellationRequested)
-            {
-                try
-                {
-                    await messageQueue.Reader.WaitToReadAsync(token);
-                    Logger.LogInformation("开始消费男友粉发言...");
-                    await Dequeue(token);
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogError("男友粉anit出错！", ex);
                 }
             }
         }

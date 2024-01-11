@@ -11,14 +11,9 @@ using System.Threading.Tasks;
 
 namespace Mikibot.Analyze.Bot
 {
-    public class MikiDanmakuProxyService
+    public class MikiDanmakuProxyService(IMiraiService miraiService)
     {
-        public MikiDanmakuProxyService(IMiraiService miraiService)
-        {
-            MiraiService = miraiService;
-        }
-
-        private IMiraiService MiraiService { get; }
+        private IMiraiService MiraiService { get; } = miraiService;
 
         public async Task HandleDanmaku(DanmuMsg msg)
         {

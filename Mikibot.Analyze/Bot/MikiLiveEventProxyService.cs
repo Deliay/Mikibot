@@ -17,14 +17,9 @@ public static class MikiLiveEventProxyServiceExtensions
     }
 }
 
-public class MikiLiveEventProxyService
+public class MikiLiveEventProxyService(IMiraiService miraiService)
 {
-    public MikiLiveEventProxyService(IMiraiService miraiService)
-    {
-        MiraiService = miraiService;
-    }
-
-    private IMiraiService MiraiService { get; }
+    private IMiraiService MiraiService { get; } = miraiService;
 
     public async Task HandleAnchorStart(AnchorLotStart msg)
     {
