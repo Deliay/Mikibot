@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using MathNet.Numerics.Random;
 using Microsoft.Extensions.Logging;
 using Mikibot.Analyze.Generic;
 using Mikibot.Analyze.MiraiHttp;
@@ -49,16 +50,21 @@ public partial class OptionaSelectorService(IMiraiService miraiService, ILogger<
                     .Split(' ')
                     .Select(option => option.Trim())
                     .Where(option => option.Length > 0)
+                    .Select(option => (option, roll: Random.NextDecimal() * 100))
                     .ToList();
 
+                var all = options.Select(option => option.roll).Sum();
+
                 var allOptions = options
-                    .GroupBy(option => option)
-                    .Select(group => (option: group.Key, rank: group.Count(), rolls: group.Select((_) => Random.Next(1, 101))))
+                    .GroupBy(option => option.option)
+                    .Select(group => (option: group.Key, rank: group.Count(), rolls: group.Select(option => option.roll).ToList()))
                     .Select(optionGroup => (
                         optionGroup.option,
                         optionGroup.rank,
-                        chance: optionGroup.rolls.Sum()))
+                        rollStr: optionGroup.rolls.Count > 1 ? string.Join('+', optionGroup.rolls.Select(i => $"{i / all * 100:0.00}")) + "=" : "",
+                        chance: optionGroup.rolls.Sum() / all))
                     .OrderByDescending(item => item.chance)
+                    .Select(item => (item.option, item.rank, item.rollStr, chance: $"{item.chance * 100:0.00}%"))
                     .ToList();
 
                 if (allOptions.Count == 1)
@@ -73,7 +79,7 @@ public partial class OptionaSelectorService(IMiraiService miraiService, ILogger<
                 }
 
                 var selectedText = string.Join(' ', allOptions.Take(selectCount).Select(item => item.option));
-                var optionWithPercentText = string.Join('\n', allOptions.Select(option => $"- {option.option} [x{option.rank} {option.chance}%]"));
+                var optionWithPercentText = string.Join('\n', allOptions.Select(option => $"- {option.option} [{option.rollStr}{option.chance}]"));
 
                 await MiraiService.SendMessageToGroup(messages.Sender.Group, token,
                 [
