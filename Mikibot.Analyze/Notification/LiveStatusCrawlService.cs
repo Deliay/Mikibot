@@ -58,7 +58,7 @@ namespace Mikibot.Analyze.Notification
         private async ValueTask<LiveStatus> GenerateStatus(string bid, LiveRoomInfo info, CancellationToken token)
             => new()
             {
-                Cover = info.Background,
+                Cover = info.UserCover,
                 Notified = false,
                 Status = info.LiveStatus,
                 FollowerCount = (int)await Crawler.GetFollowerCount(BiliLiveCrawler.mxmk, token),
@@ -84,7 +84,7 @@ namespace Mikibot.Analyze.Notification
             Logger.LogInformation("Message composed {}", msg);
             return
             [
-                new ImageMessage() { Url = info.Background },
+                new ImageMessage() { Url = info.UserCover },
                 new PlainMessage(msg),
             ];
         }
@@ -122,7 +122,7 @@ namespace Mikibot.Analyze.Notification
                             {
                                 await Mirai.SendMessageToSomeGroup(GroupMapping[rid], token,
                                 [
-                                    new ImageMessage() { Url = info.Background },
+                                    new ImageMessage() { Url = info.UserCover },
                                     new PlainMessage($"诶嘿，开始为您持续关注 {info.RoomId} 的开播信息~\n{info.Url}"),
                                 ]);
                             }
