@@ -49,12 +49,12 @@ public class RandomImageService(IMiraiService miraiService, ILogger<RandomImageS
             try
             {
                 await messageQueue.Reader.WaitToReadAsync(token);
-                logger.LogInformation("started B站连接parser...");
+                logger.LogInformation("started 随机图图...");
                 await Dequeue(token);
             }
             catch (Exception ex)
             {
-                logger.LogError("B站连接parserr！", ex);
+                logger.LogError("随机图图", ex);
             }
         }
     }

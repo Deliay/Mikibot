@@ -97,14 +97,15 @@ namespace Mikibot.Analyze.Notification
                 Logger.LogInformation("{} 秒后开始同步状态", next);
                 // 每15~30秒收集一次数据
                 await Task.Delay(TimeSpan.FromSeconds(next), token);
-                foreach (var bid in GroupMapping.Keys)
+                foreach (var rid in GroupMapping.Keys)
                 {
-                    Logger.LogInformation($"开始同步 {bid} 状态");
+                    Logger.LogInformation($"开始同步 {rid} 状态");
                     await Task.Delay(TimeSpan.FromSeconds(random.Next(1, 5)), token);
                     try
                     {
+                        var bid = GetBid(rid);
                         var latest = await db.LiveStatuses.Where(s => s.Bid == bid).OrderBy(s => s.Id).LastOrDefaultAsync(token);
-                        var info = await Crawler.GetLiveRoomInfo(GetRid(bid), token);
+                        var info = await Crawler.GetLiveRoomInfo(long.Parse(rid), token);
                         // 发通知咯！
                         if (latest == null || (latest.Status != info.LiveStatus))
                         {
@@ -115,11 +116,11 @@ namespace Mikibot.Analyze.Notification
                             // 发开播消息
                             if (latest != null)
                             {
-                                await Mirai.SendMessageToSomeGroup(GroupMapping[bid], token, ComposeMessage(info, latest, newly));
+                                await Mirai.SendMessageToSomeGroup(GroupMapping[rid], token, ComposeMessage(info, latest, newly));
                             }
                             else
                             {
-                                await Mirai.SendMessageToSomeGroup(GroupMapping[bid], token,
+                                await Mirai.SendMessageToSomeGroup(GroupMapping[rid], token,
                                 [
                                     new ImageMessage() { Url = info.Background },
                                     new PlainMessage($"诶嘿，开始为您持续关注 {info.RoomId} 的开播信息~\n{info.Url}"),
