@@ -69,28 +69,68 @@ public class PingtiItemReplaceService(IMiraiService miraiService, ILogger<Pingti
         
     }
 
-    private readonly List<PlainMessage> messageCache = [];
-    private DateTime lastSendTime = DateTime.Now - TimeSpan.FromSeconds(5);
+    private readonly Dictionary<string, List<PlainMessage>> messageCache = [];
+    private readonly Dictionary<string, DateTime> lastSendTime = [];
     private readonly SemaphoreSlim _lockSend = new(1);
+
+    protected override ValueTask PreRun(CancellationToken token)
+    {
+        _ = Task.Run(async () =>
+        {
+            while (!token.IsCancellationRequested)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(5), token);
+                await _lockSend.WaitAsync();
+                try
+                {
+                    foreach (var (groupId, messages) in messageCache)
+                    {
+                        if (messages.Count > 0)
+                        {
+                            Logger.LogInformation($"处理聚合消息 {groupId} 共 {messages.Count} 条");
+                            await MiraiService.SendMessageToSomeGroup([groupId], token, messages.ToArray());
+                            messages.Clear();
+                        }
+                    }
+                }
+                finally
+                {
+                    _lockSend.Release();
+                }
+            }
+        }, token);
+
+        return ValueTask.CompletedTask;
+    }
 
     protected override async ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
     {
         foreach (var msg in message.MessageChain)
         {
-            if (msg is PlainMessage plain && plain.Text.StartsWith("!平替") && plain.Text.Length > 3)
+            if (msg is PlainMessage plain && (plain.Text.StartsWith("!平替") || plain.Text.StartsWith("！平替"))  && plain.Text.Length > 3)
             {
-                var item = plain.Text[3..];
-                var replace = await GetReplaceItem(item, token);
-                messageCache.Add(new PlainMessage($"{item} 的平替是 {replace}"));
-
                 await _lockSend.WaitAsync(token);
                 try
                 {
-                    if (DateTime.Now - lastSendTime > TimeSpan.FromSeconds(2))
+                    var item = plain.Text[3..].Trim();
+                    var replace = await GetReplaceItem(item, token);
+
+                    if (!messageCache.TryGetValue(message.GroupId, out var cachedMsgs))
                     {
-                        await MiraiService.SendMessageToGroup(message.Sender.Group, token, messageCache.ToArray());
-                        messageCache.Clear();
-                        lastSendTime = DateTime.Now;
+                        messageCache.Add(message.GroupId, cachedMsgs = []);
+                    }
+
+                    cachedMsgs.Add(new PlainMessage($"{item} 的平替是 {replace}"));
+                    if (!lastSendTime.TryGetValue(message.GroupId, out var lastSendAt))
+                    {
+                        lastSendTime.Add(message.GroupId, lastSendAt = DateTime.Now - TimeSpan.FromSeconds(5));
+                    }
+
+                    if (DateTime.Now - lastSendAt > TimeSpan.FromSeconds(5))
+                    {
+                        await MiraiService.SendMessageToGroup(message.Sender.Group, token, messageCache[message.GroupId].ToArray());
+                        messageCache[message.GroupId].Clear();
+                        lastSendTime[message.GroupId] = DateTime.Now;
                     }
                 }
                 finally

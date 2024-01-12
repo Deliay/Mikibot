@@ -32,8 +32,11 @@ public abstract class MiraiGroupMessageProcessor<T>(IMiraiService miraiService, 
 
     protected abstract ValueTask Process(GroupMessageReceiver message, CancellationToken token = default);
 
+    protected virtual ValueTask PreRun(CancellationToken token) => ValueTask.CompletedTask;
+
     public async Task Run(CancellationToken token)
     {
+        await PreRun(token);
         logger.LogInformation("Mirai group handling message: {}", serviceName);
         miraiService.SubscribeMessage(FilterMessage, token);
         while (!token.IsCancellationRequested)
