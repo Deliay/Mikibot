@@ -46,6 +46,7 @@ appBuilder.RegisterType<AntiBoyFriendFanVoiceService>().AsSelf().SingleInstance(
 appBuilder.RegisterType<AiVoiceGenerationService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<RandomImageService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<OptionaSelectorService>().AsSelf().SingleInstance();
+appBuilder.RegisterType<PingtiItemReplaceService>().AsSelf().SingleInstance();
 
 var appContainer = appBuilder.Build();
 
@@ -85,6 +86,7 @@ using (var app = appContainer.BeginLifetimeScope())
     var biliParser = app.Resolve<BiliBiliVideoLinkShareProxerService>();
     var randomImage = app.Resolve<RandomImageService>();
     var optionaSelector = app.Resolve<OptionaSelectorService>();
+    var pingti = app.Resolve<PingtiItemReplaceService>();
 
     eventService.CmdHandler.Register(danmakuCrawler);
     eventService.CmdHandler.Register(mxmkLiveEventProxy);
@@ -105,5 +107,6 @@ using (var app = appContainer.BeginLifetimeScope())
         //aiImage.Run(token),
         aiVoice.Run(token),   
         optionaSelector.Run(token),
+        pingti.Run(token),
     ]);
 }

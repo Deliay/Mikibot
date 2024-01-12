@@ -87,6 +87,7 @@ namespace Mikibot.Analyze.Notification
         private async Task<string> GetRecentlyLiveStreamStatus(DateTimeOffset start, CancellationToken token)
         {
             var result = await db.LiveStatuses
+                    .Where(s => s.Bid == BiliLiveCrawler.mxmks)
                     .Where(s => s.CreatedAt > start)
                     .GroupBy(s => s.Title)
                     .Select(sg => new

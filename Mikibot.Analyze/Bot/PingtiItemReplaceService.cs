@@ -1,0 +1,103 @@
+using System.Text.Json;
+using Microsoft.Extensions.Logging;
+using Mikibot.Analyze.Generic;
+using Mikibot.Analyze.MiraiHttp;
+using Mirai.Net.Data.Messages.Concretes;
+using Mirai.Net.Data.Messages.Receivers;
+
+namespace Mikibot.Analyze.Bot;
+
+public class PingtiItemReplaceService(IMiraiService miraiService, ILogger<PingtiItemReplaceService> logger)
+    : MiraiGroupMessageProcessor<PingtiItemReplaceService>(miraiService, logger)
+{
+    private readonly HttpClient client = new()
+    {
+        DefaultRequestHeaders =
+        {
+            {"origin", "https://www.pingti.xyz"},
+            {"pragma", "no-cache"},
+            {"referer", "https://www.pingti.xyz/"},
+            {"sec-ch-ua", "\"Not_A Brand\";v=\"8\", \"Chromium\";v=\"120\", \"Microsoft Edge\";v=\"120\""},
+            {"sec-ch-ua-mobile", "?0"},
+            {"sec-ch-ua-platform", "\"Linux\""},
+            {"accept", "*/*"},
+            {"accept-language", "en,zh-CN;q=0.9,zh;q=0.8,en-GB;q=0.7,en-US;q=0.6"},
+            {"cache-control", "no-cache"},
+            {"user-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0"},
+            {"cookie", "cf_clearance=Sinygclcc1o7JXKQUGMwupF2cKeaPvhnD0Hl7mUy5lw-1705043751-0-2-84a182b5.a081298a.d9b532ed-0.2.1705043751; _ga=GA1.1.1591650678.1705043753; _ga_3E02DMZGKH=GS1.1.1705050411.2.1.1705050843.0.0.0"}
+        },
+        Timeout = TimeSpan.FromSeconds(10),
+    };
+    private readonly SemaphoreSlim _lock = new(1);
+    private static readonly string CacheFile = Path.Combine(Environment.GetEnvironmentVariable("MIKI_VOICE_DIR") ?? "", "pingti.json");
+    private readonly Dictionary<string, string> Cache = File.Exists(CacheFile)
+        ? JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(CacheFile)) ?? []
+        : [];
+
+    private async ValueTask<string> GetReplaceItemRequest(string raw, CancellationToken token = default)
+    {
+        var msgStr = "{\"messages\":[{\"role\":\"user\",\"content\":" + JsonSerializer.Serialize(raw) + "}]}";
+        var res = await client.PostAsync("https://www.pingti.xyz/api/chat", new StringContent(msgStr, null, "text/plain"), token);
+        
+        res.EnsureSuccessStatusCode();
+
+        var result = await res.Content.ReadAsStringAsync(token);
+
+        return result;
+    }
+    private async ValueTask<string> GetReplaceItem(string raw, CancellationToken token = default)
+    {
+        await _lock.WaitAsync(token);
+        try
+        {
+            if (!Cache.TryGetValue(raw, out string? value))
+            {
+                Cache.Add(raw, value = await GetReplaceItemRequest(raw, token));
+                await File.WriteAllTextAsync(CacheFile, JsonSerializer.Serialize(Cache), token);
+            }
+
+            return value;
+        }
+        catch (Exception e)
+        {
+            return $"获取失败 {e.Message}";
+        }
+        finally
+        {
+            _lock.Release();
+        }
+        
+    }
+
+    private readonly List<PlainMessage> messageCache = [];
+    private DateTime lastSendTime = DateTime.Now - TimeSpan.FromSeconds(5);
+    private readonly SemaphoreSlim _lockSend = new(1);
+
+    protected override async ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
+    {
+        foreach (var msg in message.MessageChain)
+        {
+            if (msg is PlainMessage plain && plain.Text.StartsWith("!平替") && plain.Text.Length > 3)
+            {
+                var item = plain.Text[3..];
+                var replace = await GetReplaceItem(item, token);
+                messageCache.Add(new PlainMessage($"{item} 的平替是 {replace}"));
+
+                await _lockSend.WaitAsync(token);
+                try
+                {
+                    if (DateTime.Now - lastSendTime > TimeSpan.FromSeconds(2))
+                    {
+                        await MiraiService.SendMessageToGroup(message.Sender.Group, token, messageCache.ToArray());
+                        messageCache.Clear();
+                        lastSendTime = DateTime.Now;
+                    }
+                }
+                finally
+                {
+                    _lockSend.Release();
+                }
+            }
+        }
+    }
+}
