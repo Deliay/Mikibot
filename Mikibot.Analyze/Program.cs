@@ -107,6 +107,6 @@ using (var app = appContainer.BeginLifetimeScope())
         //aiImage.Run(token),
         aiVoice.Run(token),   
         optionaSelector.Run(token),
-        pingti.Run(token),
+        // pingti.Run(token),
     ]);
 }
