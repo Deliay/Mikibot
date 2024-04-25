@@ -31,6 +31,16 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger) : IMiraiServic
         await using var fileStream = File.OpenRead(BotLoginStore);
         return await JsonSerializer.DeserializeAsync<BotKeystore>(fileStream);
     }
+    private static async ValueTask SaveKeyStore(BotKeystore keystore)
+    {
+        if (File.Exists(BotLoginStore))
+        {
+            File.Move(BotLoginStore, BotLoginStore + "-" + Guid.NewGuid());
+        }
+        
+        await using var fileStream = File.OpenWrite(BotLoginStore);
+        await JsonSerializer.SerializeAsync(fileStream, keystore);
+    }
     
     private static async ValueTask<BotDeviceInfo> GetDeviceInfo()
     {
@@ -60,7 +70,6 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger) : IMiraiServic
         
         tcs.SetCanceled(cts.Token);
         bot.Invoker.OnBotOnlineEvent += InvokerOnOnBotOnlineEvent;
-        bot.Invoker.OnBotOfflineEvent += InvokerOnOnBotOfflineEvent;
 
         try
         {
@@ -69,15 +78,9 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger) : IMiraiServic
         finally
         {
             bot.Invoker.OnBotOnlineEvent -= InvokerOnOnBotOnlineEvent;
-            bot.Invoker.OnBotOfflineEvent -= InvokerOnOnBotOfflineEvent;
         }
 
         return;
-        void InvokerOnOnBotOfflineEvent(BotContext context, BotOfflineEvent e)
-        {
-            tcs.SetCanceled();
-        }
-
         void InvokerOnOnBotOnlineEvent(BotContext context, BotOnlineEvent @event)
         {
             tcs.TrySetResult();
@@ -103,7 +106,8 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger) : IMiraiServic
         logger.LogInformation("等待登录中...");
         await WaitBotOnlineAsync(TimeSpan.FromMinutes(2));
         logger.LogInformation("登录完成");
-        
+
+        await SaveKeyStore(bot.UpdateKeystore());
     }
 
     private static IEnumerable<MessageBase> ConvertMessageToMiraiCore(MessageChain lagrange)
