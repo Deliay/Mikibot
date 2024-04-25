@@ -23,7 +23,8 @@ appBuilder.Register((_) => MiraiBotConfig.FromEnviroment());
 #if DEBUG
 appBuilder.RegisterType<ConsoleMiraiService>().As<IMiraiService>().SingleInstance();
 appBuilder.RegisterType<LocalOssService>().As<IOssService>().SingleInstance();
-appBuilder.RegisterType<ConsoleEmailService>().As<IEmailService>().SingleInstance();
+// appBuilder.RegisterType<ConsoleEmailService>().As<IEmailService>().SingleInstance();
+appBuilder.RegisterType<LagrangeBotBridge>().As<IMiraiService>().SingleInstance();
 #else
 appBuilder.RegisterType<LagrangeBotBridge>().As<IMiraiService>().SingleInstance();
 // appBuilder.RegisterType<MiraiService>().As<IMiraiService>().SingleInstance();
@@ -73,11 +74,11 @@ using (var app = appContainer.BeginLifetimeScope())
 
     var statusCrawler = app.Resolve<LiveStatusCrawlService>();
     var followerStat = app.Resolve<DailyFollowerStatisticService>();
-    var eventService = app.Resolve<LiveStreamEventService>();
+    // var eventService = app.Resolve<LiveStreamEventService>();
 
-    var danmakuClip = app.Resolve<DanmakuRecordControlService>();
-    var danmakuCrawler = app.Resolve<DanmakuCollectorService>();
-    var danmakuExportGuard = app.Resolve<DanmakuExportGuardList>();
+    // var danmakuClip = app.Resolve<DanmakuRecordControlService>();
+    // var danmakuCrawler = app.Resolve<DanmakuCollectorService>();
+    // var danmakuExportGuard = app.Resolve<DanmakuExportGuardList>();
 
     var aiVoice = app.Resolve<AiVoiceGenerationService>();
     //var aiImage = app.Resolve<AiImageGenerationService>();
@@ -89,19 +90,19 @@ using (var app = appContainer.BeginLifetimeScope())
     var optionaSelector = app.Resolve<OptionaSelectorService>();
     var pingti = app.Resolve<PingtiItemReplaceService>();
 
-    eventService.CmdHandler.Register(danmakuCrawler);
-    eventService.CmdHandler.Register(mxmkLiveEventProxy);
+    // eventService.CmdHandler.Register(danmakuCrawler);
+    // eventService.CmdHandler.Register(mxmkLiveEventProxy);
 
-    eventService.CmdHandler.Subscribe<DanmuMsg>(danmakuClip.HandleDanmu);
-    eventService.CmdHandler.Subscribe<DanmuMsg>(danmakuExportGuard.HandleDanmaku);
-    eventService.CmdHandler.Subscribe<DanmuMsg>(mxmkDanmakuProxy.HandleDanmaku);
+    // eventService.CmdHandler.Subscribe<DanmuMsg>(danmakuClip.HandleDanmu);
+    // eventService.CmdHandler.Subscribe<DanmuMsg>(danmakuExportGuard.HandleDanmaku);
+    // eventService.CmdHandler.Subscribe<DanmuMsg>(mxmkDanmakuProxy.HandleDanmaku);
 
     logger.LogInformation("Starting schedule module...");
     await Task.WhenAll(
     [
         statusCrawler.Run(token),
         followerStat.Run(token),
-        eventService.Run(token),
+        // eventService.Run(token),
         bffAnti.Run(token),
         biliParser.Run(token),
         randomImage.Run(token),

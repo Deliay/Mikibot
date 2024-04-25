@@ -51,6 +51,7 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger, ILogger<BotCon
             info.DeviceName = "Generic x86 System";
             info.KernelVersion = "6.6.7-arch1-1";
             info.SystemKernel = "Linux";
+            
             await using var file = File.OpenWrite(BotDeviceStore);
             await JsonSerializer.SerializeAsync(file, info);
             
@@ -89,9 +90,30 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger, ILogger<BotCon
     public async ValueTask Run()
     {
         var botKeystore = await GetKeyStore();
+        bot = BotFactory.Create(new BotConfig()
+        {
+            Protocol = Protocols.Linux,
+        }, await GetDeviceInfo(), new BotKeystore());
+        bot.Invoker.OnBotLogEvent += (_, args) => botLogger.Log(args.Level switch
+        {
+            LogLevel.Debug => Microsoft.Extensions.Logging.LogLevel.Trace,
+            LogLevel.Verbose => Microsoft.Extensions.Logging.LogLevel.Information,
+            LogLevel.Information => Microsoft.Extensions.Logging.LogLevel.Information,
+            LogLevel.Warning => Microsoft.Extensions.Logging.LogLevel.Warning,
+            LogLevel.Fatal => Microsoft.Extensions.Logging.LogLevel.Error,
+            _ => Microsoft.Extensions.Logging.LogLevel.Error
+        }, args.ToString());
+        bot.Invoker.OnBotCaptchaEvent += (_, @event) =>
+        {
+            Console.WriteLine(@event.ToString());
+            var captcha = Console.ReadLine();
+            var randStr = Console.ReadLine();
+            if (captcha != null && randStr != null) bot.SubmitCaptcha(captcha, randStr);
+        };
+        bot.Invoker.OnGroupMessageReceived += InvokerOnOnGroupMessageReceived;
+
         if (botKeystore is null)
         {
-            bot = BotFactory.Create(new BotConfig(), await GetDeviceInfo(), new BotKeystore());
 
             var result = await bot.FetchQrCode();
             if (!result.HasValue) throw new InvalidOperationException("Lagrange无法获得二维码");
@@ -102,18 +124,9 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger, ILogger<BotCon
         }
         else
         {
-            bot = BotFactory.Create(new BotConfig(), await GetDeviceInfo(), botKeystore);
+            await bot.LoginByPassword();
         }
-        bot.Invoker.OnBotLogEvent += (_, args) => botLogger.Log(args.Level switch
-        {
-            LogLevel.Debug => Microsoft.Extensions.Logging.LogLevel.Trace,
-            LogLevel.Verbose => Microsoft.Extensions.Logging.LogLevel.Information,
-            LogLevel.Information => Microsoft.Extensions.Logging.LogLevel.Information,
-            LogLevel.Warning => Microsoft.Extensions.Logging.LogLevel.Warning,
-            LogLevel.Fatal => Microsoft.Extensions.Logging.LogLevel.Error,
-            _ => Microsoft.Extensions.Logging.LogLevel.Error
-        }, args.ToString());
-        bot.Invoker.OnGroupMessageReceived += InvokerOnOnGroupMessageReceived;
+        await bot.LoginByPassword();
         
         logger.LogInformation("等待登录中...");
         await WaitBotOnlineAsync();
