@@ -97,6 +97,7 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger) : IMiraiServic
         
             logger.LogInformation("需要扫码登录，二维码图片[png]：base64={}", Convert.ToBase64String(result.Value.QrCode));
             await bot.LoginByQrCode();
+            await SaveKeyStore(bot.UpdateKeystore());
         }
 
         bot.Invoker.OnGroupMessageReceived += InvokerOnOnGroupMessageReceived;
@@ -104,8 +105,6 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger) : IMiraiServic
         logger.LogInformation("等待登录中...");
         await WaitBotOnlineAsync();
         logger.LogInformation("登录完成");
-
-        await SaveKeyStore(bot.UpdateKeystore());
     }
 
     private static IEnumerable<MessageBase> ConvertMessageToMiraiCore(MessageChain lagrange)
@@ -249,6 +248,7 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger) : IMiraiServic
     private readonly Dictionary<Action<GroupMessageReceiver>, CancellationTokenRegistration> _subscriber = [];
     public void SubscribeMessage(Action<GroupMessageReceiver> next, CancellationToken token)
     {
+        logger.LogInformation("注册消费消息: {}", next);
         _subscriber.Add(next, token.Register(() =>
         {
             _subscriber.TryGetValue(next, out var reg);
