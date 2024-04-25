@@ -13,11 +13,12 @@ using Mirai.Net.Data.Messages.Concretes;
 using Mirai.Net.Data.Messages.Receivers;
 using Mirai.Net.Data.Shared;
 using File = System.IO.File;
+using LogLevel = Lagrange.Core.Event.EventArg.LogLevel;
 using MessageChain = Lagrange.Core.Message.MessageChain;
 
 namespace Mikibot.Analyze.MiraiHttp;
 
-public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger) : IMiraiService
+public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger, ILogger<BotContext> botLogger) : IMiraiService
 {
     private static readonly string BotConfigDir = Environment.GetEnvironmentVariable("BOT_CONFIG_DIR") ?? Path.GetTempPath();
 
@@ -99,7 +100,19 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger) : IMiraiServic
             await bot.LoginByQrCode();
             await SaveKeyStore(bot.UpdateKeystore());
         }
-
+        else
+        {
+            bot = BotFactory.Create(new BotConfig(), await GetDeviceInfo(), botKeystore);
+        }
+        bot.Invoker.OnBotLogEvent += (_, args) => botLogger.Log(args.Level switch
+        {
+            LogLevel.Debug => Microsoft.Extensions.Logging.LogLevel.Trace,
+            LogLevel.Verbose => Microsoft.Extensions.Logging.LogLevel.Information,
+            LogLevel.Information => Microsoft.Extensions.Logging.LogLevel.Information,
+            LogLevel.Warning => Microsoft.Extensions.Logging.LogLevel.Warning,
+            LogLevel.Fatal => Microsoft.Extensions.Logging.LogLevel.Error,
+            _ => Microsoft.Extensions.Logging.LogLevel.Error
+        }, args.ToString());
         bot.Invoker.OnGroupMessageReceived += InvokerOnOnGroupMessageReceived;
         
         logger.LogInformation("等待登录中...");
