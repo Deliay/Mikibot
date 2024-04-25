@@ -25,7 +25,8 @@ appBuilder.RegisterType<ConsoleMiraiService>().As<IMiraiService>().SingleInstanc
 appBuilder.RegisterType<LocalOssService>().As<IOssService>().SingleInstance();
 appBuilder.RegisterType<ConsoleEmailService>().As<IEmailService>().SingleInstance();
 #else
-appBuilder.RegisterType<MiraiService>().As<IMiraiService>().SingleInstance();
+appBuilder.RegisterType<LagrangeBotBridge>().As<IMiraiService>().SingleInstance();
+// appBuilder.RegisterType<MiraiService>().As<IMiraiService>().SingleInstance();
 appBuilder.RegisterType<LocalOssService>().As<IOssService>().SingleInstance();
 appBuilder.RegisterType<ConsoleEmailService>().As<IEmailService>().SingleInstance();
 #endif

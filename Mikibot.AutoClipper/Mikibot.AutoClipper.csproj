@@ -19,6 +19,7 @@
 	<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
     <PackageReference Include="EmberSimpleHttpServer" Version="1.0.0" />
     <PackageReference Include="Xabe.FFmpeg" Version="5.2.3" />
+    <PackageReference Include="Lagrange.Core" Version="0.2.1" />
   </ItemGroup>
 
   <ItemGroup>

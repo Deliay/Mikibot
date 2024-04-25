@@ -27,6 +27,7 @@
     <PackageReference Include="QWeatherAPI" Version="1.3.3" />
 	<PackageReference Include="FFMpegCore" Version="5.1.0" />
 	<PackageReference Include="Mikibot.Crawler" Version="1.0.4" />
+    <PackageReference Include="Lagrange.Core" Version="0.2.1" />
   </ItemGroup>
 
   <ItemGroup>
