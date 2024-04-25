@@ -63,12 +63,10 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger) : IMiraiServic
 
     private BotContext bot = null!;
 
-    private async ValueTask WaitBotOnlineAsync(TimeSpan timeout)
+    private async ValueTask WaitBotOnlineAsync()
     {
         var tcs = new TaskCompletionSource();
-        using var cts = new CancellationTokenSource(timeout);
         
-        tcs.SetCanceled(cts.Token);
         bot.Invoker.OnBotOnlineEvent += InvokerOnOnBotOnlineEvent;
 
         try
@@ -104,7 +102,7 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger) : IMiraiServic
         bot.Invoker.OnGroupMessageReceived += InvokerOnOnGroupMessageReceived;
         
         logger.LogInformation("等待登录中...");
-        await WaitBotOnlineAsync(TimeSpan.FromMinutes(2));
+        await WaitBotOnlineAsync();
         logger.LogInformation("登录完成");
 
         await SaveKeyStore(bot.UpdateKeystore());
