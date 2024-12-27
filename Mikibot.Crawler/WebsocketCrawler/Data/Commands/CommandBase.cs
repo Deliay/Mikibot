@@ -6,12 +6,68 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands;
+using Getters = (Func<ICommandBase, object?> infoGetter, Func<ICommandBase, object?> dataGetter);
 
 public interface ICommandBase
 {
     public KnownCommands Command { get; set; }
 
-    private static readonly Dictionary<KnownCommands, Type> CommandTypeMapping = new()
+    public static ICommandBase? Parse(string raw)
+    {
+        try
+        {
+            var rawCmd = JsonSerializer.Deserialize<JsonElement>(raw, CommandBaseHelper.JsonOptions);
+            if (!rawCmd.TryGetProperty("cmd", out var cmdJson)
+                || cmdJson.GetString() is not { Length: > 0 } cmdStr)
+            {
+#if DEBUG
+                Debug.WriteLine("Parse failed! The 'cmd' property is missing.");
+#endif
+                return null;
+            }
+
+            if (!Enum.TryParse<KnownCommands>(cmdStr, true, out _))
+            {
+#if DEBUG
+                Debug.WriteLine($"Unknown command: {raw}");
+#endif
+                return null;
+            }
+                
+            var cmd = rawCmd.Deserialize<CommandBase<JsonElement>>(CommandBaseHelper.JsonOptions);
+            if (!CommandBaseHelper.CommandTypeMapping.TryGetValue(cmd.Command, out var underlying))
+                return cmd;
+                
+            var converter = CommandBaseHelper.GetCommandConverter(underlying);
+            return converter(cmd, CommandBaseHelper.JsonOptions);
+        }
+        catch (Exception ex)
+        {
+#if DEBUG
+            Debug.WriteLine("{0} error {1}", raw, ex);
+#endif
+            return null!;
+        }
+    }
+}
+
+public struct CommandBase<T> : ICommandBase
+{
+    [JsonPropertyName("cmd")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public KnownCommands Command { get; set; }
+        
+    [JsonPropertyName("data")]
+    public T Data { get; set; }
+        
+    [JsonPropertyName("info")]
+    public T Info { get; set; }
+}
+
+public static class CommandBaseHelper
+{
+    
+    internal static readonly Dictionary<KnownCommands, Type> CommandTypeMapping = new()
     {
         { KnownCommands.DANMU_MSG, typeof(DanmuMsg) },
         { KnownCommands.SEND_GIFT, typeof(SendGift) },
@@ -30,22 +86,22 @@ public interface ICommandBase
     };
     private static readonly Dictionary<Type, KnownCommands> KnownCommandMapping =
         CommandTypeMapping.ToDictionary(p => p.Value, p => p.Key);
-
+    
     public static Type Mapping(KnownCommands command) => CommandTypeMapping[command];
     public static KnownCommands Mapping(Type type) => KnownCommandMapping[type];
     public static bool IsKnown(KnownCommands command) => CommandTypeMapping.ContainsKey(command);
     public static bool IsKnown(Type type) => KnownCommandMapping.ContainsKey(type);
-
-    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+    
+    public static void Register(KnownCommands command, Type type) => CommandTypeMapping.Add(command, type);
+    
+    internal static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
 
-    
-
     private static readonly MethodInfo RawMethod = ((Delegate)Convert<int>).Method.GetGenericMethodDefinition();
-    private delegate ICommandBase ConvertDelegate(CommandBase<JsonElement> json, JsonSerializerOptions options = null!);
+    internal delegate ICommandBase ConvertDelegate(CommandBase<JsonElement> json, JsonSerializerOptions options = null!);
     private static ICommandBase Convert<T>(CommandBase<JsonElement> json, JsonSerializerOptions options = null!)
     {
         var cmd = new CommandBase<T>()
@@ -59,7 +115,7 @@ public interface ICommandBase
     }
     
     private static readonly Dictionary<Type, ConvertDelegate> CommandFactoryConverter = [];
-    private static ConvertDelegate GetCommandConverter(Type underlyingType)
+    internal static ConvertDelegate GetCommandConverter(Type underlyingType)
     {
         if (CommandFactoryConverter.TryGetValue(underlyingType, out var converter)) return converter;
         
@@ -77,55 +133,33 @@ public interface ICommandBase
 
         return converter;
     }
+    
+    private static readonly Dictionary<Type, Getters> CommandPropertyAccessors = [];
 
-    public static ICommandBase? Parse(string raw)
+    public static Getters GetCommandPropertyGetters(Type type)
     {
-        try
-        {
-            var rawCmd = JsonSerializer.Deserialize<JsonElement>(raw, JsonSerializerOptions);
-            if (!rawCmd.TryGetProperty("cmd", out var cmdJson)
-                || cmdJson.GetString() is not { Length: >0 } cmdStr)
-            {
-                    
-#if DEBUG
-                Debug.WriteLine("Parse failed! The 'cmd' property is missing.");
-#endif
-                return null;
-            }
+        if (CommandPropertyAccessors.TryGetValue(type, out var getters)) return getters;
+        
+        // cmd
+        var arg = Expression.Parameter(typeof(ICommandBase));
+        
+        // cast = (CommandBase<T>)cmd
+        var casted = Expression.Convert(arg, type);
+        
+        // cast.Info
+        var propertyInfo = Expression.Property(casted, nameof(CommandBase<int>.Info));
+        var castInfoToObject = Expression.Convert(propertyInfo, typeof(object));
+        
+        // cast.Data
+        var propertyData = Expression.Property(casted, nameof(CommandBase<int>.Data));
+        var castDataToObject = Expression.Convert(propertyData, typeof(object));
+        
+        var infoGetter = Expression.Lambda<Func<ICommandBase, object?>>(castInfoToObject, arg).Compile();
+        
+        var dataGetter = Expression.Lambda<Func<ICommandBase, object?>>(castDataToObject, arg).Compile();
+        
+        CommandPropertyAccessors.Add(type, getters = (infoGetter, dataGetter));
 
-            if (!Enum.TryParse<KnownCommands>(cmdStr, true, out var command))
-            {
-#if DEBUG
-                Debug.WriteLine($"Unknown command: {raw}");
-#endif
-                return null;
-            }
-                
-            var cmd = rawCmd.Deserialize<CommandBase<JsonElement>>(JsonSerializerOptions);
-            if (!CommandTypeMapping.TryGetValue(cmd.Command, out var underlying)) return cmd;
-                
-            var converter = GetCommandConverter(underlying);
-            return converter(cmd, JsonSerializerOptions);
-        }
-        catch (Exception ex)
-        {
-#if DEBUG
-            Debug.WriteLine("{0} error {1}", raw, ex.ToString());
-#endif
-            return null!;
-        }
+        return getters;
     }
-}
-
-public struct CommandBase<T> : ICommandBase
-{
-    [JsonPropertyName("cmd")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public KnownCommands Command { get; set; }
-        
-    [JsonPropertyName("data")]
-    public T Data { get; set; }
-        
-    [JsonPropertyName("info")]
-    public T Info { get; set; }
 }

@@ -1,15 +1,14 @@
 using Mikibot.Crawler.Http.Bilibili.Model;
 
-namespace Mikibot.Crawler.Http.Bilibili
-{
-    public class BiliBasicInfoCrawler(HttpClient client) : HttpCrawler(client)
-    {
-        public async ValueTask<NavInfo> GetNavInfo(CancellationToken cancellationToken)
-        {
-            var result = await GetAsync<BilibiliApiResponse<NavInfo>>("https://api.bilibili.com/x/member/web/account", cancellationToken);
-            result.AssertCode();
+namespace Mikibot.Crawler.Http.Bilibili;
 
-            return result.Data;
-        }
+public class BiliBasicInfoCrawler(HttpClient client) : HttpCrawler(client)
+{
+    public async ValueTask<NavInfo> GetNavInfo(CancellationToken cancellationToken)
+    {
+        var result = await GetAsync<BilibiliApiResponse<NavInfo>>("https://api.bilibili.com/x/member/web/account", cancellationToken);
+        result.AssertCode();
+
+        return result.Data;
     }
 }

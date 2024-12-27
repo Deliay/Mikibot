@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
-namespace Mikibot.Crawler.Http.Bilibili.Model
+namespace Mikibot.Crawler.Http.Bilibili.Model;
+
+public struct LiveStreamAddresses
 {
-    public struct LiveStreamAddresses
-    {
-        [JsonPropertyName("durl")]
-        public List<LiveStreamAddress> Urls { get; set; }
-    }
+    [JsonPropertyName("durl")]
+    public List<LiveStreamAddress> Urls { get; set; }
 }

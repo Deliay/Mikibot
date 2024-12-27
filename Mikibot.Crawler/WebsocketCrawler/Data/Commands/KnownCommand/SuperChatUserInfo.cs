@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
-namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand
+namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
+
+public struct SuperChatUserInfo
 {
-    public struct SuperChatUserInfo
-    {
-        [JsonPropertyName("guard_level")]
-        public int GuardLevel { get; set; }
-        [JsonPropertyName("uname")]
-        public string UserName { get; set; }
-    }
+    [JsonPropertyName("guard_level")]
+    public int GuardLevel { get; set; }
+    [JsonPropertyName("uname")]
+    public string UserName { get; set; }
 }

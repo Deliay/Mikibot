@@ -1,78 +1,85 @@
-﻿using Mikibot.Crawler.WebsocketCrawler.Packet;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
+using Mikibot.Crawler.WebsocketCrawler.Packet;
 
-namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils
+namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils;
+
+public class CommandSubscriber : IDisposable
 {
-    public class CommandSubscriber : IDisposable
+    private readonly Dictionary<KnownCommands, List<Func<object, Task>>> _handlers = new();
+
+    private static Func<T, Task> Wrap<T>(Action<T> action)
     {
-        private readonly Dictionary<KnownCommands, List<Func<object, Task>>> _handlers = new();
-
-        private static Func<T, Task> Wrap<T>(Action<T> action)
+        return (t) =>
         {
-            return (t) =>
-            {
-                action(t);
-                return Task.CompletedTask;
-            };
-        }
-
-        private void Subscribe<T>(KnownCommands command, Func<T, Task> handler)
-        {
-            if (!_handlers.ContainsKey(command))
-            {
-                _handlers.Add(command, new());
-            }
-
-            _handlers[command].Add((obj) => handler((T)obj));
-        }
-
-        public void Subscribe<T>(Func<T, Task> handler)
-        {
-            if (ICommandBase.IsKnown(typeof(T)))
-            {
-                Subscribe(ICommandBase.Mapping(typeof(T)), handler);
-            }
-        }
-        public void Subscribe<T>(Action<T> handler) => Subscribe<T>(Wrap(handler));
-
-        private static object SelectData(ICommandBase cmd)
-        {
-            if (cmd.Command is KnownCommands.DANMU_MSG)
-            {
-                return cmd.GetType().GetProperty("Info")?.GetValue(cmd)!;
-            }
-
-            return cmd.GetType().GetProperty("Data")?.GetValue(cmd)!;
-        }
-
-        public async Task Handle(ICommandBase? cmd)
-        {
-            if (cmd == null) return;
-            if (_handlers.ContainsKey(cmd.Command))
-            {
-                await Task.WhenAll(_handlers[cmd.Command].Select(async (handler) => await handler(SelectData(cmd)!)));
-            }
-        }
-
-        public Task Handle(Normal normal) => Handle(ICommandBase.Parse(normal.RawContent));
-
-        public Task Handle(IData data)
-        {
-            if (data.Type == PacketType.Normal)
-            {
-                return Handle((Normal)data);
-            }
+            action(t);
             return Task.CompletedTask;
+        };
+    }
+
+    private void Subscribe<T>(KnownCommands command, Func<T, Task> handler)
+    {
+        if (!CommandBaseHelper.IsKnown(command))
+        {
+            throw new InvalidOperationException($"Can't map type {typeof(T)} to command enum");
+        }
+        
+        if (!_handlers.ContainsKey(command))
+        {
+            _handlers.Add(command, []);
         }
 
-        public void Dispose()
+        _handlers[command].Add((obj) => handler((T)obj));
+    }
+
+    public void Subscribe<T>(Func<T, Task> handler)
+    {
+        if (CommandBaseHelper.IsKnown(typeof(T)))
         {
-            _handlers.Clear();
-            GC.SuppressFinalize(this);
+            Subscribe(CommandBaseHelper.Mapping(typeof(T)), handler);
         }
+        else
+        {
+            throw new InvalidOperationException($"Can't map type {typeof(T)} to command enum");
+        }
+    }
+    
+    public void Subscribe<T>(Action<T> handler) => Subscribe(Wrap(handler));
+
+    private static object SelectData(ICommandBase cmd)
+    {
+        if (cmd is CommandBase<DanmuMsg> danmuMsg)
+        {
+            return danmuMsg.Info;
+        }
+
+        var (infoGetter, dataGetter) = CommandBaseHelper.GetCommandPropertyGetters(cmd.GetType());
+        
+        return dataGetter(cmd) ?? infoGetter(cmd)!;
+    }
+
+    public async Task Handle(ICommandBase? cmd)
+    {
+        if (cmd == null) return;
+        if (_handlers.TryGetValue(cmd.Command, out var cmdHandler))
+        {
+            await Task.WhenAll(cmdHandler.Select(async (handler) => await handler(SelectData(cmd))));
+        }
+    }
+
+    public Task Handle(Normal normal) => Handle(ICommandBase.Parse(normal.RawContent));
+
+    public Task Handle(IData data)
+    {
+        if (data.Type == PacketType.Normal)
+        {
+            return Handle((Normal)data);
+        }
+        return Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        _handlers.Clear();
+        GC.SuppressFinalize(this);
     }
 }
