@@ -2,7 +2,7 @@ using Mikibot.Crawler.Http.Bilibili.Model;
 
 namespace Mikibot.Crawler.Http.Bilibili
 {
-    public class BiliBasicInfoCrawler : HttpCrawler
+    public class BiliBasicInfoCrawler(HttpClient client) : HttpCrawler(client)
     {
         public async ValueTask<NavInfo> GetNavInfo(CancellationToken cancellationToken)
         {

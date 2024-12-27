@@ -1,51 +1,54 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Mikibot.Crawler.Http.Bilibili;
-using Mikibot.Crawler.Http.Bilibili.Model;
 using Mikibot.Crawler.WebsocketCrawler.Client;
-using Mikibot.Crawler.WebsocketCrawler.Data;
-using Mikibot.Crawler.WebsocketCrawler.Data.Commands;
 using Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 using Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils;
-using System.Text.Json;
 
 var serviceBuilder = new ServiceCollection();
 serviceBuilder.AddLogging(b => b.AddConsole());
+serviceBuilder.AddSingleton<HttpClient>();
 serviceBuilder.AddSingleton<BiliLiveCrawler>();
-serviceBuilder.AddSingleton<BiliVideoCrawler>();
+serviceBuilder.AddSingleton<BiliBasicInfoCrawler>();
 serviceBuilder.AddTransient<WebsocketClient>();
 
-using var services = serviceBuilder.BuildServiceProvider();
+await using var services = serviceBuilder.BuildServiceProvider();
 using var csc = new CancellationTokenSource();
 
 var logger = services.GetRequiredService<ILogger<Program>>();
 var crawler = services.GetRequiredService<BiliLiveCrawler>();
-var wsClient = services.GetRequiredService<WebsocketClient>();
+var personalCrawler = services.GetRequiredService<BiliBasicInfoCrawler>();
+// 必须设置cookie
+// crawler.SetCookie("...");
 var roomId = 11306;
 
+var self = await personalCrawler.GetNavInfo(csc.Token);
+var wsClient = services.GetRequiredService<WebsocketClient>();
 var playAddr = await crawler.GetLiveStreamAddressV2(roomId, csc.Token);
-
-var personal = await crawler.GetLiveRoomInfo(roomId, csc.Token);
-var realRoomId = await crawler.GetRealRoomId(roomId, csc.Token);
+var realRoomId = playAddr.RoomId;
 var spectatorEndpoint = await crawler.GetLiveToken(realRoomId, csc.Token);
-var spectatorHost = spectatorEndpoint.Hosts[0];
 
-var allGuards = new HashSet<GuardUserInfo>();
-var init = await crawler.GetRoomGuardList(roomId, token: csc.Token);
-allGuards.UnionWith(init.List);
-allGuards.UnionWith(init.Top3);
-while (init.List.Count > 0
-    && init.Info.Count > allGuards.Count
-    && init.Info.PageCount > init.Info.Current)
+foreach (var spectatorHost in spectatorEndpoint.Hosts)
 {
-    init = await crawler.GetRoomGuardList(roomId, init.Info.Current + 1, csc.Token);
-    allGuards.UnionWith(init.List);
+    try
+    {
+        await wsClient.ConnectAsync(crawler.Client,
+            host: spectatorHost.Host,
+            port: spectatorHost.WssPort,
+            roomId: realRoomId,
+            uid: self.Mid,
+            liveToken: spectatorEndpoint.Token,
+            protocol: "wss",
+            cancellationToken: csc.Token);
+        break;
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine($"连接 {spectatorHost.Host} 失败");
+    }
 }
-var count = allGuards.Where(n => n.Online != 0).Count();
-Console.WriteLine($"舰长在线数量:{count}");
 
-await wsClient.ConnectAsync(spectatorHost.Host, spectatorHost.WssPort, realRoomId, 0, spectatorEndpoint.Token, "wss", cancellationToken: csc.Token);
-
+Console.WriteLine($"已连接到 {realRoomId}");
 using var cmdHandler = new CommandSubscriber();
 cmdHandler.Subscribe<DanmuMsg>((msg) => Console.WriteLine($"[弹幕] {msg.UserName}: {msg.Msg}"));
 cmdHandler.Subscribe<RoomRealTimeMessageUpdate>((msg) => Console.WriteLine($"直播间状态变更 粉丝数量: {msg.Fans}"));

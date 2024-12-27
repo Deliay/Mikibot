@@ -27,17 +27,17 @@ namespace Mikibot.Crawler.WebsocketCrawler.Packet
         public byte[] Data = null!;
 
         private const int DefaultHeadSize = sizeof(uint) * 3 + sizeof(ushort) * 2;
-        private static readonly byte[] KeepliveContent = Encoding.UTF8.GetBytes("[Object asswecan]");
-        private static readonly ArraySegment<byte> KeepliveData = new BasePacket()
+        private static readonly byte[] KeepaliveContent = "[Object asswecan]"u8.ToArray();
+        private static readonly ArraySegment<byte> KeepaliveData = new BasePacket()
         {
             Type = PacketType.Heartbeat,
             HeadSize = DefaultHeadSize,
-            Size = (uint)(KeepliveContent.Length + DefaultHeadSize),
-            Data = KeepliveContent,
+            Size = (uint)(KeepaliveContent.Length + DefaultHeadSize),
+            Data = KeepaliveContent,
         }.ToByte();
-        public static ArraySegment<byte> Keeplive() => KeepliveData;
+        public static ArraySegment<byte> Keepalive() => KeepaliveData;
 
-        public readonly static BasePacket Empty = new()
+        public static readonly BasePacket Empty = new()
         {
             HeadSize = 0,
             Sequence = 0,
@@ -48,15 +48,10 @@ namespace Mikibot.Crawler.WebsocketCrawler.Packet
 
         public static BasePacket Auth(long roomId, long uid, string auth)
         {
-            var authPacket = JsonSerializer.Serialize(new
-            {
-                uid,
-                roomid = roomId,
-                protover = 3,
-                platform = "web",
-                type = 2,
-                key = auth,
-            });
+            var rawAuthPacket = uid > 0
+                ? new { uid, roomid = roomId, protover = 3, platform = "web", type = 2, key = auth, }
+                : new { uid = 0L, roomid = roomId, protover = 3, platform = "web", type = 2, key = auth, };
+            var authPacket = JsonSerializer.Serialize(rawAuthPacket);
             var data = Encoding.UTF8.GetBytes(authPacket);
             return new BasePacket()
             {

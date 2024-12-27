@@ -17,6 +17,6 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand
         [JsonConverter(typeof(UnixSecondOffsetConverter))]
         public DateTimeOffset InteractAt { get; set; }
         [JsonPropertyName("fans_medal")]
-        public InteractFansMedal FansMedal { get; set; }
+        public InteractFansMedal? FansMedal { get; set; }
     }
 }

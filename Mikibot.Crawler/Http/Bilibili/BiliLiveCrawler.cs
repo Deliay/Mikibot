@@ -10,15 +10,20 @@ using System.Threading.Tasks;
 
 namespace Mikibot.Crawler.Http.Bilibili
 {
-    public class BiliLiveCrawler : HttpCrawler
+    public class BiliLiveCrawler(HttpClient client) : HttpCrawler(client)
     {
-        public const int mxmkr = 21672023;
-        public const int mxmk = 477317922;
-        public const string mxmks = "477317922";
-
         public HttpClient Client => client;
 
         public long Uid { get; set; }
+        private const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0";
+        protected override ValueTask BeforeRequestAsync(CancellationToken cancellationToken)
+        {
+            AddHeader("User-Agent", UserAgent);
+            AddHeader("Referer", "https://live.bilibili.com/");
+            AddHeader("Origin", "https://live.bilibili.com");
+            
+            return base.BeforeRequestAsync(cancellationToken);
+        }
 
         [Obsolete("不让抓了")]
         public async ValueTask<PersonalInfo> GetPersonalInfo(long uid, CancellationToken token = default)
@@ -53,7 +58,7 @@ namespace Mikibot.Crawler.Http.Bilibili
             {
                 return value;
             }
-            var roomUrl = $"http://api.live.bilibili.com/room/v1/Room/room_init?id={roomId}";
+            var roomUrl = $"https://api.live.bilibili.com/room/v1/Room/room_init?id={roomId}";
             var roomResult = await GetAsync<BilibiliApiResponse<LiveInitInfo>>(roomUrl, token);
             roomResult.AssertCode();
 
@@ -76,29 +81,46 @@ namespace Mikibot.Crawler.Http.Bilibili
 
         public async ValueTask<LiveToken> GetLiveToken(long roomId, CancellationToken token = default)
         {
-            var tokenUrl = $"http://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id={roomId}";
+            var tokenUrl = $"https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id={roomId}";
             var result = await GetAsync<BilibiliApiResponse<LiveToken>>(tokenUrl, token);
             result.AssertCode();
 
             return result.Data;
         }
 
-        public async ValueTask<List<LiveStreamAddress>> GetLiveStreamAddress(long roomid, CancellationToken token = default)
+        public async ValueTask<List<LiveStreamAddress>> GetLiveStreamAddress(long roomId, CancellationToken token = default)
         {
-            var url = $"http://api.live.bilibili.com/room/v1/Room/playUrl?cid={roomid}&platform=web&quality=4&qn=400";
+            var url = $"https://api.live.bilibili.com/room/v1/Room/playUrl?cid={roomId}&platform=web&quality=4&qn=400";
             var result = await GetAsync<BilibiliApiResponse<LiveStreamAddresses>>(url, token);
             result.AssertCode();
 
             return result.Data.Urls;
         }
 
-        public async ValueTask<LiveStreamAddressesV2> GetLiveStreamAddressV2(long roomid, CancellationToken token = default)
+        public async ValueTask<LiveStreamAddressesV2> GetLiveStreamAddressV2(long roomId, CancellationToken token = default)
         {
-            var url = $"https://api.live.bilibili.com/xlive/web-room/v2/index/getRoomPlayInfo?room_id={roomid}&protocol=0,1&format=0,1,2&codec=0,1&qn=30000&platform=web&ptype=8&dolby=5&panorama=1";
+            var url = $"https://api.live.bilibili.com/xlive/web-room/v2/index/getRoomPlayInfo?room_id={roomId}&protocol=0,1&format=0,1,2&codec=0,1&qn=30000&platform=web&ptype=8&dolby=5&panorama=1";
             var result = await GetAsync<BilibiliApiResponse<LiveStreamAddressesV2>>(url, token);
             result.AssertCode();
 
             return result.Data;
+        }
+
+        public async ValueTask<LiveStreamAddressesV2> GetLiveStreamAddressFromSsr(long roomId,
+            CancellationToken token = default)
+        {
+            var url = $"https://live.bilibili.com/{roomId}";
+            var htmlStr = await Client.GetStringAsync(url, token);
+            //__NEPTUNE_IS_MY_WAIFU__=...</script>
+            //...^}
+            const string WAIFU = "<script>window.__NEPTUNE_IS_MY_WAIFU__=";
+            var startPos = htmlStr.IndexOf(WAIFU, StringComparison.InvariantCulture) + WAIFU.Length;
+            var endPost = htmlStr.IndexOf("</script>", startPos, StringComparison.InvariantCulture);
+            var initJsonStr = htmlStr[startPos..endPost];
+            var initJson = JsonDocument.Parse(initJsonStr);
+            var res = initJson.RootElement.GetProperty("roomInitRes");
+            var content = res.Deserialize<BilibiliApiResponse<LiveStreamAddressesV2>>();
+            return content.Data;
         }
 
         private static readonly Dictionary<long, LiveInitInfo> roomIdMappingCache = new();
@@ -110,7 +132,7 @@ namespace Mikibot.Crawler.Http.Bilibili
 
         public async ValueTask<GuardInfo> GetRoomGuardList(long roomId, long bId, int page = 1, CancellationToken token = default)
         {
-            var url = $"http://api.live.bilibili.com/xlive/app-room/v2/guardTab/topList?roomid={roomId}&page={page}&ruid={bId}&page_size=29";
+            var url = $"https://api.live.bilibili.com/xlive/app-room/v2/guardTab/topList?roomid={roomId}&page={page}&ruid={bId}&page_size=29";
             var result = await GetAsync<BilibiliApiResponse<GuardInfo>>(url, token);
             result.AssertCode();
 
@@ -119,7 +141,7 @@ namespace Mikibot.Crawler.Http.Bilibili
 
         public async ValueTask<LiveRoomInfo> GetLiveRoomInfo(long roomId, CancellationToken token = default)
         {
-            var url = $"http://api.live.bilibili.com/room/v1/Room/get_info?room_id={roomId}";
+            var url = $"https://api.live.bilibili.com/room/v1/Room/get_info?room_id={roomId}";
             var result = await GetAsync<BilibiliApiResponse<LiveRoomInfo>>(url, token);
             result.AssertCode();
 
@@ -188,6 +210,18 @@ namespace Mikibot.Crawler.Http.Bilibili
 
             var res = await PostFormAsync<BilibiliApiResponse<object>>("http://api.vc.bilibili.com/web_im/v1/web_im/send_msg", body, cancellationToken);
             res.AssertCode();
+        }
+        
+        public async Task<Stream> OpenLiveStream(string url, CancellationToken cancellationToken)
+        {
+            var res = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            return await res.Content.ReadAsStreamAsync(cancellationToken);
+        }
+
+        public async Task OpenLiveStream(string url, Stream @out, CancellationToken cancellationToken)
+        {
+            var res = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            await res.Content.CopyToAsync(@out, cancellationToken);
         }
     }
 }

@@ -10,6 +10,10 @@ Mikibot B站直播间事件抓取模块
 // 也可以自行调用叔叔的API
 var crawler = new BiliLiveCrawler();
 
+// 最好设置cookie，不然拿不到用户信息
+// 同时也会吞弹幕
+crawler.SetCookie("...");
+
 // 一些主播的直播房间号并不是真实房间号
 // 需要调用B站API拿到真实房间号
 var uriRoomId = 21672023;
@@ -21,7 +25,14 @@ var spectatorHost = spectatorEndpoint.Hosts[0];
 
 // 初始化wsClient实例，并连接到直播间
 var wsClient = new WebsocketClient();
-await wsClient.ConnectAsync(spectatorHost.Host, spectatorHost.WsPort, realRoomId, cancellationToken: cancellationToken);
+await wsClient.ConnectAsync(crawler.Client,
+    host: spectatorHost.Host, 
+    port: spectatorHost.WssPort,
+    roomId: realRoomId,
+    uid: 0,
+    liveToken: spectatorEndpoint.Token,
+    protocol: "wss",
+    cancellationToken: csc.Token);
 
 // 推荐使用CommandSubscriber来管理事件
 var cmdHandler = new CommandSubscriber();

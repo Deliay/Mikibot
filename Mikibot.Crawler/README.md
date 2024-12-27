@@ -9,8 +9,19 @@
 | - | - |
 | BiliLiveCrawler | 直播弹幕、直播流相关API |
 | BiliVideoCrawler | 视频相关信息API |
+| BiliBasicInfoCrawler | 个人基本信息 |
+| BiliVideoCrawler | 视频信息 |
 
 ## 使用示例
+
+### 共享Cookie
+```csharp
+var client = new HttpClient();
+var liveCrawler = new BiliLiveCrawler(client);
+var personalCrawler = new BiliBasicInfoCrawler(client);
+// 使用任意crawler设置cookie即可
+liveCrawler.SetCookie("...");
+```
 
 ### 获得直播间弹幕流
 代码示例：
@@ -34,8 +45,7 @@ var spectatorHost = liveToken.Hosts[0];
 // 连接弹幕服务器，填入使用cookie获得的token
 using var wsClient = new WebsocketClient();
 
-// 可以不传crawler.Client，最好传一下，里面设置了Http Referer
-// await wsClient.ConnectAsync(spectatorHost.Host, spectatorHost.WssPort, roomId, uid, token, "wss", cancellationToken);
+// 可以不传crawler.Client，最好传一下，里面设置了Http Referer和Cookies
 await wsClient.ConnectAsync(crawler.Client, spectatorHost.Host, spectatorHost.WssPort, realRoomId, uid, token, "wss", cancellationToken);
 
 // 获得事件
@@ -45,7 +55,7 @@ await foreach(var @event in wsClient.Events(cancellationToken))
 }
 ```
 
-### 处理事件：使用CommandSubscriber
+#### 处理事件：使用CommandSubscriber
 ```csharp
 // 事先准备好CommandSubscriber类
 using var cmdHandler = new CommandSubscriber();
@@ -58,7 +68,7 @@ cmdHandler.Subscribe<SendGift>(async (msg) => ...);
 await commandHandler.Handle(@event);
 ```
 
-### 处理事件：手动处理
+#### 处理事件：手动处理
 ```csharp
 // 或者手动处理直播事件
 

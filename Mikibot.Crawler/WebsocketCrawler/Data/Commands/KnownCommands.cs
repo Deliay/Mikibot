@@ -112,5 +112,11 @@ namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands
         RECOMMEND_CARD,
         GOTO_BUY_FLOW,
         LIVE_MULTI_VIEW_CHANGE,
+        LOG_IN_NOTICE,
+        DM_INTERACTION,
+        RANK_CHANGED,
+        POPULARITY_RED_POCKET_V2_NEW,
+        
+        UNKNOWN,
     }
 }

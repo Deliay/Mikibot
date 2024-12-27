@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Mikibot.Crawler.Http.Bilibili
 {
-    public class BiliVideoCrawler : HttpCrawler
+    public class BiliVideoCrawler(HttpClient client) : HttpCrawler(client)
     {
         public async ValueTask<VideoInfo> GetVideoInfo(string? bv, int? av, CancellationToken token = default)
         {
