@@ -4,6 +4,7 @@ name: Build Image and Deploy to cluster
 on:
   push:
     branches: [ "main" ]
+    paths: [ "Mikibot.Analyze" ]
 
 jobs:
 
