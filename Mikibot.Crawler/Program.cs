@@ -19,7 +19,7 @@ var logger = services.GetRequiredService<ILogger<Program>>();
 var crawler = services.GetRequiredService<BiliLiveCrawler>();
 var personalCrawler = services.GetRequiredService<BiliBasicInfoCrawler>();
 // 必须设置cookie
-crawler.SetCookie("....");
+crawler.SetCookie("...");
 var roomId = 1603600;
 
 var self = await personalCrawler.GetNavInfo(csc.Token);
