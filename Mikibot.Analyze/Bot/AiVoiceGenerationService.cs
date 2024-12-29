@@ -1,21 +1,13 @@
 ﻿using FFMpegCore;
-using FFMpegCore.Pipes;
 using Microsoft.Extensions.Logging;
 using Mikibot.Analyze.Generic;
 using Mikibot.Analyze.MiraiHttp;
-using Mirai.Net.Data.Messages;
 using Mirai.Net.Data.Messages.Concretes;
 using Mirai.Net.Data.Messages.Receivers;
 using Mirai.Net.Sessions.Http.Managers;
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Json;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Channels;
-using System.Threading.Tasks;
 
 namespace Mikibot.Analyze.Bot
 {

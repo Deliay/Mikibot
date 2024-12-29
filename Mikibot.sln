@@ -15,8 +15,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mikibot.AutoClipper.Abstrac
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mikibot.Database", "Mikibot.Database\Mikibot.Database.csproj", "{53FB046B-7281-4A21-B691-AAD98ECED4AC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mikibot.FE", "Mikibot.FE\Mikibot.FE.csproj", "{924F177D-FEBD-4807-ACAE-C4B39CE46C70}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mikibot.StableDiffusion.WebUi.Api", "Mikibot.StableDiffusion.WebUi.Api\Mikibot.StableDiffusion.WebUi.Api.csproj", "{0BAA976E-CF01-49CE-8E3A-AC5EFBBF13E0}"
 EndProject
 Global
@@ -49,10 +47,6 @@ Global
 		{53FB046B-7281-4A21-B691-AAD98ECED4AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53FB046B-7281-4A21-B691-AAD98ECED4AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53FB046B-7281-4A21-B691-AAD98ECED4AC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{924F177D-FEBD-4807-ACAE-C4B39CE46C70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{924F177D-FEBD-4807-ACAE-C4B39CE46C70}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{924F177D-FEBD-4807-ACAE-C4B39CE46C70}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{924F177D-FEBD-4807-ACAE-C4B39CE46C70}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0BAA976E-CF01-49CE-8E3A-AC5EFBBF13E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0BAA976E-CF01-49CE-8E3A-AC5EFBBF13E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BAA976E-CF01-49CE-8E3A-AC5EFBBF13E0}.Release|Any CPU.ActiveCfg = Release|Any CPU

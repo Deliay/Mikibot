@@ -11,6 +11,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using SixLabors.ImageSharp.Drawing.Processing;
 using System.Numerics;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 
 namespace Mikibot.BuildingBlocks.Util
 {
@@ -19,12 +22,12 @@ namespace Mikibot.BuildingBlocks.Util
         private static readonly Image transparent = Image.Load("resources/transparent.png");
         private static readonly FontCollection fonts = new();
         private static readonly FontFamily fontFamily;
-        private static readonly TextOptions basic;
-        private static readonly TextOptions dateFont;
-        private static readonly TextOptions userFont;
-        private static readonly TextOptions luckyFont;
-        private static readonly TextOptions weatherFont;
-        private static readonly TextOptions watermarkFont;
+        private static readonly RichTextOptions basic;
+        private static readonly RichTextOptions dateFont;
+        private static readonly RichTextOptions userFont;
+        private static readonly RichTextOptions luckyFont;
+        private static readonly RichTextOptions weatherFont;
+        private static readonly RichTextOptions watermarkFont;
         private static readonly Color watermarkColor = new (new Argb32(0, 0, 0, 50));
         public static void Initialize() { }
 
@@ -60,12 +63,12 @@ namespace Mikibot.BuildingBlocks.Util
                 }
             }
 
-            basic = new TextOptions(new Font(fontFamily, 36));
-            weatherFont = new TextOptions(basic) { Origin = new Vector2(48, 1600), Font = new Font(basic.Font, 36), FallbackFontFamilies = GetEmojiFallback() };
-            dateFont = new TextOptions(basic) { Origin = new Vector2(48, 1770), Font = new Font(basic.Font, 48) };
-            userFont = new TextOptions(basic) { Origin = new Vector2(48, 1850), Font = new Font(basic.Font, 36), FallbackFontFamilies = GetEmojiFallback() };
-            luckyFont = new TextOptions(basic) { Origin = new Vector2(810, 1770), Font = new Font(basic.Font, 86) };
-            watermarkFont = new TextOptions(basic) { Origin = new Vector2(0, 0), Font = new Font(basic.Font, 24) };
+            basic = new RichTextOptions(new Font(fontFamily, 36));
+            weatherFont = new RichTextOptions(basic) { Origin = new Vector2(48, 1600), Font = new Font(basic.Font, 36), FallbackFontFamilies = GetEmojiFallback() };
+            dateFont = new RichTextOptions(basic) { Origin = new Vector2(48, 1770), Font = new Font(basic.Font, 48) };
+            userFont = new RichTextOptions(basic) { Origin = new Vector2(48, 1850), Font = new Font(basic.Font, 36), FallbackFontFamilies = GetEmojiFallback() };
+            luckyFont = new RichTextOptions(basic) { Origin = new Vector2(810, 1770), Font = new Font(basic.Font, 86) };
+            watermarkFont = new RichTextOptions(basic) { Origin = new Vector2(0, 0), Font = new Font(basic.Font, 24) };
         }
 
         private readonly static IImageProcessor NightTemperatrueProcessor = new TemperatureProcessor(-15);

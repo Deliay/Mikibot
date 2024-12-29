@@ -4,13 +4,7 @@ using Mikibot.Analyze.MiraiHttp;
 using Mirai.Net.Data.Messages;
 using Mirai.Net.Data.Messages.Concretes;
 using Mirai.Net.Data.Messages.Receivers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Channels;
-using System.Threading.Tasks;
 
 namespace Mikibot.Analyze.Bot
 {

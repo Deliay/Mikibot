@@ -89,7 +89,7 @@ namespace Mikibot.AutoClipper.Service
             var clipRecord = new LiveStreamRecord()
             {
                 LocalFileName = GetClipFileName(roomId),
-                Bid = roomId,
+                Bid = roomId.ToString(),
                 CreatedAt = DateTimeOffset.Now,
                 Reserve = reserve,
             };

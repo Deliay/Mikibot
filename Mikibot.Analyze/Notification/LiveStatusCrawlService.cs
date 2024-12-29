@@ -7,11 +7,6 @@ using Mikibot.Crawler.Http.Bilibili;
 using Mikibot.Crawler.Http.Bilibili.Model;
 using Mirai.Net.Data.Messages;
 using Mirai.Net.Data.Messages.Concretes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mikibot.Analyze.Notification
 {
@@ -26,46 +21,27 @@ namespace Mikibot.Analyze.Notification
         public IMiraiService Mirai => mirai;
         public ILogger<LiveStatusCrawlService> Logger => logger;
 
-        public async Task<LiveStatus?> GetCurrentStatus(string roomId = MxmkRid, CancellationToken token = default)
+        public async Task<LiveStatus?> GetCurrentStatus(string userId, CancellationToken token = default)
         {
-            var bid = GetBid(roomId);
-            return await db.LiveStatuses.Where(s => s.Bid == bid).OrderBy(s => s.Id).LastOrDefaultAsync(token);
+            return await db.LiveStatuses
+                .Where(s => s.Bid == userId)
+                .OrderBy(s => s.Id)
+                .LastOrDefaultAsync(token);
         }
 
         private readonly Random random = new();
 
-        private static readonly Dictionary<string, HashSet<string>> GroupMapping = new()
-        {
-            { $"{BiliLiveCrawler.mxmkr}", ["314503649", "139528984"] },
-            { $"{22323445}", ["650042418"] },
-        };
-
-        private const string AkumariaRid = "22323445";
-        private const string AkumariaBid = "576858552";
-        private const string MxmkRid = "21672023";
-
-        private static string GetBid(string roomId) => roomId switch {
-            AkumariaRid => AkumariaBid,
-            MxmkRid => BiliLiveCrawler.mxmks,
-            _ => throw new InvalidOperationException()
-        };
-        private static long GetRid(string bid) => bid switch {
-            AkumariaBid => long.Parse(AkumariaRid),
-            BiliLiveCrawler.mxmks => long.Parse(MxmkRid),
-            _ => throw new InvalidOperationException()
-        };
-
-        private async ValueTask<LiveStatus> GenerateStatus(string bid, LiveRoomInfo info, CancellationToken token)
+        private async ValueTask<LiveStatus> GenerateStatus(string userId, LiveRoomInfo info, CancellationToken token)
             => new()
             {
                 Cover = info.UserCover,
                 Notified = false,
                 Status = info.LiveStatus,
-                FollowerCount = (int)await Crawler.GetFollowerCount(BiliLiveCrawler.mxmk, token),
+                FollowerCount = (int)await Crawler.GetFollowerCount(long.Parse(userId), token),
                 StatusChangedAt = DateTimeOffset.Now,
                 UpdatedAt = DateTimeOffset.Now,
                 Title = info.Title,
-                Bid = bid,
+                Bid = userId,
             };
 
         private async ValueTask InsertStatus(LiveStatus status, CancellationToken token)
@@ -75,7 +51,7 @@ namespace Mikibot.Analyze.Notification
             await db.SaveChangesAsync(token);
         }
 
-        private MessageBase[] ComposeMessage(LiveRoomInfo info, LiveStatus? latest, LiveStatus newly)
+        private MessageBase[] ComposeMessage(LiveRoomInfo info, LiveStatus? latest, LiveStatus newly, bool enabledFans = false)
         {
             string status() => info.LiveStatus == 1 ? "开" : "下";
             string fans() => newly.Status == 0 && latest != null ? $"本次直播涨粉: {newly.FollowerCount - latest.FollowerCount}" : "";
@@ -97,34 +73,43 @@ namespace Mikibot.Analyze.Notification
                 Logger.LogInformation("{} 秒后开始同步状态", next);
                 // 每15~30秒收集一次数据
                 await Task.Delay(TimeSpan.FromSeconds(next), token);
-                foreach (var rid in GroupMapping.Keys)
+
+                var subscriptions = await db.SubscriptionLiveStarts.ToListAsync(token);
+                var userIdGroupedSubs = subscriptions.GroupBy(s => s.UserId);
+                
+                foreach (var subscriptionGroup in userIdGroupedSubs)
                 {
-                    Logger.LogInformation($"开始同步 {rid} 状态");
+                    var userId = subscriptionGroup.Key;
+                    Logger.LogInformation("开始同步 {} 状态", userId);
                     await Task.Delay(TimeSpan.FromSeconds(random.Next(1, 5)), token);
                     try
                     {
-                        var bid = GetBid(rid);
-                        var latest = await db.LiveStatuses.Where(s => s.Bid == bid).OrderBy(s => s.Id).LastOrDefaultAsync(token);
-                        var info = await Crawler.GetLiveRoomInfo(long.Parse(rid), token);
+                        var roomId = long.Parse(subscriptionGroup.First().RoomId);
+                        
+                        var latest = await db.LiveStatuses
+                            .Where(s => s.Bid == userId)
+                            .OrderBy(s => s.Id)
+                            .LastOrDefaultAsync(token);
+                        
+                        var info = await Crawler.GetLiveRoomInfo(roomId, token);
                         // 发通知咯！
                         if (latest == null || (latest.Status != info.LiveStatus))
                         {
                             // 将最新数据入库
-                            var newly = await GenerateStatus(bid, info, token);
+                            var newly = await GenerateStatus(userId, info, token);
                             await InsertStatus(newly, token);
                             Logger.LogInformation("写入数据库完成");
                             // 发开播消息
-                            if (latest != null)
+                            foreach (var subscription in subscriptionGroup)
                             {
-                                await Mirai.SendMessageToSomeGroup(GroupMapping[rid], token, ComposeMessage(info, latest, newly));
-                            }
-                            else
-                            {
-                                await Mirai.SendMessageToSomeGroup(GroupMapping[rid], token,
-                                [
-                                    new ImageMessage() { Url = info.UserCover },
-                                    new PlainMessage($"诶嘿，开始为您持续关注 {info.RoomId} 的开播信息~\n{info.Url}"),
-                                ]);
+                                var msg = latest != null
+                                    ? ComposeMessage(info, latest, newly, subscription.EnabledFansTrendingStatistics)
+                                    : 
+                                    [
+                                        new ImageMessage() { Url = info.UserCover },
+                                        new PlainMessage($"诶嘿，开始为您持续关注 {info.RoomId} 的开播信息~\n{info.Url}"),
+                                    ];
+                                await Mirai.SendMessageToSomeGroup([subscription.GroupId], token, msg);
                             }
                             Logger.LogInformation("同步QQ消息完成");
                         }

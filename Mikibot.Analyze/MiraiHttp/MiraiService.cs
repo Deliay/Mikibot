@@ -4,14 +4,7 @@ using Mirai.Net.Data.Messages.Receivers;
 using Mirai.Net.Data.Shared;
 using Mirai.Net.Sessions;
 using Mirai.Net.Sessions.Http.Managers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reactive;
-using System.Threading.Tasks;
 using System.Reactive.Linq;
-using Mikibot.Crawler.Http.Bilibili;
 
 namespace Mikibot.Analyze.MiraiHttp
 {

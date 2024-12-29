@@ -3,7 +3,6 @@ using Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 using Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils;
 using Mirai.Net.Data.Messages;
 using Mirai.Net.Data.Messages.Concretes;
-using System.Text;
 
 namespace Mikibot.Analyze.Bot;
 

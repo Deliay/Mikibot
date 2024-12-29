@@ -1,24 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore.Design;
 
-namespace Mikibot.Database
+namespace Mikibot.Database;
+
+public class MikibotDatabaseDesignTimeFactory : IDesignTimeDbContextFactory<MikibotDatabaseContext>
 {
-    public class MikibotDatabaseDesignTimeFactory : IDesignTimeDbContextFactory<MikibotDatabaseContext>
+    public MikibotDatabaseContext CreateDbContext(string[] args)
     {
-        public MikibotDatabaseContext CreateDbContext(string[] args)
+        return new MikibotDatabaseContext(new MySqlConfiguration()
         {
-            return new MikibotDatabaseContext(new MySqlConfiguration()
-            {
-                Host = "localhost",
-                Database = "mikibot",
-                Port = 3306,
-                User = "root",
-            });
-        }
+            Host = "localhost",
+            Database = "mikibot",
+            Port = 3306,
+            User = "root",
+        });
     }
 }
