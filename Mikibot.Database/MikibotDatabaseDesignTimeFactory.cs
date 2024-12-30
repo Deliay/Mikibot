@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Design;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace Mikibot.Database;
 
@@ -8,10 +9,11 @@ public class MikibotDatabaseDesignTimeFactory : IDesignTimeDbContextFactory<Miki
     {
         return new MikibotDatabaseContext(new MySqlConfiguration()
         {
-            Host = "localhost",
+            Host = "192.168.31.75",
             Database = "mikibot",
             Port = 3306,
-            User = "root",
+            User = "zero_apps",
+            Password = "1",
         });
     }
 }

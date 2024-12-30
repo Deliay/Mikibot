@@ -6,6 +6,8 @@ namespace Mikibot.Database;
 
 public class MikibotDatabaseContext : DbContext
 {
+    public MikibotDatabaseContext(DbContextOptions<MikibotDatabaseContext> options) : base(options) {}
+    
     public MikibotDatabaseContext(MySqlConfiguration mySqlConfiguration)
     {
         MySqlConfiguration = mySqlConfiguration;

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mikibot.Database;
 
@@ -16,14 +17,18 @@ namespace Mikibot.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.1")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
             modelBuilder.Entity("Mikibot.Database.Model.FollowerStatistic", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Bid")
                         .IsRequired()
@@ -32,6 +37,8 @@ namespace Mikibot.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<DateTimeOffset>("CreatedAt"));
 
                     b.Property<int>("FollowerCount")
                         .HasColumnType("int");
@@ -45,12 +52,15 @@ namespace Mikibot.Migrations
 
             modelBuilder.Entity("Mikibot.Database.Model.LiveBuyGuardLog", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    b.Property<int>("Bid")
-                        .HasColumnType("int");
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Bid")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTimeOffset>("BoughtAt")
                         .HasColumnType("datetime(6)");
@@ -58,6 +68,8 @@ namespace Mikibot.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<DateTimeOffset>("CreatedAt"));
 
                     b.Property<string>("GiftName")
                         .IsRequired()
@@ -70,8 +82,9 @@ namespace Mikibot.Migrations
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
-                    b.Property<int>("Uid")
-                        .HasColumnType("int");
+                    b.Property<string>("Uid")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -88,16 +101,21 @@ namespace Mikibot.Migrations
 
             modelBuilder.Entity("Mikibot.Database.Model.LiveDanmaku", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    b.Property<int>("Bid")
-                        .HasColumnType("int");
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Bid")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<DateTimeOffset>("CreatedAt"));
 
                     b.Property<int>("FansLevel")
                         .HasColumnType("int");
@@ -120,8 +138,9 @@ namespace Mikibot.Migrations
                     b.Property<DateTimeOffset>("SentAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -140,16 +159,19 @@ namespace Mikibot.Migrations
 
             modelBuilder.Entity("Mikibot.Database.Model.LiveGift", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Action")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("Bid")
-                        .HasColumnType("int");
+                    b.Property<string>("Bid")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("CoinType")
                         .IsRequired()
@@ -163,6 +185,8 @@ namespace Mikibot.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<DateTimeOffset>("CreatedAt"));
+
                     b.Property<int>("DiscountPrice")
                         .HasColumnType("int");
 
@@ -173,8 +197,9 @@ namespace Mikibot.Migrations
                     b.Property<DateTimeOffset>("SentAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("Uid")
-                        .HasColumnType("int");
+                    b.Property<string>("Uid")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -193,16 +218,19 @@ namespace Mikibot.Migrations
 
             modelBuilder.Entity("Mikibot.Database.Model.LiveGiftCombo", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Action")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("Bid")
-                        .HasColumnType("int");
+                    b.Property<string>("Bid")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("ComboId")
                         .IsRequired()
@@ -215,6 +243,8 @@ namespace Mikibot.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<DateTimeOffset>("CreatedAt"));
+
                     b.Property<string>("GiftName")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -222,8 +252,9 @@ namespace Mikibot.Migrations
                     b.Property<int>("TotalCoin")
                         .HasColumnType("int");
 
-                    b.Property<int>("Uid")
-                        .HasColumnType("int");
+                    b.Property<string>("Uid")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -246,6 +277,8 @@ namespace Mikibot.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("Bid")
                         .HasColumnType("int");
 
@@ -256,6 +289,8 @@ namespace Mikibot.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<DateTimeOffset>("CreatedAt"));
 
                     b.Property<DateTimeOffset>("EnteredAt")
                         .HasColumnType("datetime(6)");
@@ -277,9 +312,11 @@ namespace Mikibot.Migrations
 
             modelBuilder.Entity("Mikibot.Database.Model.LiveStatus", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Bid")
                         .IsRequired()
@@ -292,6 +329,8 @@ namespace Mikibot.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<DateTimeOffset>("CreatedAt"));
 
                     b.Property<int>("FollowerCount")
                         .HasColumnType("int");
@@ -327,12 +366,15 @@ namespace Mikibot.Migrations
 
             modelBuilder.Entity("Mikibot.Database.Model.LiveStreamRecord", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    b.Property<int>("Bid")
-                        .HasColumnType("int");
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Bid")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetime(6)");
@@ -359,16 +401,21 @@ namespace Mikibot.Migrations
 
             modelBuilder.Entity("Mikibot.Database.Model.LiveSuperChat", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    b.Property<int>("Bid")
-                        .HasColumnType("int");
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Bid")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<DateTimeOffset>("CreatedAt"));
 
                     b.Property<int>("MedalGuardLevel")
                         .HasColumnType("int");
@@ -380,8 +427,9 @@ namespace Mikibot.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("MedalUserId")
-                        .HasColumnType("int");
+                    b.Property<string>("MedalUserId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Message")
                         .IsRequired()
@@ -393,8 +441,9 @@ namespace Mikibot.Migrations
                     b.Property<DateTimeOffset>("SentAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("Uid")
-                        .HasColumnType("int");
+                    b.Property<string>("Uid")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -409,19 +458,25 @@ namespace Mikibot.Migrations
 
             modelBuilder.Entity("Mikibot.Database.Model.LiveUserInteractiveLog", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    b.Property<int>("Bid")
-                        .HasColumnType("int");
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Bid")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("FansTagUserId")
-                        .HasColumnType("int");
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<DateTimeOffset>("CreatedAt"));
+
+                    b.Property<string>("FansTagUserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("GuardLevel")
                         .HasColumnType("int");
@@ -436,8 +491,9 @@ namespace Mikibot.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -456,9 +512,11 @@ namespace Mikibot.Migrations
 
             modelBuilder.Entity("Mikibot.Database.Model.StatisticReportLog", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Bid")
                         .IsRequired()
@@ -476,6 +534,82 @@ namespace Mikibot.Migrations
                     b.HasIndex("Bid");
 
                     b.ToTable("StatisticReportLogs");
+                });
+
+            modelBuilder.Entity("Mikibot.Database.Model.SubscriptionFansTrends", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("GroupId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("TargetFansCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SubscriptionFansTrends");
+                });
+
+            modelBuilder.Entity("Mikibot.Database.Model.SubscriptionLiveStart", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("EnabledFansTrendingStatistics")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("GroupId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("RoomId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SubscriptionLiveStarts");
+                });
+
+            modelBuilder.Entity("Mikibot.Database.Model.VoxList", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Bid")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("暗杀名单", (string)null);
                 });
 #pragma warning restore 612, 618
         }

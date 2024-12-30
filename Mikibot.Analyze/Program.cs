@@ -19,17 +19,18 @@ appBuilder.Register((_) => MySqlConfiguration.FromEnviroment());
 appBuilder.RegisterType<MikibotDatabaseContext>().AsSelf().InstancePerDependency();
 
 appBuilder.Register((_) => MiraiBotConfig.FromEnviroment());
-#if DEBUG
-appBuilder.RegisterType<ConsoleMiraiService>().As<IMiraiService>().SingleInstance();
-appBuilder.RegisterType<LocalOssService>().As<IOssService>().SingleInstance();
-// appBuilder.RegisterType<ConsoleEmailService>().As<IEmailService>().SingleInstance();
-appBuilder.RegisterType<LagrangeBotBridge>().As<IMiraiService>().SingleInstance();
-#else
-appBuilder.RegisterType<LagrangeBotBridge>().As<IMiraiService>().SingleInstance();
+// #if DEBUG
+// appBuilder.RegisterType<ConsoleMiraiService>().As<IMiraiService>().SingleInstance();
+// appBuilder.RegisterType<LocalOssService>().As<IOssService>().SingleInstance();
+// // appBuilder.RegisterType<ConsoleEmailService>().As<IEmailService>().SingleInstance();
+// // appBuilder.RegisterType<LagrangeBotBridge>().As<IMiraiService>().SingleInstance();
+// #else
+// appBuilder.RegisterType<LagrangeBotBridge>().As<IMiraiService>().SingleInstance();
 // appBuilder.RegisterType<MiraiService>().As<IMiraiService>().SingleInstance();
-appBuilder.RegisterType<LocalOssService>().As<IOssService>().SingleInstance();
-appBuilder.RegisterType<ConsoleEmailService>().As<IEmailService>().SingleInstance();
-#endif
+appBuilder.RegisterType<SatoriBotBridge>().As<IMiraiService>().SingleInstance();
+// appBuilder.RegisterType<LocalOssService>().As<IOssService>().SingleInstance();
+// appBuilder.RegisterType<ConsoleEmailService>().As<IEmailService>().SingleInstance();
+// #endif
 
 // appBuilder.RegisterType<LiveStreamEventService>().AsSelf().SingleInstance();
 
@@ -38,13 +39,13 @@ appBuilder.RegisterType<DailyFollowerStatisticService>().AsSelf().SingleInstance
 // appBuilder.RegisterType<DanmakuCollectorService>().AsSelf().SingleInstance();
 // appBuilder.RegisterType<DanmakuRecordControlService>().AsSelf().SingleInstance();
 // appBuilder.RegisterType<DanmakuExportGuardList>().AsSelf().SingleInstance();
-appBuilder.RegisterType<MikiDanmakuProxyService>().AsSelf().SingleInstance();
-appBuilder.RegisterType<MikiLiveEventProxyService>().AsSelf().SingleInstance();
+// appBuilder.RegisterType<MikiDanmakuProxyService>().AsSelf().SingleInstance();
+// appBuilder.RegisterType<MikiLiveEventProxyService>().AsSelf().SingleInstance();
 
 appBuilder.RegisterType<BiliBiliVideoLinkShareProxyService>().AsSelf().SingleInstance();
 // appBuilder.RegisterType<AntiBoyFriendFanVoiceService>().AsSelf().SingleInstance();
 //appBuilder.RegisterType<AiImageGenerationService>().AsSelf().SingleInstance();
-appBuilder.RegisterType<AiVoiceGenerationService>().AsSelf().SingleInstance();
+// appBuilder.RegisterType<AiVoiceGenerationService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<RandomImageService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<OptionaSelectorService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<PingtiItemReplaceService>().AsSelf().SingleInstance();
@@ -66,10 +67,8 @@ using (var app = appContainer.BeginLifetimeScope())
     logger.LogInformation("Done");
 
     var mirai = app.Resolve<IMiraiService>();
-    logger.LogInformation("Intiializing mirai service...");
+    logger.LogInformation("Initializing mirai service...");
     await mirai.Run();
-    logger.LogInformation("Done");
-
 
     var statusCrawler = app.Resolve<LiveStatusCrawlService>();
     var followerStat = app.Resolve<DailyFollowerStatisticService>();
@@ -79,11 +78,11 @@ using (var app = appContainer.BeginLifetimeScope())
     // var danmakuCrawler = app.Resolve<DanmakuCollectorService>();
     // var danmakuExportGuard = app.Resolve<DanmakuExportGuardList>();
 
-    var aiVoice = app.Resolve<AiVoiceGenerationService>();
+    // var aiVoice = app.Resolve<AiVoiceGenerationService>();
     //var aiImage = app.Resolve<AiImageGenerationService>();
-    var bffAnti = app.Resolve<AntiBoyFriendFanVoiceService>();
-    var mxmkDanmakuProxy = app.Resolve<MikiDanmakuProxyService>();
-    var mxmkLiveEventProxy = app.Resolve<MikiLiveEventProxyService>();
+    // var bffAnti = app.Resolve<AntiBoyFriendFanVoiceService>();
+    // var mxmkDanmakuProxy = app.Resolve<MikiDanmakuProxyService>();
+    // var mxmkLiveEventProxy = app.Resolve<MikiLiveEventProxyService>();
     var biliParser = app.Resolve<BiliBiliVideoLinkShareProxyService>();
     var randomImage = app.Resolve<RandomImageService>();
     var optionaSelector = app.Resolve<OptionaSelectorService>();
@@ -102,12 +101,12 @@ using (var app = appContainer.BeginLifetimeScope())
         statusCrawler.Run(token),
         followerStat.Run(token),
         // eventService.Run(token),
-        bffAnti.Run(token),
+        // bffAnti.Run(token),
         biliParser.Run(token),
         randomImage.Run(token),
         //aiImage.Run(token),
-        aiVoice.Run(token),   
+        // aiVoice.Run(token),   
         optionaSelector.Run(token),
-        // pingti.Run(token),
+        pingti.Run(token)
     ]);
 }

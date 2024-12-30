@@ -17,7 +17,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="NPOI" Version="2.7.2" />
-	  <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
 	  <PackageReference Include="Polly" Version="8.5.0" />
 	  <PackageReference Include="Mirai.Net" Version="2.5.2" />
 	<PackageReference Include="Autofac" Version="8.2.0" />
@@ -28,6 +27,7 @@
 	<PackageReference Include="FFMpegCore" Version="5.1.0" />
 	<PackageReference Include="Mikibot.Crawler" Version="1.0.5" />
     <PackageReference Include="Lagrange.Core" Version="0.3.1" />
+    <PackageReference Include="SatoriClient-ZeroAshUpdated" Version="1.0.0-alpha.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -51,6 +51,12 @@
     <None Include="Notification\Deprecated\DanmakuSpeedStatisticService.cs" />
     <Compile Remove="Service\Deprecated\LiveStreamEventService.cs" />
     <None Include="Service\Deprecated\LiveStreamEventService.cs" />
+    <Compile Remove="Notification\Deprecated\DanmakuCollectorService.cs" />
+    <None Include="Notification\Deprecated\DanmakuCollectorService.cs" />
+    <Compile Remove="Notification\Deprecated\DanmakuExportGuardList.cs" />
+    <None Include="Notification\Deprecated\DanmakuExportGuardList.cs" />
+    <Compile Remove="Notification\Deprecated\DanmakuRecordControlService.cs" />
+    <None Include="Notification\Deprecated\DanmakuRecordControlService.cs" />
   </ItemGroup>
 
 </Project>
