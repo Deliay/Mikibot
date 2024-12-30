@@ -12,6 +12,7 @@ using Mikibot.Analyze.Bot.RandomImage;
 
 var appBuilder = ContainerInitializer.Create();
 
+appBuilder.RegisterType<HttpClient>().AsSelf().SingleInstance();
 appBuilder.RegisterType<BiliLiveCrawler>().AsSelf().SingleInstance();
 appBuilder.RegisterType<BiliVideoCrawler>().AsSelf().SingleInstance();
 
