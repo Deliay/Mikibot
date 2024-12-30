@@ -9,7 +9,6 @@ using Mikibot.Analyze.Service;
 using Mikibot.BuildingBlocks.Util;
 using Mikibot.Crawler.Http.Bilibili;
 using Mikibot.Analyze.Bot;
-using Mikibot.Analyze.Bot.RandomImage;
 
 var appBuilder = ContainerInitializer.Create();
 
@@ -48,7 +47,7 @@ appBuilder.RegisterType<BiliBiliVideoLinkShareProxyService>().AsSelf().SingleIns
 // appBuilder.RegisterType<AntiBoyFriendFanVoiceService>().AsSelf().SingleInstance();
 //appBuilder.RegisterType<AiImageGenerationService>().AsSelf().SingleInstance();
 // appBuilder.RegisterType<AiVoiceGenerationService>().AsSelf().SingleInstance();
-appBuilder.RegisterType<RandomImageService>().AsSelf().SingleInstance();
+// appBuilder.RegisterType<RandomImageService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<OptionaSelectorService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<PingtiItemReplaceService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<SubscribeService>().AsSelf().SingleInstance();
@@ -76,7 +75,6 @@ await mirai.Run();
 var statusCrawler = app.Resolve<LiveStatusCrawlService>();
 var followerStat = app.Resolve<DailyFollowerStatisticService>();
 var biliParser = app.Resolve<BiliBiliVideoLinkShareProxyService>();
-var randomImage = app.Resolve<RandomImageService>();
 var optionaSelector = app.Resolve<OptionaSelectorService>();
 var pingti = app.Resolve<PingtiItemReplaceService>();
 var subscribe = app.Resolve<SubscribeService>();
@@ -87,7 +85,6 @@ await Task.WhenAll(
     statusCrawler.Run(token),
     followerStat.Run(token),
     biliParser.Run(token),
-    randomImage.Run(token),
     optionaSelector.Run(token),
     pingti.Run(token),
     subscribe.Run(token),

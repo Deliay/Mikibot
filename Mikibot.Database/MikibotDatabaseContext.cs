@@ -30,6 +30,8 @@ public class MikibotDatabaseContext : DbContext
     
     public DbSet<SubscriptionFansTrends> SubscriptionFansTrends { get; set; }
     public DbSet<SubscriptionLiveStart> SubscriptionLiveStarts { get; set; }
+    
+    public DbSet<RandomFood> RandomFoods { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

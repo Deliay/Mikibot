@@ -510,6 +510,23 @@ namespace Mikibot.Migrations
                     b.ToTable("LiveUserInteractiveLogs");
                 });
 
+            modelBuilder.Entity("Mikibot.Database.Model.RandomFood", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RandomFoods");
+                });
+
             modelBuilder.Entity("Mikibot.Database.Model.StatisticReportLog", b =>
                 {
                     b.Property<long>("Id")

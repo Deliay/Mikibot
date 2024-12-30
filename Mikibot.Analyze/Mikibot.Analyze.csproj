@@ -41,22 +41,28 @@
     <None Update="resources\transparent.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Compile Remove="Notification\DanmakuRecordControlService.cs" />
-    <None Include="Notification\Deprecated\DanmakuCollectorService.cs" />
-    <None Include="Notification\Deprecated\DanmakuExportGuardList.cs" />
-    <None Include="Notification\Deprecated\DanmakuRecordControlService.cs" />
-    <Compile Remove="Notification\DanmakuCollectorService.cs" />
-    <Compile Remove="Notification\DanmakuExportGuardList.cs" />
-    <Compile Remove="Notification\DanmakuSpeedStatisticService.cs" />
-    <None Include="Notification\Deprecated\DanmakuSpeedStatisticService.cs" />
-    <Compile Remove="Service\Deprecated\LiveStreamEventService.cs" />
-    <None Include="Service\Deprecated\LiveStreamEventService.cs" />
+    <Compile Remove="Bot\Deprecated\AiImageGenerationService.cs" />
+    <None Include="Bot\Deprecated\AiImageGenerationService.cs" />
+    <Compile Remove="Bot\Deprecated\AiVoiceGenerationService.cs" />
+    <None Include="Bot\Deprecated\AiVoiceGenerationService.cs" />
+    <Compile Remove="Bot\Deprecated\AntiBoyFriendFanVoiceService.cs" />
+    <None Include="Bot\Deprecated\AntiBoyFriendFanVoiceService.cs" />
+    <Compile Remove="Bot\Deprecated\MikiDanmakuProxyService.cs" />
+    <None Include="Bot\Deprecated\MikiDanmakuProxyService.cs" />
+    <Compile Remove="Bot\Deprecated\MikiLiveEventProxyService.cs" />
+    <None Include="Bot\Deprecated\MikiLiveEventProxyService.cs" />
+    <Compile Remove="Bot\Deprecated\RandomImageService.cs" />
+    <None Include="Bot\Deprecated\RandomImageService.cs" />
     <Compile Remove="Notification\Deprecated\DanmakuCollectorService.cs" />
     <None Include="Notification\Deprecated\DanmakuCollectorService.cs" />
     <Compile Remove="Notification\Deprecated\DanmakuExportGuardList.cs" />
     <None Include="Notification\Deprecated\DanmakuExportGuardList.cs" />
     <Compile Remove="Notification\Deprecated\DanmakuRecordControlService.cs" />
     <None Include="Notification\Deprecated\DanmakuRecordControlService.cs" />
+    <Compile Remove="Notification\Deprecated\DanmakuSpeedStatisticService.cs" />
+    <None Include="Notification\Deprecated\DanmakuSpeedStatisticService.cs" />
+    <Compile Remove="Service\Deprecated\LiveStreamEventService.cs" />
+    <None Include="Service\Deprecated\LiveStreamEventService.cs" />
   </ItemGroup>
 
   <ItemGroup>

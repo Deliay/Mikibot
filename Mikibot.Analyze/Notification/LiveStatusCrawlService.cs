@@ -88,8 +88,8 @@ public class LiveStatusCrawlService(BiliLiveCrawler crawler, IMiraiService mirai
                         
                     var latest = await db.LiveStatuses
                         .Where(s => s.Bid == userId)
-                        .OrderBy(s => s.Id)
-                        .LastOrDefaultAsync(token);
+                        .OrderByDescending(s => s.Id)
+                        .FirstOrDefaultAsync(token);
                         
                     var info = await Crawler.GetLiveRoomInfo(roomId, token);
                     // 发通知咯！

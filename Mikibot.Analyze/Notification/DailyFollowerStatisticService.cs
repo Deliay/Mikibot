@@ -16,7 +16,6 @@ namespace Mikibot.Analyze.Notification;
 public class DailyFollowerStatisticService(IMiraiService mirai, ILogger<DailyFollowerStatisticService> logger)
 {
     private readonly MikibotDatabaseContext db = new(MySqlConfiguration.FromEnviroment());
-    private readonly MikibotDatabaseContext dbWeekly = new(MySqlConfiguration.FromEnviroment());
 
     // 不需要登录
 
