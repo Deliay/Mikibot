@@ -54,7 +54,7 @@ public class LiveStatusCrawlService(BiliLiveCrawler crawler, IMiraiService mirai
     private MessageBase[] ComposeMessage(LiveRoomInfo info, LiveStatus? latest, LiveStatus newly, bool enabledFans = false)
     {
         string status() => info.LiveStatus == 1 ? "开" : "下";
-        string fans() => newly.Status == 0 && latest != null ? $"本次直播涨粉: {newly.FollowerCount - latest.FollowerCount}" : "";
+        string fans() => newly.Status == 0 && latest != null && enabledFans ? $"本次直播涨粉: {newly.FollowerCount - latest.FollowerCount}" : "";
         string url() => newly.Status == 1 ? $"https://live.bilibili.com/{info.RoomId}" : "";
         var msg = $"{status()}啦~ {info.Title}\n{url()}{fans()}";
         Logger.LogInformation("Message composed {}", msg);
