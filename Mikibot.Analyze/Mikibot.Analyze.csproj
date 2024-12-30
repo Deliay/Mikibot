@@ -59,4 +59,10 @@
     <None Include="Notification\Deprecated\DanmakuRecordControlService.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="..\.dockerignore">
+      <Link>.dockerignore</Link>
+    </Content>
+  </ItemGroup>
+
 </Project>
