@@ -80,7 +80,7 @@ var biliParser = app.Resolve<BiliBiliVideoLinkShareProxyService>();
 var optionaSelector = app.Resolve<OptionaSelectorService>();
 var pingti = app.Resolve<PingtiItemReplaceService>();
 var subscribe = app.Resolve<SubscribeService>();
-var foodDice = app.Resolve<SubscribeService>();
+var foodDice = app.Resolve<FoodDiceService>();
 
 logger.LogInformation("Starting schedule module...");
 await Task.WhenAll(
