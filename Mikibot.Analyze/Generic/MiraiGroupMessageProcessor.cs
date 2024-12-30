@@ -5,7 +5,7 @@ using Mirai.Net.Data.Messages.Receivers;
 
 namespace Mikibot.Analyze.Generic;
 
-public abstract class MiraiGroupMessageProcessor<T>(IMiraiService miraiService, ILogger<T> logger, string serviceName = nameof(T)) where T : MiraiGroupMessageProcessor<T>
+public abstract class MiraiGroupMessageProcessor<T>(IMiraiService miraiService, ILogger<T> logger) where T : MiraiGroupMessageProcessor<T>
 {
     protected IMiraiService MiraiService => miraiService;
     protected ILogger<T> Logger => logger;
@@ -37,19 +37,19 @@ public abstract class MiraiGroupMessageProcessor<T>(IMiraiService miraiService, 
     public async Task Run(CancellationToken token)
     {
         await PreRun(token);
-        logger.LogInformation("Mirai group handling message: {}", serviceName);
+        logger.LogInformation("Mirai group handling message: {}", typeof(T).Name);
         miraiService.SubscribeMessage(FilterMessage, token);
         while (!token.IsCancellationRequested)
         {
             try
             {
                 await messageQueue.Reader.WaitToReadAsync(token);
-                logger.LogInformation("{} Started", serviceName);
+                logger.LogInformation("{} Started", typeof(T).Name);
                 await Dequeue(token);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "{}", serviceName);
+                logger.LogError(ex, "{}", typeof(T).Name);
             }
         }
     }

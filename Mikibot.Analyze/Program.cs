@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using Mikibot.Database;
 using Mikibot.Analyze.MiraiHttp;
@@ -50,6 +51,7 @@ appBuilder.RegisterType<BiliBiliVideoLinkShareProxyService>().AsSelf().SingleIns
 appBuilder.RegisterType<RandomImageService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<OptionaSelectorService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<PingtiItemReplaceService>().AsSelf().SingleInstance();
+appBuilder.RegisterType<SubscribeService>().AsSelf().SingleInstance();
 
 var appContainer = appBuilder.Build();
 
@@ -77,6 +79,7 @@ var biliParser = app.Resolve<BiliBiliVideoLinkShareProxyService>();
 var randomImage = app.Resolve<RandomImageService>();
 var optionaSelector = app.Resolve<OptionaSelectorService>();
 var pingti = app.Resolve<PingtiItemReplaceService>();
+var subscribe = app.Resolve<SubscribeService>();
 
 logger.LogInformation("Starting schedule module...");
 await Task.WhenAll(
@@ -86,5 +89,6 @@ await Task.WhenAll(
     biliParser.Run(token),
     randomImage.Run(token),
     optionaSelector.Run(token),
-    pingti.Run(token)
+    pingti.Run(token),
+    subscribe.Run(token),
 ]);

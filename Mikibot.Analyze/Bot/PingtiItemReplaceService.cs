@@ -1,4 +1,6 @@
+using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Mikibot.Analyze.Generic;
 using Mikibot.Analyze.MiraiHttp;
@@ -34,6 +36,7 @@ public class PingtiItemReplaceService(IMiraiService miraiService, ILogger<Pingti
         ? JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(CacheFile)) ?? []
         : [];
 
+    private readonly record struct PingtiResult(string response, string reason);
     private async ValueTask<string> GetReplaceItemRequest(string raw, CancellationToken token = default)
     {
         var msgStr = "{\"messages\":[{\"role\":\"user\",\"content\":" + JsonSerializer.Serialize(raw) + "}]}";
@@ -41,9 +44,9 @@ public class PingtiItemReplaceService(IMiraiService miraiService, ILogger<Pingti
         
         res.EnsureSuccessStatusCode();
 
-        var result = await res.Content.ReadAsStringAsync(token);
+        var result = await res.Content.ReadFromJsonAsync<PingtiResult>(token);
 
-        return result;
+        return $"{result.response}！\n因为{result.reason}！";
     }
     private async ValueTask<string> GetReplaceItem(string raw, CancellationToken token = default)
     {

@@ -3,11 +3,13 @@
     "Mikibot.Analyze": {
       "commandName": "Project",
       "environmentVariables": {
-        "MYSQL_USER": "root",
+        "ENV_SATORI_ENDPOINT": "http://192.168.31.75:5500",
+        "ENV_SATORI_TOKEN": "08f43548cfc0c63dd60fe00a580244c0f62943432ddc0c9dc75a9318e6c235a3",
+        "MYSQL_HOST": "192.168.31.75",
         "MYSQL_PORT": "3306",
-        "MYSQL_HOST": "localhost",
-        "MYSQL_DATABASE": "mikibot",
-        "QWEATHER_API_KEY": "114514"
+        "MYSQL_USER": "zero_apps",
+        "MYSQL_PASSWORD": "1",
+        "MYSQL_DATABASE": "mikibot2"
       },
       "remoteDebugEnabled": false
     },

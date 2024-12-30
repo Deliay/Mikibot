@@ -7,7 +7,7 @@ using Mirai.Net.Data.Messages.Receivers;
 namespace Mikibot.Analyze.Bot.RandomImage;
 
 public class RandomImageService(IMiraiService miraiService, ILogger<RandomImageService> logger)
-    : MiraiGroupMessageProcessor<RandomImageService>(miraiService, logger, "随机图图")
+    : MiraiGroupMessageProcessor<RandomImageService>(miraiService, logger)
 {
     protected override async ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
     {
