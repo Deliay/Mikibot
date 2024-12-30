@@ -52,61 +52,38 @@ appBuilder.RegisterType<PingtiItemReplaceService>().AsSelf().SingleInstance();
 
 var appContainer = appBuilder.Build();
 
-using (var csc = new CancellationTokenSource())
-using (var app = appContainer.BeginLifetimeScope())
-{
-    var token = csc.Token;
+using var csc = new CancellationTokenSource();
+await using var app = appContainer.BeginLifetimeScope();
 
-    var logger = app.Resolve<ILogger<Program>>();
+var token = csc.Token;
 
-    logger.LogInformation("Mikibot starting...v{}", typeof(Program).Assembly.GetName().Version);
+var logger = app.Resolve<ILogger<Program>>();
 
-    var db = app.Resolve<MikibotDatabaseContext>();
-    logger.LogInformation("Initializing database connection and database structure");
-    await db.Database.MigrateAsync(token);
-    logger.LogInformation("Done");
+logger.LogInformation("Mikibot starting...v{}", typeof(Program).Assembly.GetName().Version);
 
-    var mirai = app.Resolve<IMiraiService>();
-    logger.LogInformation("Initializing mirai service...");
-    await mirai.Run();
+var db = app.Resolve<MikibotDatabaseContext>();
+logger.LogInformation("Initializing database connection and database structure");
+await db.Database.MigrateAsync(token);
+logger.LogInformation("Done");
 
-    var statusCrawler = app.Resolve<LiveStatusCrawlService>();
-    var followerStat = app.Resolve<DailyFollowerStatisticService>();
-    // var eventService = app.Resolve<LiveStreamEventService>();
+var mirai = app.Resolve<IMiraiService>();
+logger.LogInformation("Initializing mirai service...");
+await mirai.Run();
 
-    // var danmakuClip = app.Resolve<DanmakuRecordControlService>();
-    // var danmakuCrawler = app.Resolve<DanmakuCollectorService>();
-    // var danmakuExportGuard = app.Resolve<DanmakuExportGuardList>();
+var statusCrawler = app.Resolve<LiveStatusCrawlService>();
+var followerStat = app.Resolve<DailyFollowerStatisticService>();
+var biliParser = app.Resolve<BiliBiliVideoLinkShareProxyService>();
+var randomImage = app.Resolve<RandomImageService>();
+var optionaSelector = app.Resolve<OptionaSelectorService>();
+var pingti = app.Resolve<PingtiItemReplaceService>();
 
-    // var aiVoice = app.Resolve<AiVoiceGenerationService>();
-    //var aiImage = app.Resolve<AiImageGenerationService>();
-    // var bffAnti = app.Resolve<AntiBoyFriendFanVoiceService>();
-    // var mxmkDanmakuProxy = app.Resolve<MikiDanmakuProxyService>();
-    // var mxmkLiveEventProxy = app.Resolve<MikiLiveEventProxyService>();
-    var biliParser = app.Resolve<BiliBiliVideoLinkShareProxyService>();
-    var randomImage = app.Resolve<RandomImageService>();
-    var optionaSelector = app.Resolve<OptionaSelectorService>();
-    var pingti = app.Resolve<PingtiItemReplaceService>();
-
-    // eventService.CmdHandler.Register(danmakuCrawler);
-    // eventService.CmdHandler.Register(mxmkLiveEventProxy);
-
-    // eventService.CmdHandler.Subscribe<DanmuMsg>(danmakuClip.HandleDanmu);
-    // eventService.CmdHandler.Subscribe<DanmuMsg>(danmakuExportGuard.HandleDanmaku);
-    // eventService.CmdHandler.Subscribe<DanmuMsg>(mxmkDanmakuProxy.HandleDanmaku);
-
-    logger.LogInformation("Starting schedule module...");
-    await Task.WhenAll(
-    [
-        statusCrawler.Run(token),
-        followerStat.Run(token),
-        // eventService.Run(token),
-        // bffAnti.Run(token),
-        biliParser.Run(token),
-        randomImage.Run(token),
-        //aiImage.Run(token),
-        // aiVoice.Run(token),   
-        optionaSelector.Run(token),
-        pingti.Run(token)
-    ]);
-}
+logger.LogInformation("Starting schedule module...");
+await Task.WhenAll(
+[
+    statusCrawler.Run(token),
+    followerStat.Run(token),
+    biliParser.Run(token),
+    randomImage.Run(token),
+    optionaSelector.Run(token),
+    pingti.Run(token)
+]);
