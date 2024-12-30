@@ -9,6 +9,7 @@ using Mikibot.Analyze.Service;
 using Mikibot.BuildingBlocks.Util;
 using Mikibot.Crawler.Http.Bilibili;
 using Mikibot.Analyze.Bot;
+using Mikibot.Analyze.Bot.FoodDice;
 
 var appBuilder = ContainerInitializer.Create();
 
@@ -51,6 +52,7 @@ appBuilder.RegisterType<BiliBiliVideoLinkShareProxyService>().AsSelf().SingleIns
 appBuilder.RegisterType<OptionaSelectorService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<PingtiItemReplaceService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<SubscribeService>().AsSelf().SingleInstance();
+appBuilder.RegisterType<FoodDiceService>().AsSelf().SingleInstance();
 
 var appContainer = appBuilder.Build();
 
@@ -78,6 +80,7 @@ var biliParser = app.Resolve<BiliBiliVideoLinkShareProxyService>();
 var optionaSelector = app.Resolve<OptionaSelectorService>();
 var pingti = app.Resolve<PingtiItemReplaceService>();
 var subscribe = app.Resolve<SubscribeService>();
+var foodDice = app.Resolve<SubscribeService>();
 
 logger.LogInformation("Starting schedule module...");
 await Task.WhenAll(
@@ -88,4 +91,5 @@ await Task.WhenAll(
     optionaSelector.Run(token),
     pingti.Run(token),
     subscribe.Run(token),
+    foodDice.Run(token),
 ]);
