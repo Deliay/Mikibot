@@ -14,6 +14,9 @@ public class FoodDiceService(IMiraiService miraiService, ILogger<FoodDiceService
 {
     private readonly IMiraiService _miraiService = miraiService;
     private static readonly RandomFood Wind = new() { Name = "西北风 (还未配置食物数据库)", Category = "食物"};
+
+    public const string 食物 = "食物";
+    public const string 酒 = "酒";
     
     protected override async ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
     {
@@ -25,6 +28,7 @@ public class FoodDiceService(IMiraiService miraiService, ILogger<FoodDiceService
         
         var food = await db.RandomFoods
             .OrderBy(c => EF.Functions.Random())
+            .Where(c => c.Category == 食物)
             .FirstOrDefaultAsync(token) ?? Wind;
 
         await _miraiService.SendMessageToSomeGroup([message.GroupId], token,
