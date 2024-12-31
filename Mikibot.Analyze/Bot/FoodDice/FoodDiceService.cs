@@ -13,7 +13,7 @@ public class FoodDiceService(IMiraiService miraiService, ILogger<FoodDiceService
     : MiraiGroupMessageProcessor<FoodDiceService>(miraiService, logger)
 {
     private readonly IMiraiService _miraiService = miraiService;
-    private static readonly RandomFood Wind = new() { Name = "西北风 (还未配置食物数据库)" };
+    private static readonly RandomFood Wind = new() { Name = "西北风 (还未配置食物数据库)", Category = "食物"};
     
     protected override async ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
     {

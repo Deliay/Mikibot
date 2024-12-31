@@ -8,4 +8,6 @@ public class RandomFood
     public long Id { get; set; }
 
     public required string Name { get; set; }
+    
+    public required string Category { get; set; }
 }
