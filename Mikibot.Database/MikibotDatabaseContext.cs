@@ -140,5 +140,10 @@ public class MikibotDatabaseContext : DbContext
             model.ToTable("暗杀名单");
             model.HasKey(m => m.Id);
         });
+
+        modelBuilder.Entity<RandomFood>(m =>
+        {
+            m.HasIndex(nameof(RandomFood.Name), nameof(RandomFood.Category)).IsUnique();
+        });
     }
 }
