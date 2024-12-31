@@ -106,46 +106,46 @@ public class DailyFollowerStatisticService(IMiraiService mirai, ILogger<DailyFol
 
     private async Task DailyReportAll(CancellationToken token)
     {
-        while (DateTimeOffset.Now.Hour != 19 || DateTimeOffset.Now.Minute > 15 )
+        while (!token.IsCancellationRequested)
         {
-            await Task.Delay(TimeSpan.FromMinutes(5), token);
-        }
+            while (DateTimeOffset.Now.Hour != 19 || DateTimeOffset.Now.Minute > 15 )
+            {
+                await Task.Delay(TimeSpan.FromMinutes(5), token);
+            }
 
-        var subscriptions = await db.SubscriptionFansTrends.ToListAsync(token);
+            var subscriptions = await db.SubscriptionFansTrends.ToListAsync(token);
 
-        foreach (var subscription in subscriptions)
-        {
-            await DailyReport(subscription, token);
+            foreach (var subscription in subscriptions)
+            {
+                await DailyReport(subscription, token);
+            }
         }
     }
         
     private async Task DailyReport(SubscriptionFansTrends subscription, CancellationToken token)
     {
-        while (!token.IsCancellationRequested)
+        try
         {
-            try
-            {
-                var userId = subscription.UserId;
+            var userId = subscription.UserId;
                 
-                var end = DateTimeOffset.Now;
-                var start = end.Subtract(TimeSpan.FromDays(1));
+            var end = DateTimeOffset.Now;
+            var start = end.Subtract(TimeSpan.FromDays(1));
 
-                var startFollowerCount = await GetRangeStartFollowerCount(userId, start, token);
-                var endFollowerCount = await GetRangeEndFollowerCount(userId, end, token);
+            var startFollowerCount = await GetRangeStartFollowerCount(userId, start, token);
+            var endFollowerCount = await GetRangeEndFollowerCount(userId, end, token);
 
-                var status = await GetRecentlyLiveStreamStatus(userId, start, token);
+            var status = await GetRecentlyLiveStreamStatus(userId, start, token);
 
-                var msg = $"涨粉日报\n{Format(start)} ~ {Format(end)}\n涨粉 {endFollowerCount - startFollowerCount} 人\n直播场次详细：\n{status}";
-                Logger.LogInformation("{}", msg);
-                await Mirai.SendMessageToSomeGroup([subscription.GroupId], token,
-                    new PlainMessage(msg));
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, "发送日报时出现了问题");
-            }
-            await Task.Delay(TimeSpan.FromHours(1), token);
+            var msg = $"涨粉日报\n{Format(start)} ~ {Format(end)}\n涨粉 {endFollowerCount - startFollowerCount} 人\n直播场次详细：\n{status}";
+            Logger.LogInformation("{}", msg);
+            await Mirai.SendMessageToSomeGroup([subscription.GroupId], token,
+                new PlainMessage(msg));
         }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "发送日报时出现了问题");
+        }
+        await Task.Delay(TimeSpan.FromHours(1), token);
     }
 
     public async Task WeeklyReport(SubscriptionFansTrends subscription, CancellationToken token)
