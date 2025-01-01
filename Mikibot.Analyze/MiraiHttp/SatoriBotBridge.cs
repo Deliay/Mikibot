@@ -95,14 +95,15 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
             logger.LogError(ex, "Listen failed");
         }
     }
+    private Login CurrentBot { get; set; }
     public async ValueTask Run()
     {
         Client = new SatoriClient(EnvSatoriEndpoint, EnvSatoriToken);
-        var login = await Client.GetLoginAsync();
+        CurrentBot = await Client.GetLoginAsync();
         Bot = await Client.GetBotAsync();
         Bot.MessageCreated += BotOnMessageCreated;
 
-        logger.LogInformation("准备启动机器人，账号 {}", login.SelfId);
+        logger.LogInformation("准备启动机器人，账号 {}", CurrentBot.SelfId);
         _ = StartAsync();
     }
 
@@ -112,7 +113,10 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
     {
         if (e.Message is null) return;
         if (e is not { User: not null, Channel: not null }) return;
-
+    
+        // don't process the messages from bot self
+        if (CurrentBot.SelfId == e.User.Id) return;
+        
         if (!_messageIds.Add(e.Message.Id))
         {
             return;
