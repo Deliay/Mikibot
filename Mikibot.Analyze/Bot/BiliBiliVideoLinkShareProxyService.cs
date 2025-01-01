@@ -123,15 +123,18 @@ public class BiliBiliVideoLinkShareProxyService(
                     await TrySend(group, null, av, token);
                     return;
                 }
-                
-                var b23 = text.IndexOf("https://b23.tv", StringComparison.InvariantCulture);
-                var b2233 = text.IndexOf("https://bili2233.cn/", StringComparison.InvariantCulture);
+
+                const string b23raw = "https://b23.tv/";
+                const string b2233raw = "https://bili2233.cn/";
+                var b23 = text.IndexOf(b23raw, StringComparison.InvariantCulture);
+                var b2233 = text.IndexOf(b2233raw, StringComparison.InvariantCulture);
                 if (b23 > -1 || b2233 > -1)
                 {
                     if (!await permissions.IsGroupEnabled(BiliVideoParser, group.Id, token)) return;
                     var pos = b23 > -1 ? b23 : b2233;
-                    var url = Fetch(text, pos, ValidBv);
-                    
+                    var prefix = b23 > -1 ? b23raw : b2233raw;
+                    var suffix = Fetch(text, pos + prefix.Length, ValidBv);
+                    var url = prefix + suffix;
                     Logger.LogInformation("准备发送url {}", url);
                     await TrySend(group, url, token);
                     return;
