@@ -15,6 +15,11 @@ public class PermissionService(MikibotDatabaseContext db, ILogger<PermissionServ
         logger.LogInformation("Permission {}:{} action:{}, result: {}", role, userId, action, result);
         return result;
     }
+
+    public ValueTask<bool> IsGroupEnabled(string action, string groupId, CancellationToken cancellationToken = default)
+    {
+        return HasPermission(Group, groupId, action, cancellationToken);
+    }
     
     public ValueTask<bool> IsBotOperator(string userId, CancellationToken cancellationToken = default)
         => HasPermission(User, userId, BotOperator, cancellationToken);
