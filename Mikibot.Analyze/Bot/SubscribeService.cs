@@ -103,11 +103,6 @@ public partial class SubscribeService(
 
     protected override async ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
     {
-        if (!await permissions.IsBotOperator(message.Sender.Id, token))
-        {
-            return;
-        }
-        
         var source = message.MessageChain.GetSourceMessage();
         foreach (var msg in message.MessageChain)
         {
@@ -116,6 +111,11 @@ public partial class SubscribeService(
             var matches = BindMatchRegex.Matches(plain.Text);
             if (matches.Count == 0) return;
 
+            if (!await permissions.IsBotOperator(message.Sender.Id, token))
+            {
+                return;
+            }
+            
             var (isCancel, type, bid) = matches
                 .Select(m => (m.Groups[2].Value == "取消", m.Groups[3].Value, m.Groups[4].Value))
                 .FirstOrDefault();
