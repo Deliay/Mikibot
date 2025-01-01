@@ -83,12 +83,13 @@ public class BiliBiliVideoLinkShareProxyService(
         var bvUrl = infoList[1];
         var title = infoList[2];
         var author = infoList[3];
-        Logger.LogInformation("Will send message to group {},{}, {}, {}", title, author, image, bvUrl);
+        var atImage = image.IndexOf('@', StringComparison.InvariantCulture);
+        var fullImage = atImage > 0 ? image[..atImage] : image; 
         await MiraiService.SendMessageToGroup(group, token,
         [
             new ImageMessage()
             {
-                Url = image,
+                Url = fullImage,
             },
             new PlainMessage($"{title} (作者: {author}) \n {bvUrl}"),
         ]);
