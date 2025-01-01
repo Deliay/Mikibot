@@ -79,7 +79,7 @@ public class BiliBiliVideoLinkShareProxyService(
             .Select(s => s.Attributes["content"].Value)
             .ToList();
 
-        var image = infoList[0];
+        var image = "https:" + infoList[0];
         var bvUrl = infoList[1];
         var title = infoList[2];
         var author = infoList[3];
