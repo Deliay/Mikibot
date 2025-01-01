@@ -132,8 +132,8 @@ public class BiliBiliVideoLinkShareProxyService(
                     var pos = b23 > -1 ? b23 : b2233;
                     var url = Fetch(text, pos, ValidBv);
                     
-                    await TrySend(group, url, token);
                     Logger.LogInformation("准备发送url {}", url);
+                    await TrySend(group, url, token);
                     return;
                 }
             }
