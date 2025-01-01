@@ -40,6 +40,7 @@ public class FoodDiceService(IMiraiService miraiService, ILogger<FoodDiceService
         if (msg.StartsWith("吃什么")) category = 食物;
         else if (msg.StartsWith("小酌什么")) category = 酒;
         else if (msg.StartsWith("喝什么")) category = 饮品;
+        else return;
         
         var food = await RollRandomFood(category, token);
         
