@@ -59,7 +59,7 @@ public class BiliBiliVideoLinkShareProxyService(
         return raw[startIndex..];
     }
 
-    private static readonly IEnumerable<string> Selectors =
+    private static readonly List<string> Selectors =
     [
         "//meta[@property='og:image']",
         "//meta[@property='og:url']",
@@ -83,7 +83,7 @@ public class BiliBiliVideoLinkShareProxyService(
         var bvUrl = infoList[1];
         var title = infoList[2];
         var author = infoList[3];
-        
+        Logger.LogInformation("Will send message to group {},{}, {}, {}", title, author, image, bvUrl);
         await MiraiService.SendMessageToGroup(group, token,
         [
             new ImageMessage()
