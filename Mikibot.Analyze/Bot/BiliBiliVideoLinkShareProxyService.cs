@@ -88,7 +88,7 @@ public class BiliBiliVideoLinkShareProxyService(
         [
             new ImageMessage()
             {
-                Url = bvUrl,
+                Url = image,
             },
             new PlainMessage($"{title} (作者: {author}) \n {bvUrl}"),
         ]);
