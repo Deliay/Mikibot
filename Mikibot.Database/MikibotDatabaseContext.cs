@@ -32,6 +32,8 @@ public class MikibotDatabaseContext : DbContext
     public DbSet<SubscriptionLiveStart> SubscriptionLiveStarts { get; set; }
     
     public DbSet<RandomFood> RandomFoods { get; set; }
+    
+    public DbSet<Permission> Permissions { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -144,6 +146,11 @@ public class MikibotDatabaseContext : DbContext
         modelBuilder.Entity<RandomFood>(m =>
         {
             m.HasIndex(nameof(RandomFood.Name), nameof(RandomFood.Category)).IsUnique();
+        });
+
+        modelBuilder.Entity<Permission>(m =>
+        {
+            m.HasIndex(nameof(Permission.UserId), nameof(Permission.Role), nameof(Permission.Action)).IsUnique();
         });
     }
 }

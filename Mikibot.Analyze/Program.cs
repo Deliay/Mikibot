@@ -10,6 +10,7 @@ using Mikibot.BuildingBlocks.Util;
 using Mikibot.Crawler.Http.Bilibili;
 using Mikibot.Analyze.Bot;
 using Mikibot.Analyze.Bot.FoodDice;
+using Mikibot.Analyze.Generic;
 
 var appBuilder = ContainerInitializer.Create();
 
@@ -53,6 +54,7 @@ appBuilder.RegisterType<OptionaSelectorService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<PingtiItemReplaceService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<SubscribeService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<FoodDiceService>().AsSelf().SingleInstance();
+appBuilder.RegisterType<PermissionService>().AsSelf().SingleInstance();
 
 var appContainer = appBuilder.Build();
 

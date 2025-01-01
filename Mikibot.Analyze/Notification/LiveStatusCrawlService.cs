@@ -106,7 +106,6 @@ public class LiveStatusCrawlService(BiliLiveCrawler crawler, IMiraiService mirai
                                 ? ComposeMessage(info, latest, newly, subscription.EnabledFansTrendingStatistics)
                                 : 
                                 [
-                                    new ImageMessage() { Url = info.UserCover },
                                     new PlainMessage($"诶嘿，开始为您持续关注 {info.RoomId} 的开播信息~\n{info.Url}"),
                                 ];
                             await Mirai.SendMessageToSomeGroup([subscription.GroupId], token, msg);

@@ -15,6 +15,7 @@ public partial class SubscribeService(
     IMiraiService miraiService,
     ILogger<SubscribeService> logger,
     BiliLiveCrawler crawler,
+    PermissionService permissions,
     MikibotDatabaseContext db)
     : MiraiGroupMessageProcessor<SubscribeService>(miraiService, logger)
 {
@@ -100,29 +101,34 @@ public partial class SubscribeService(
 
     private static readonly Regex BindMatchRegex = GenerateBindMatchRegex();
 
-    protected override ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
+    protected override async ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
     {
+        if (!await permissions.IsBotOperator(message.Sender.Id, token))
+        {
+            return;
+        }
+        
         var source = message.MessageChain.GetSourceMessage();
         foreach (var msg in message.MessageChain)
         {
             if (msg is not PlainMessage plain) continue;
             
             var matches = BindMatchRegex.Matches(plain.Text);
-            if (matches.Count == 0) return ValueTask.CompletedTask;
+            if (matches.Count == 0) return;
 
             var (isCancel, type, bid) = matches
                 .Select(m => (m.Groups[2].Value == "取消", m.Groups[3].Value, m.Groups[4].Value))
                 .FirstOrDefault();
 
-            if (type is not { Length: > 0 } || bid is not { Length: > 0 }) return ValueTask.CompletedTask;
+            if (type is not { Length: > 0 } || bid is not { Length: > 0 }) return;
             
-            return type switch
+            await (type switch
             {
                 "涨粉" => SubscribeFans(source, message.GroupId, bid, isCancel, token),
                 "开播" => SubscribeLive(source, message.GroupId, bid, isCancel, token),
                 _ => ValueTask.CompletedTask
-            };
+            });
+            return;
         }
-        return ValueTask.CompletedTask;
     }
 }
