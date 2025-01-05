@@ -50,7 +50,7 @@ appBuilder.RegisterType<BiliBiliVideoLinkShareProxyService>().AsSelf().SingleIns
 //appBuilder.RegisterType<AiImageGenerationService>().AsSelf().SingleInstance();
 // appBuilder.RegisterType<AiVoiceGenerationService>().AsSelf().SingleInstance();
 // appBuilder.RegisterType<RandomImageService>().AsSelf().SingleInstance();
-appBuilder.RegisterType<OptionaSelectorService>().AsSelf().SingleInstance();
+appBuilder.RegisterType<OptionSelectorService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<PingtiItemReplaceService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<SubscribeService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<FoodDiceService>().AsSelf().SingleInstance();
@@ -79,7 +79,7 @@ await mirai.Run();
 var statusCrawler = app.Resolve<LiveStatusCrawlService>();
 var followerStat = app.Resolve<DailyFollowerStatisticService>();
 var biliParser = app.Resolve<BiliBiliVideoLinkShareProxyService>();
-var optionaSelector = app.Resolve<OptionaSelectorService>();
+var optionaSelector = app.Resolve<OptionSelectorService>();
 var pingti = app.Resolve<PingtiItemReplaceService>();
 var subscribe = app.Resolve<SubscribeService>();
 var foodDice = app.Resolve<FoodDiceService>();
