@@ -130,7 +130,7 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
             {
                 if (lastAtAt.TryGetValue(groupId, out var at))
                 {
-                    if (DateTimeOffset.Now -  at < TimeSpan.FromSeconds(15))
+                    if (DateTimeOffset.Now -  at < TimeSpan.FromSeconds(5))
                     {
                         return;
                     }
