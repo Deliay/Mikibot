@@ -22,6 +22,8 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
 
     private readonly Dictionary<string, Queue<string>> _recentMessages = [];
     private readonly Dictionary<string, SemaphoreSlim> _locks = [];
+    private readonly Dictionary<string, string> lastSubmitMessage = [];
+    private readonly Dictionary<string, DateTimeOffset> lastAtAt = [];
     private readonly PermissionService permissions;
     private const string BasicPrompt = "请你扮演美少女弥系Miki，她是个萌音二次云美少女，" +
         "说话风格非常雌小鬼，令人拳头发硬，到处挑衅其他人。" +
@@ -58,15 +60,21 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
             _recentMessages.Add(group.Id, messages = []);
         }
 
+        bool isAt = false;
         foreach (var item in message.MessageChain)
         {
             if (item is PlainMessage plain)
             {
                 messages.Enqueue($"{message.Sender.Name}: {plain.Text}\n");
             }
+            else if (item is AtMessage at)
+            {
+                // TODO: retrieve bot uin from bot service
+                isAt = at.Target == "3093240591";
+            }
         }
 
-        await TryResponse(message.GroupId, token);
+        await TryResponse(message.GroupId, isAt, token);
     }
 
     private SemaphoreSlim GetLock(string groupId)
@@ -106,15 +114,28 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
 
     private record GroupChatResponse(int score, string topic, string reply);
 
-    private async ValueTask TryResponse(string groupId, CancellationToken cancellationToken)
+    private async ValueTask TryResponse(string groupId, bool ignoreMessageCount = false, CancellationToken cancellationToken = default)
     {
 
         if (!_recentMessages.TryGetValue(groupId, out var messages)) return;
 
         await BeginLock(groupId, async (cancellationToken) =>
         {
-            if (messages.Count < 15) return;
+            if (!ignoreMessageCount && messages.Count < 15) return;
+            // 最低也要2条
+            if (ignoreMessageCount && messages.Count < 2) return;
 
+            // add 15 seconds colddown to prevent spam
+            if (ignoreMessageCount)
+            {
+                if (lastAtAt.TryGetValue(groupId, out var at))
+                {
+                    if (DateTimeOffset.Now -  at < TimeSpan.FromSeconds(15))
+                    {
+                        return;
+                    }
+                }
+            }
 
             string messageList = "";
 
@@ -122,6 +143,18 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
             {
                 messageList += message;
             }
+
+            lastSubmitMessage.Remove(groupId);
+            lastSubmitMessage.Add(groupId, messageList);
+
+            if (ignoreMessageCount)
+            {
+                lastAtAt.Remove(groupId);
+                lastAtAt.Add(groupId, DateTimeOffset.Now);
+            }
+
+            if (ignoreMessageCount && lastSubmitMessage.TryGetValue(groupId, out var msg))
+                messageList = msg + "你因为上面的发言被下面这个人at，并对你进行了回复，请给出适当的回应：\n" + messageList;
 
             var res = await _httpClient.PostAsJsonAsync("https://api.deepseek.com/chat/completions", new Chat(
                 [
