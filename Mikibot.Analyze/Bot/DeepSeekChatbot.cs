@@ -89,6 +89,10 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
         {
             Logger.LogError(ex, "A error thrown while lock scope executing...");
         }
+        finally
+        {
+            _lock.Release();
+        }
     }
     private record Message(string role, string content);
     private record Chat(List<Message> messages,
