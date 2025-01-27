@@ -148,6 +148,10 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
 
             try
             {
+                Logger.LogInformation("Deekseep bot: {}", content);
+
+                content = content.Replace("```", "");
+
                 var groupChats = JsonSerializer.Deserialize<List<GroupChatResponse>>(content);
                 if (groupChats is null) return;
 
@@ -157,7 +161,6 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
                 await MiraiService.SendMessageToSomeGroup([groupId], default,
                     new PlainMessage(interestChat.reply));
 
-                Logger.LogInformation("Deekseep bot: {}", content);
             }
             catch (Exception ex)
             {
