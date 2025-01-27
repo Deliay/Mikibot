@@ -183,6 +183,7 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
             {
                 Logger.LogInformation("Deekseep bot: {}", content);
 
+                content = content.Replace("```json", "");
                 content = content.Replace("```", "");
 
                 var groupChats = JsonSerializer.Deserialize<List<GroupChatResponse>>(content);
