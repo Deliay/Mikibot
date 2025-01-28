@@ -171,7 +171,9 @@ public class MikibotDatabaseContext : DbContext
 
         modelBuilder.Entity<ChatbotGroupChatHistory>(h =>
         {
-            h.HasIndex(nameof(ChatbotGroupChatHistory.GroupId), nameof(ChatbotGroupChatHistory.UserId));
+            h.HasIndex(nameof(ChatbotGroupChatHistory.GroupId), 
+                nameof(ChatbotGroupChatHistory.UserId),
+                nameof(ChatbotGroupChatHistory.Id));
         });
     }
 }

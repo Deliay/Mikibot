@@ -54,6 +54,7 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
             ?? throw new ArgumentException("DeepSeek API token not configured");
         _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
         _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+        _httpClient.Timeout = TimeSpan.FromSeconds(60);
         this.permissions = permissions;
         this.db = db;
     }
@@ -165,7 +166,7 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
             }
         }
 
-        if (isGroupEnabled) await TryResponse(message.GroupId, isAt, token);
+        if (isGroupEnabled) await TryResponse(message.GroupId, message.Sender.Id, isAt, token);
     }
 
     private SemaphoreSlim GetLock(string groupId)
@@ -205,7 +206,7 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
 
     private record GroupChatResponse(int score, string topic, string reply);
 
-    private async ValueTask TryResponse(string groupId, bool ignoreMessageCount = false, CancellationToken cancellationToken = default)
+    private async ValueTask TryResponse(string groupId, string userId, bool ignoreMessageCount = false, CancellationToken cancellationToken = default)
     {
 
         if (!_recentMessages.TryGetValue(groupId, out var messages)) return;
@@ -247,9 +248,22 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
             }
 
             if (ignoreMessageCount && lastSubmitMessage.TryGetValue(groupId, out var msg))
+            {
+
+                var recentMessage = string.Join('\n', await db.chatbotGroupChatHistories
+                    .Where(c => c.GroupId == groupId && c.UserId == userId)
+                    .OrderByDescending(c => c.Id)
+                    .Take(20)
+                    .ToListAsync(cancellationToken));
+                
+
+
                 messageList = msg + "\n" + messageList
-                + "你之前的发言被下面这个人at了，并对你进行了回复，请针对下面这条消息给出回应：\n"
+                + "你之前的发言被下面这个人at了，并对你进行了回复，" +
+                "他这段时间的发言如下：" + recentMessage +
+                "\n请结合他的最近发言和特别针对下面这条消息给出回应：\n"
                 + lastMessage;
+            }
 
             var prompt = await GetPrompt(groupId, cancellationToken);
             var userPrompot = messageList;
