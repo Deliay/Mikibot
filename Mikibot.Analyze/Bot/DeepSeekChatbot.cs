@@ -250,7 +250,7 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
             if (ignoreMessageCount && lastSubmitMessage.TryGetValue(groupId, out var msg))
             {
 
-                var recentMessage = string.Join('\n', await db.chatbotGroupChatHistories
+                var recentMessage = string.Join('\n', await db.ChatbotGroupChatHistories
                     .Where(c => c.GroupId == groupId && c.UserId == userId)
                     .OrderByDescending(c => c.Id)
                     .Take(20)
