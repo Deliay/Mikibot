@@ -100,10 +100,20 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
 
             var len = "/set_character".Length;
 
+            var character = text[len..].Trim();
+
+            if (string.IsNullOrWhiteSpace(character))
+            {
+                await db.ChatbotCharacters
+                    .Where(c => c.GroupId == groupId)
+                    .ExecuteDeleteAsync(cancellationToken);
+                return;
+            }
+
             await db.ChatbotCharacters.AddAsync(new ChatbotCharacter()
             {
                 GroupId = groupId,
-                Description = text[len..],
+                Description = character,
             }, cancellationToken);
 
             await db.SaveChangesAsync(cancellationToken);
