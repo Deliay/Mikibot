@@ -1,0 +1,40 @@
+﻿using Microsoft.Extensions.Logging;
+using Mikibot.Analyze.Generic;
+using Mikibot.Analyze.MiraiHttp;
+using Mikibot.Database;
+using Mikibot.Database.Model;
+using Mirai.Net.Data.Messages.Concretes;
+using Mirai.Net.Data.Messages.Receivers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mikibot.Analyze.Bot;
+
+internal class ChatHistoryService(
+    IMiraiService miraiService,
+    ILogger<ChatHistoryService> logger,
+    MikibotDatabaseContext db)
+    : MiraiGroupMessageProcessor<ChatHistoryService>(miraiService, logger)
+{
+    protected override async ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
+    {
+        var msg = string.Join('\n', message.MessageChain
+            .OfType<PlainMessage>()
+            .Select((plain) => plain.Text))
+            .Trim();
+
+        if (string.IsNullOrWhiteSpace(msg)) return;
+
+        await db.AddAsync(new ChatbotGroupChatHistory
+        {
+            GroupId = message.GroupId,
+            UserId = message.Sender.Id,
+            Message = msg,
+        }, token);
+
+        await db.SaveChangesAsync(token);
+    }
+}
