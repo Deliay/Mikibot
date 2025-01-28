@@ -232,10 +232,12 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
             }
 
             string messageList = "";
+            string lastMessage = "";
 
             while (messages.TryDequeue(out var message))
             {
                 messageList += message;
+                lastMessage = message;
             }
 
             lastSubmitMessage.Remove(groupId);
@@ -248,7 +250,9 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
             }
 
             if (ignoreMessageCount && lastSubmitMessage.TryGetValue(groupId, out var msg))
-                messageList = msg + "你因为上面的发言被下面这个人at了，并对你进行了回复，请给出适当的回应：\n" + messageList;
+                messageList = msg + "\n" + messageList
+                + "你之前的发言被下面这个人at了，并对你进行了回复，请针对下面这条消息给出回应：\n"
+                + lastMessage;
 
             var res = await _httpClient.PostAsJsonAsync("https://api.deepseek.com/chat/completions", new Chat(
                 [
