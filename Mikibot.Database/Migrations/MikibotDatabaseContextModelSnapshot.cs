@@ -90,9 +90,9 @@ namespace Mikibot.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GroupId", "UserId");
+                    b.HasIndex("GroupId", "UserId", "Id");
 
-                    b.ToTable("chatbotGroupChatHistories");
+                    b.ToTable("ChatbotGroupChatHistories");
                 });
 
             modelBuilder.Entity("Mikibot.Database.Model.FollowerStatistic", b =>
