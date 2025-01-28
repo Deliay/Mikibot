@@ -285,6 +285,8 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
                 var interestChat = groupChats.MaxBy(c => c.score);
                 if (interestChat is null) return;
 
+                messages.Enqueue(interestChat.reply);
+
                 await MiraiService.SendMessageToSomeGroup([groupId], default,
                     new PlainMessage(interestChat.reply));
 
