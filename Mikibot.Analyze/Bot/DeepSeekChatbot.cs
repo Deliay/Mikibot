@@ -117,6 +117,9 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
                 return;
             }
 
+            await db.ChatbotCharacters.Where(c => c.GroupId == groupId)
+                .ExecuteDeleteAsync(cancellationToken);
+
             await db.ChatbotCharacters.AddAsync(new ChatbotCharacter()
             {
                 GroupId = groupId,
