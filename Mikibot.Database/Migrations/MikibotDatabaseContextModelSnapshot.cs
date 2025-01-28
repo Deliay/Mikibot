@@ -42,7 +42,7 @@ namespace Mikibot.Migrations
 
                     b.HasIndex("GroupId");
 
-                    b.ToTable("ChatbotCharacter");
+                    b.ToTable("ChatbotCharacters");
                 });
 
             modelBuilder.Entity("Mikibot.Database.Model.FollowerStatistic", b =>

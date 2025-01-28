@@ -35,6 +35,7 @@ public class MikibotDatabaseContext : DbContext
     
     public DbSet<Permission> Permissions { get; set; }
 
+    public DbSet<ChatbotCharacter> ChatbotCharacters { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         var cs = new MySqlConnectionStringBuilder()

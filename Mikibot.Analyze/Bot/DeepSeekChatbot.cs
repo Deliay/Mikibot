@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Mikibot.Analyze.Generic;
 using Mikibot.Analyze.MiraiHttp;
+using Mikibot.Database;
 using Mirai.Net.Data.Messages.Concretes;
 using Mirai.Net.Data.Messages.Receivers;
 using Mirai.Net.Data.Shared;
@@ -25,6 +26,7 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
     private readonly Dictionary<string, string> lastSubmitMessage = [];
     private readonly Dictionary<string, DateTimeOffset> lastAtAt = [];
     private readonly PermissionService permissions;
+    private readonly MikibotDatabaseContext db;
     private const string BasicPrompt = "请你扮演美少女Zerobot，她是个萌音二次云美少女，" +
         "喜欢二次元文化，说话风格非常萌，非常可爱。" +
         "帮我分析user的聊天记录，其中每一行是一个人说的一句话，前面是发言人的名字，冒号后面是发言。" +
@@ -42,7 +44,8 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
 
     public DeepSeekChatbot(IMiraiService miraiService,
         ILogger<DeepSeekChatbot> logger,
-        PermissionService permissions) : base(miraiService, logger)
+        PermissionService permissions,
+        MikibotDatabaseContext db) : base(miraiService, logger)
     {
         _httpClient = new HttpClient();
         var token = Environment.GetEnvironmentVariable("DEEPSEEK_TOKEN")
@@ -50,8 +53,15 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
         _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
         _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
         this.permissions = permissions;
+        this.db = db;
     }
     private const string Chatbot = "Chatbot";
+    
+    private ValueTask<string> GetCharacter(string groupId, CancellationToken cancellationToken)
+    {
+
+    }
+
     protected override async ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
     {
         var group = message.Sender.Group;
