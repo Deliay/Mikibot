@@ -12,6 +12,9 @@ public class MiraiService : IDisposable, IMiraiService
 {
     private MiraiBot Bot { get; }
     public ILogger<MiraiService> Logger { get; }
+
+    public string UserId => throw new NotImplementedException();
+
     private readonly SemaphoreSlim _lock = new(1);
 
     public MiraiService(MiraiBotConfig config, ILogger<MiraiService> logger)

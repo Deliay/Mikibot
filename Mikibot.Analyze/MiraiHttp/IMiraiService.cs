@@ -10,6 +10,7 @@ public interface IMiraiService
     ValueTask SendMessageToGroup(Group group, CancellationToken token, params MessageBase[] messages);
     public void SubscribeMessage(Action<GroupMessageReceiver> next, CancellationToken token);
         
+    public string UserId { get; }
         
     ValueTask SendMessageToSomeGroup(HashSet<string> groupIds, CancellationToken token, params MessageBase[] messages);
     [Obsolete("Will be removed in future version")]

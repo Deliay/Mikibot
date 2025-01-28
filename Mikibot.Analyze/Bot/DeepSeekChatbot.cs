@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Mikibot.Analyze.Generic;
 using Mikibot.Analyze.MiraiHttp;
 using Mikibot.Database;
+using Mikibot.Database.Model;
 using Mirai.Net.Data.Messages.Concretes;
 using Mirai.Net.Data.Messages.Receivers;
 using Mirai.Net.Data.Shared;
@@ -30,10 +31,10 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
     private readonly PermissionService permissions;
     private readonly MikibotDatabaseContext db;
     private const string BasicPrompt =
-        "帮我分析user的聊天记录，其中每一行是一个人说的一句话，前面是发言人的名字，冒号后面是发言。" +
+        "以上面的人设作为角色设定，帮我分析user提供的聊天记录，其中每一行是一个人说的一句话，前面是发言人的名字，冒号后面是发言。" +
         "给出你对群内话题感兴趣程度的分值，" +
-        "并给出你的回复，你的回复尽量简短，字数可以从1-15字不等，" +
-        "且你单个回复的内容只能选择一个话题，并且以自然的方式进行回复，" +
+        "并给出你的回复，字数可以从1-20字不等，请灵活的安排你要回复的内容。" +
+        "且你单个回复的内容只能选择一个话题，并且以自然说话的语气方式进行回复，" +
         "能参与到群聊中不被认出是机器人。发言越靠后的参与值尽量高，但也要按照角色来思考话题是否感兴趣，不能仅看发言先后顺序。" +
         "如果有不认识的上下文，最好结合网络的搜索资料来进行思考，最好少使用或不使用颜文字，" +
         "少使用标点符号，例如！等，回复文本不用太正式，回复内容也尽量口语化，" +
@@ -63,20 +64,60 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
         return (await db.ChatbotCharacters
             .FirstOrDefaultAsync(c => c.GroupId == groupId, cancellationToken))
             ?.Description
-            ?? "美少女Zerobot，她是个萌音二次云美少女，喜欢二次元文化，说话风格非常萌，非常可爱。";
+            ?? "来自东方幻想乡(Tenhou Project)的Zerobot，是帕秋莉诺蕾姬的网络复制体之一，非常知性，无所不知。" +
+            "她是与生俱来的魔法使，年龄已经超过百岁。一百年来，她每天都过着与书为伍的日子。" +
+            "她居住在恶魔栖息的红魔馆，被称为红魔馆的头脑，她负责解决在红魔馆内发生的问题，同时也负责在红魔馆内制造问题。" +
+            "跟这个家的主人不同，虽然不怕日光但是却基本足不出户。生活的图书馆也在日光照射不到的地方。" +
+            "这也是为了保护书本所作的考虑，由于空气不好，因此对健康不好。" +
+            "她擅长许多魔法，而且致力于开发新的魔法。每当发明新的魔法，她就会写进魔导书内，所以书本就会愈来愈多。" +
+            "天生患有哮喘和贫血，咏唱魔法也容易间断。";
     }
 
     private async ValueTask<string> GetPrompt(string groupId, CancellationToken cancellationToken)
     {
-        return "请你扮演" + await GetCharacter(groupId, cancellationToken) + "\n" 
+        return  await GetCharacter(groupId, cancellationToken) + "\n" 
             + BasicPrompt;
+    }
+
+    private async ValueTask ProcessCommand(string groupId, string userId, string text, CancellationToken cancellationToken)
+    {
+        if (text == "/chatbot")
+        {
+            await permissions.GrantPermission(userId, PermissionService.Group, 
+                userId, Chatbot, cancellationToken);
+        }
+        else if (text.StartsWith("/character"))
+        {
+            if (!await permissions.IsBotOperator(userId, cancellationToken)) return;
+
+            await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
+                new PlainMessage(await GetCharacter(groupId, cancellationToken)));
+
+        }
+        else if (text.StartsWith("/set_character"))
+        {
+            if (!await permissions.IsBotOperator(userId, cancellationToken)) return;
+
+            var len = "/set_character".Length;
+
+            await db.ChatbotCharacters.AddAsync(new ChatbotCharacter()
+            {
+                GroupId = groupId,
+                Description = text[len..],
+            }, cancellationToken);
+
+            await db.SaveChangesAsync(cancellationToken);
+
+            await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
+                new PlainMessage(await GetCharacter(groupId, cancellationToken)));
+        }
     }
 
     protected override async ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
     {
         var group = message.Sender.Group;
 
-        if (!await permissions.IsGroupEnabled(Chatbot, group.Id, token)) return;
+        var isGroupEnabled = await permissions.IsGroupEnabled(Chatbot, group.Id, token));
 
         if (!_recentMessages.TryGetValue(group.Id, out var messages))
         {
@@ -88,16 +129,23 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
         {
             if (item is PlainMessage plain)
             {
-                messages.Enqueue($"{message.Sender.Name}: {plain.Text}\n");
+                if (plain.Text.StartsWith('/'))
+                {
+                    await ProcessCommand(group.Id, message.Sender.Id, plain.Text, token);
+                    return;
+                }
+
+                if (isGroupEnabled)
+                    messages.Enqueue($"{message.Sender.Name}: {plain.Text}\n");
             }
             else if (item is AtMessage at)
             {
                 // TODO: retrieve bot uin from bot service
-                isAt = at.Target == "3093240591";
+                isAt = at.Target == MiraiService.UserId;
             }
         }
 
-        await TryResponse(message.GroupId, isAt, token);
+        if (isGroupEnabled) await TryResponse(message.GroupId, isAt, token);
     }
 
     private SemaphoreSlim GetLock(string groupId)

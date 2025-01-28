@@ -98,6 +98,9 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
         }
     }
     private Login CurrentBot { get; set; }
+
+    public string UserId => CurrentBot.SelfId!;
+
     public async ValueTask Run()
     {
         Client = new SatoriClient(EnvSatoriEndpoint, EnvSatoriToken);

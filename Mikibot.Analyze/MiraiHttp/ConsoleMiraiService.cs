@@ -15,6 +15,8 @@ public class ConsoleMiraiService : IMiraiService
 
     public ILogger<ConsoleMiraiService> Logger { get; }
 
+    public string UserId => throw new NotImplementedException();
+
     public ValueTask Run()
     {
         Logger.LogInformation("Console mirai service started");

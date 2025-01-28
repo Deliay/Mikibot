@@ -272,6 +272,9 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger, ILogger<BotCon
     }
 
     private readonly Dictionary<Action<GroupMessageReceiver>, CancellationTokenRegistration> _subscriber = [];
+
+    public string UserId => throw new NotImplementedException();
+
     public void SubscribeMessage(Action<GroupMessageReceiver> next, CancellationToken token)
     {
         logger.LogInformation("注册消费消息: {}", next);
