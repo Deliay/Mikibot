@@ -56,6 +56,7 @@ appBuilder.RegisterType<SubscribeService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<FoodDiceService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<PermissionService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<DeepSeekChatbot>().AsSelf().SingleInstance();
+appBuilder.RegisterType<ChatHistoryService>().AsSelf().SingleInstance();
 
 var appContainer = appBuilder.Build();
 
@@ -85,6 +86,7 @@ var pingti = app.Resolve<PingtiItemReplaceService>();
 var subscribe = app.Resolve<SubscribeService>();
 var foodDice = app.Resolve<FoodDiceService>();
 var chatBot = app.Resolve<DeepSeekChatbot>();
+var chatHistory = app.Resolve<ChatHistoryService>();
 
 logger.LogInformation("Starting schedule module...");
 await Task.WhenAll(

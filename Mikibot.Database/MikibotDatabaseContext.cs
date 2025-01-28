@@ -39,6 +39,8 @@ public class MikibotDatabaseContext : DbContext
 
     public DbSet<ChatbotAlwaysReplyUser> ChatbotAlwaysReplyUsers { get; set; }
 
+    public DbSet<ChatbotGroupChatHistory> chatbotGroupChatHistories { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         var cs = new MySqlConnectionStringBuilder()
@@ -165,6 +167,11 @@ public class MikibotDatabaseContext : DbContext
         modelBuilder.Entity<ChatbotAlwaysReplyUser>(c =>
         {
             c.HasIndex(nameof(ChatbotAlwaysReplyUser.GroupId), nameof(ChatbotAlwaysReplyUser.UserId));
+        });
+
+        modelBuilder.Entity<ChatbotGroupChatHistory>(h =>
+        {
+            h.HasIndex(nameof(ChatbotGroupChatHistory.GroupId), nameof(ChatbotGroupChatHistory.UserId));
         });
     }
 }

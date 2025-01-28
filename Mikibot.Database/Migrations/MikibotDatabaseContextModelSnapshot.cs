@@ -22,6 +22,29 @@ namespace Mikibot.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("Mikibot.Database.Model.ChatbotAlwaysReplyUser", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("GroupId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId", "UserId");
+
+                    b.ToTable("ChatbotAlwaysReplyUsers");
+                });
+
             modelBuilder.Entity("Mikibot.Database.Model.ChatbotCharacter", b =>
                 {
                     b.Property<long>("Id")
@@ -43,6 +66,33 @@ namespace Mikibot.Migrations
                     b.HasIndex("GroupId");
 
                     b.ToTable("ChatbotCharacters");
+                });
+
+            modelBuilder.Entity("Mikibot.Database.Model.ChatbotGroupChatHistory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("GroupId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId", "UserId");
+
+                    b.ToTable("chatbotGroupChatHistories");
                 });
 
             modelBuilder.Entity("Mikibot.Database.Model.FollowerStatistic", b =>
