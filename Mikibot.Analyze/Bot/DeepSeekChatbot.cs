@@ -93,7 +93,7 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
             else
             {
                 await permissions.GrantPermission(userId, PermissionService.Group,
-                    userId, Chatbot, cancellationToken);
+                    groupId, Chatbot, cancellationToken);
 
                 await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
                     new PlainMessage("已开启本群Chatbot"));
