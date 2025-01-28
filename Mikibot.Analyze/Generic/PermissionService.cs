@@ -28,6 +28,16 @@ public class PermissionService(MikibotDatabaseContext db, ILogger<PermissionServ
     public const string Group = "Group";
     public const string BotOperator = "BotOperator";
     
+    public async ValueTask RevokePermission(string @operator, string role, string userId, string action,
+        CancellationToken cancellationToken = default)
+    {
+        if (!await HasPermission(User, @operator, BotOperator, cancellationToken)) return;
+
+        await db.Permissions
+            .Where(p => p.Role == role && p.UserId ==  userId && p.Action == action)
+            .ExecuteDeleteAsync(cancellationToken);
+    }
+
     public async ValueTask<bool> GrantPermission(string @operator, string role, string userId, string action,
         CancellationToken cancellationToken = default)
     {
