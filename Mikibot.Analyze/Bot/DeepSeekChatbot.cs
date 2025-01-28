@@ -117,7 +117,7 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
     {
         var group = message.Sender.Group;
 
-        var isGroupEnabled = await permissions.IsGroupEnabled(Chatbot, group.Id, token));
+        var isGroupEnabled = await permissions.IsGroupEnabled(Chatbot, group.Id, token);
 
         if (!_recentMessages.TryGetValue(group.Id, out var messages))
         {
