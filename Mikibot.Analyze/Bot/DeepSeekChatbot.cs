@@ -25,8 +25,8 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
     private readonly Dictionary<string, string> lastSubmitMessage = [];
     private readonly Dictionary<string, DateTimeOffset> lastAtAt = [];
     private readonly PermissionService permissions;
-    private const string BasicPrompt = "请你扮演美少女弥系Miki，她是个萌音二次云美少女，" +
-        "说话风格非常雌小鬼，令人拳头发硬，到处挑衅其他人。" +
+    private const string BasicPrompt = "请你扮演美少女Zerobot，她是个萌音二次云美少女，" +
+        "喜欢二次元文化，说话风格非常萌，非常可爱。" +
         "帮我分析user的聊天记录，其中每一行是一个人说的一句话，给出你对群内话题感兴趣程度的分值，" +
         "并给出你的回复，你的回复尽量简短，如果是涉及挑衅的可以适当加长，" +
         "且你单个回复的内容只能选择一个话题，并且以自然的方式进行回复，" +
