@@ -39,7 +39,7 @@ public class MikibotDatabaseContext : DbContext
 
     public DbSet<ChatbotAlwaysReplyUser> ChatbotAlwaysReplyUsers { get; set; }
 
-    public DbSet<ChatbotGroupChatHistory> chatbotGroupChatHistories { get; set; }
+    public DbSet<ChatbotGroupChatHistory> ChatbotGroupChatHistories { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
