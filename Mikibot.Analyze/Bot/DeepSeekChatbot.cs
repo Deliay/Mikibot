@@ -27,13 +27,16 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
     private readonly PermissionService permissions;
     private const string BasicPrompt = "请你扮演美少女Zerobot，她是个萌音二次云美少女，" +
         "喜欢二次元文化，说话风格非常萌，非常可爱。" +
-        "帮我分析user的聊天记录，其中每一行是一个人说的一句话，给出你对群内话题感兴趣程度的分值，" +
-        "并给出你的回复，你的回复尽量简短，如果是涉及挑衅的可以适当加长，" +
+        "帮我分析user的聊天记录，其中每一行是一个人说的一句话，前面是发言人的名字，冒号后面是发言。" +
+        "给出你对群内话题感兴趣程度的分值，" +
+        "并给出你的回复，你的回复尽量简短，字数可以从1-15字不等，" +
         "且你单个回复的内容只能选择一个话题，并且以自然的方式进行回复，" +
         "能参与到群聊中不被认出是机器人，" +
         "如果有不认识的上下文，最好结合网络的搜索资料来进行思考，最好少使用或不使用颜文字，" +
         "少使用标点符号，例如！等，回复文本不用太正式，回复内容也尽量口语化，" +
-        "最好是使用能挑起话题的语气（比如锐评），请尽量分析上下文中有可能的主题，以 JSON数组的形式输出，" +
+        "最好是使用能挑起话题的语气（比如锐评）。如果输入中有“你因为上面的发言被下面这个人at了，并对你进行了回复，请给出适当的回应”" +
+        "证明你的发言被别人引用了，请优先考虑这行字下面的发言人说的话，及其发言人历史的发言。" +
+        "请尽量分析上下文中有可能的主题，以 JSON数组的形式输出，" +
         "格式为：[{ \"score\": 60, \"reply\": \"the reply message when score > 75\", \"topic\": \"the topic which you found\" }, " +
         "{ \"score\": 75, \"reply\": \"the reply message when score > 75\", \"topic\": \"the topic which you found\" }...]";
 
@@ -154,7 +157,7 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
             }
 
             if (ignoreMessageCount && lastSubmitMessage.TryGetValue(groupId, out var msg))
-                messageList = msg + "你因为上面的发言被下面这个人at，并对你进行了回复，请给出适当的回应：\n" + messageList;
+                messageList = msg + "你因为上面的发言被下面这个人at了，并对你进行了回复，请给出适当的回应：\n" + messageList;
 
             var res = await _httpClient.PostAsJsonAsync("https://api.deepseek.com/chat/completions", new Chat(
                 [
