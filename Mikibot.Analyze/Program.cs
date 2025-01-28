@@ -99,4 +99,5 @@ await Task.WhenAll(
     subscribe.Run(token),
     foodDice.Run(token),
     chatBot.Run(token),
+    chatHistory.Run(token)
 ]);
