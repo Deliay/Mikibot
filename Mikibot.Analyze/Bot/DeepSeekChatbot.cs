@@ -86,17 +86,11 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
             if (await permissions.HasPermission(PermissionService.Group, groupId, Chatbot, cancellationToken))
             {
                 await permissions.RevokePermission(userId, PermissionService.Group, groupId, Chatbot, cancellationToken);
-
-                await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
-                    new PlainMessage("已关闭本群Chatbot"));
             }
             else
             {
                 await permissions.GrantPermission(userId, PermissionService.Group,
                     groupId, Chatbot, cancellationToken);
-
-                await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
-                    new PlainMessage("已开启本群Chatbot"));
             }
         }
         else if (text.StartsWith("/character"))
