@@ -254,6 +254,7 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
                     .Where(c => c.GroupId == groupId && c.UserId == userId)
                     .OrderByDescending(c => c.Id)
                     .Take(20)
+                    .Select(c => c.Message)
                     .ToListAsync(cancellationToken));
                 
 
