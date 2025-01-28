@@ -83,7 +83,7 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
     {
         if (text == "/chatbot")
         {
-            if (await permissions.HasPermission(PermissionService.Group, userId, Chatbot, cancellationToken))
+            if (await permissions.HasPermission(PermissionService.Group, groupId, Chatbot, cancellationToken))
             {
                 await permissions.RevokePermission(userId, PermissionService.Group, groupId, Chatbot, cancellationToken);
 
