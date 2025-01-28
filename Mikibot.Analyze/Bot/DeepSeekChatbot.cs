@@ -248,10 +248,16 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
                 + "你之前的发言被下面这个人at了，并对你进行了回复，请针对下面这条消息给出回应：\n"
                 + lastMessage;
 
+            var prompt = await GetPrompt(groupId, cancellationToken);
+            var userPrompot = messageList;
+
+            Logger.LogInformation("prompt: {}", prompt);
+            Logger.LogInformation("user prompt: {}", userPrompot);
+
             var res = await _httpClient.PostAsJsonAsync("https://api.deepseek.com/chat/completions", new Chat(
                 [
-                    new Message("system", await GetPrompt(groupId, cancellationToken)),
-                    new Message("user", messageList)
+                    new Message("system", prompt),
+                    new Message("user", userPrompot)
                 ]), cancellationToken);
 
             if (!res.IsSuccessStatusCode)
