@@ -152,5 +152,10 @@ public class MikibotDatabaseContext : DbContext
         {
             m.HasIndex(nameof(Permission.UserId), nameof(Permission.Role), nameof(Permission.Action)).IsUnique();
         });
+
+        modelBuilder.Entity<ChatbotCharacter>(c =>
+        {
+            c.HasIndex(nameof(ChatbotCharacter.GroupId));
+        });
     }
 }
