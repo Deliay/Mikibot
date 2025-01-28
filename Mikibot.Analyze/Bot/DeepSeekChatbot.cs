@@ -1,10 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Mikibot.Analyze.Generic;
 using Mikibot.Analyze.MiraiHttp;
 using Mikibot.Database;
 using Mirai.Net.Data.Messages.Concretes;
 using Mirai.Net.Data.Messages.Receivers;
 using Mirai.Net.Data.Shared;
+using NPOI.Util;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
@@ -27,13 +29,12 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
     private readonly Dictionary<string, DateTimeOffset> lastAtAt = [];
     private readonly PermissionService permissions;
     private readonly MikibotDatabaseContext db;
-    private const string BasicPrompt = "请你扮演美少女Zerobot，她是个萌音二次云美少女，" +
-        "喜欢二次元文化，说话风格非常萌，非常可爱。" +
+    private const string BasicPrompt =
         "帮我分析user的聊天记录，其中每一行是一个人说的一句话，前面是发言人的名字，冒号后面是发言。" +
         "给出你对群内话题感兴趣程度的分值，" +
         "并给出你的回复，你的回复尽量简短，字数可以从1-15字不等，" +
         "且你单个回复的内容只能选择一个话题，并且以自然的方式进行回复，" +
-        "能参与到群聊中不被认出是机器人，" +
+        "能参与到群聊中不被认出是机器人。发言越靠后的参与值尽量高，但也要按照角色来思考话题是否感兴趣，不能仅看发言先后顺序。" +
         "如果有不认识的上下文，最好结合网络的搜索资料来进行思考，最好少使用或不使用颜文字，" +
         "少使用标点符号，例如！等，回复文本不用太正式，回复内容也尽量口语化，" +
         "最好是使用能挑起话题的语气（比如锐评）。如果输入中有“你因为上面的发言被下面这个人at了，并对你进行了回复，请给出适当的回应”" +
@@ -57,9 +58,18 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
     }
     private const string Chatbot = "Chatbot";
     
-    private ValueTask<string> GetCharacter(string groupId, CancellationToken cancellationToken)
+    private async ValueTask<string> GetCharacter(string groupId, CancellationToken cancellationToken)
     {
+        return (await db.ChatbotCharacters
+            .FirstOrDefaultAsync(c => c.GroupId == groupId, cancellationToken))
+            ?.Description
+            ?? "美少女Zerobot，她是个萌音二次云美少女，喜欢二次元文化，说话风格非常萌，非常可爱。";
+    }
 
+    private async ValueTask<string> GetPrompt(string groupId, CancellationToken cancellationToken)
+    {
+        return "请你扮演" + await GetCharacter(groupId, cancellationToken) + "\n" 
+            + BasicPrompt;
     }
 
     protected override async ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
@@ -171,9 +181,10 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
 
             var res = await _httpClient.PostAsJsonAsync("https://api.deepseek.com/chat/completions", new Chat(
                 [
-                    new Message("system", BasicPrompt),
+                    new Message("system", await GetPrompt(groupId, cancellationToken)),
                     new Message("user", messageList)
                 ]), cancellationToken);
+
             if (!res.IsSuccessStatusCode)
             {
                 Logger.LogWarning("Deepseek service call failed");
