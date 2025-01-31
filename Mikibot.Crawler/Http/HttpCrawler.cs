@@ -67,7 +67,7 @@ public class HttpCrawler : IDisposable
     }
 
     public void Dispose()
-    {
+    {   
         GC.SuppressFinalize(this);
         client.Dispose();
     }

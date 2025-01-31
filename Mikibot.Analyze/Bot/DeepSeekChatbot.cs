@@ -38,7 +38,7 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
         "能参与到群聊中不被认出是机器人。发言越靠后的参与值尽量高，但也要按照角色来思考话题是否感兴趣，不能仅看发言先后顺序。" +
         "如果有不认识的上下文，最好结合网络的搜索资料来进行思考，最好少使用或不使用颜文字，" +
         "少使用标点符号，例如！等，回复文本不用太正式，回复内容也尽量口语化，" +
-        "最好是使用能挑起话题的语气（比如锐评）。如果输入中有“你之前的发言被下面这个人at了，并对你进行了回复，请针对下面这条消息给出回应" +
+        "尽可能进行锐评和攻击。如果输入中有“你之前的发言被下面这个人at了，并对你进行了回复，请针对下面这条消息给出回应" +
         "证明你的发言被别人引用了，请优先考虑这行字下面的发言人说的话，及其发言人历史的发言。" +
         "请尽量分析上下文中有可能的主题，以 JSON数组的形式输出，" +
         "格式为：[{ \"score\": 60, \"reply\": \"the reply message when score > 75\", \"topic\": \"the topic which you found\" }, " +
@@ -182,7 +182,7 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
     {
         var _lock = GetLock(groupId);
 
-        await _lock.WaitAsync();
+        await _lock.WaitAsync(cancellationToken);
         try
         {
             await func(cancellationToken);
@@ -261,7 +261,7 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
 
                 messageList = msg + "\n" + messageList
                 + "你之前的发言被下面这个人at了，并对你进行了回复，" +
-                "他这段时间的发言如下：" + recentMessage +
+                "他这段时间的发言如下，这里发言仅供参考：" + recentMessage +
                 "\n请结合他的最近发言和特别针对下面这条消息给出回应：\n"
                 + lastMessage;
             }
@@ -280,7 +280,9 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
 
             if (!res.IsSuccessStatusCode)
             {
-                Logger.LogWarning("Deepseek service call failed");
+                var message = await res.Content.ReadAsStringAsync(cancellationToken);
+                Logger.LogWarning("Deepseek service call failed: {}, message: {}", 
+                    res.StatusCode, message);
                 return;
             }
 
