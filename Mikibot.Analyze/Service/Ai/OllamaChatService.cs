@@ -22,7 +22,7 @@ public class OllamaChatService : IBotChatService
                           ?? "deepseek-r1:14b";
 
         var client = new HttpClient();
-        client.Timeout = TimeSpan.FromMinutes(3);
+        client.Timeout = TimeSpan.FromMinutes(5);
         client.BaseAddress = ollamaEndpoint;
         ollamaClient = new OllamaApiClient(client, ollamaModel);
     }
