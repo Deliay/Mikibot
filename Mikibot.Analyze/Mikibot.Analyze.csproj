@@ -15,6 +15,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.AI.Ollama" Version="9.1.0-preview.1.25064.3" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="NPOI" Version="2.7.2" />
 	  <PackageReference Include="Polly" Version="8.5.0" />
@@ -28,6 +29,7 @@
 	<PackageReference Include="Mikibot.Crawler" Version="1.0.5" />
     <PackageReference Include="Lagrange.Core" Version="0.3.1" />
     <PackageReference Include="SatoriClient-ZeroAshUpdated" Version="1.0.0-alpha.3" />
+    <PackageReference Include="System.Linq.Async" Version="6.0.1" />
   </ItemGroup>
 
   <ItemGroup>

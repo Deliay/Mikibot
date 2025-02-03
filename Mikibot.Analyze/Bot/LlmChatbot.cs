@@ -17,47 +17,37 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.AI;
+using Mikibot.Analyze.Service.Ai;
 
 namespace Mikibot.Analyze.Bot;
 
-public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
+public class LlmChatbot(
+    IMiraiService miraiService,
+    ILogger<LlmChatbot> logger,
+    PermissionService permissions,
+    MikibotDatabaseContext db,
+    IBotChatService botChatService)
+    : MiraiGroupMessageProcessor<LlmChatbot>(miraiService, logger)
 {
-    private HttpClient _httpClient;
-
     private readonly Dictionary<string, Queue<string>> _recentMessages = [];
     private readonly Dictionary<string, SemaphoreSlim> _locks = [];
     private readonly Dictionary<string, string> lastSubmitMessage = [];
     private readonly Dictionary<string, DateTimeOffset> lastAtAt = [];
-    private readonly PermissionService permissions;
-    private readonly MikibotDatabaseContext db;
+
     private const string BasicPrompt =
         "以上面的人设作为角色设定，帮我分析user提供的聊天记录，其中每一行是一个人说的一句话，前面是发言人的名字，冒号后面是发言。" +
-        "给出你对群内话题感兴趣程度的分值，" +
+        "评估上面角色对群内话题感兴趣程度的分值(0-100分，70分以下则认为无需参与该话题，70分则认为可以参与，85分以上则十分有兴趣)" +
         "并给出你的回复，字数可以从1-25字不等，请灵活的安排你要回复的内容，需要长的时候长，需要短的时候短。" +
         "且你单个回复的内容只能选择一个话题，并且以自然说话的语气方式进行回复，" +
-        "能参与到群聊中不被认出是机器人。发言越靠后的参与值尽量高，但也要按照角色来思考话题是否感兴趣，不能仅看发言先后顺序。" +
-        "如果有不认识的上下文，最好结合网络的搜索资料来进行思考，最好少使用或不使用颜文字，" +
-        "少使用标点符号，例如！等，回复文本不用太正式，回复内容也尽量口语化，" +
-        "尽可能进行锐评和攻击。如果输入中有“你之前的发言被下面这个人at了，并对你进行了回复，请针对下面这条消息给出回应" +
-        "证明你的发言被别人引用了，请优先考虑这行字下面的发言人说的话，及其发言人历史的发言。" +
+        "能参与到群聊中不被认出是机器人。发言列表中越靠后的参与值相比前面的尽量高，但也要按照角色来思考话题是否感兴趣，不能仅看发言先后顺序。" +
+        "回复文本不用太正式，回复内容也尽量口语化，" +
+        "尽可能进行锐评和攻击。如果输入中有“你之前的发言被下面这个人at了，并对你进行了回复，" +
+        "证明你的发言被别人引用了，请结合这行字下面的发言人说的话，及其发言人历史的发言进行回复。" +
         "请尽量分析上下文中有可能的主题，以 JSON数组的形式输出，" +
         "格式为：[{ \"score\": 60, \"reply\": \"the reply message when score > 75\", \"topic\": \"the topic which you found\" }, " +
         "{ \"score\": 75, \"reply\": \"the reply message when score > 75\", \"topic\": \"the topic which you found\" }...]";
 
-    public DeepSeekChatbot(IMiraiService miraiService,
-        ILogger<DeepSeekChatbot> logger,
-        PermissionService permissions,
-        MikibotDatabaseContext db) : base(miraiService, logger)
-    {
-        _httpClient = new HttpClient();
-        var token = Environment.GetEnvironmentVariable("DEEPSEEK_TOKEN")
-            ?? throw new ArgumentException("DeepSeek API token not configured");
-        _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-        _httpClient.Timeout = TimeSpan.FromSeconds(60);
-        this.permissions = permissions;
-        this.db = db;
-    }
     private const string Chatbot = "Chatbot";
     
     private async ValueTask<string> GetCharacter(string groupId, CancellationToken cancellationToken)
@@ -65,13 +55,7 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
         return (await db.ChatbotCharacters
             .FirstOrDefaultAsync(c => c.GroupId == groupId, cancellationToken))
             ?.Description
-            ?? "来自东方幻想乡(Tenhou Project)的Zerobot，是帕秋莉诺蕾姬的网络复制体之一，非常知性，无所不知。" +
-            "她是与生俱来的魔法使，年龄已经超过百岁。一百年来，她每天都过着与书为伍的日子。" +
-            "她居住在恶魔栖息的红魔馆，被称为红魔馆的头脑，她负责解决在红魔馆内发生的问题，同时也负责在红魔馆内制造问题。" +
-            "跟这个家的主人不同，虽然不怕日光但是却基本足不出户。生活的图书馆也在日光照射不到的地方。" +
-            "这也是为了保护书本所作的考虑，由于空气不好，因此对健康不好。" +
-            "她擅长许多魔法，而且致力于开发新的魔法。每当发明新的魔法，她就会写进魔导书内，所以书本就会愈来愈多。" +
-            "天生患有哮喘和贫血，咏唱魔法也容易间断。";
+            ?? "来自东方幻想乡(Tenhou Project)的Zerobot，是帕秋莉诺蕾姬的网络复制体之一，模仿帕秋莉诺蕾姬的语气进行说话。";
     }
 
     private async ValueTask<string> GetPrompt(string groupId, CancellationToken cancellationToken)
@@ -196,15 +180,6 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
             _lock.Release();
         }
     }
-    private record Message(string role, string content);
-    private record Chat(List<Message> messages,
-        string model = "deepseek-chat",
-        double temperature = 1.3,
-        bool search_enabled = true);
-    private record Choice(Message message);
-    private record Response(List<Choice> choices);
-
-    private record GroupChatResponse(int score, string topic, string reply);
 
     private async ValueTask TryResponse(string groupId, string userId, bool ignoreMessageCount = false, CancellationToken cancellationToken = default)
     {
@@ -257,8 +232,6 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
                     .Select(c => c.Message)
                     .ToListAsync(cancellationToken));
                 
-
-
                 messageList = msg + "\n" + messageList
                 + "你之前的发言被下面这个人at了，并对你进行了回复，" +
                 "他这段时间的发言如下，这里发言仅供参考：" + recentMessage +
@@ -272,56 +245,22 @@ public class DeepSeekChatbot : MiraiGroupMessageProcessor<DeepSeekChatbot>
             Logger.LogInformation("prompt: {}", prompt);
             Logger.LogInformation("user prompt: {}", userPrompot);
 
-            var res = await _httpClient.PostAsJsonAsync("https://api.deepseek.com/chat/completions", new Chat(
-                [
-                    new Message("system", prompt),
-                    new Message("user", userPrompot)
-                ]), cancellationToken);
+            var res = await botChatService.ChatAsync(new Chat(
+            [
+                new Message(ChatRole.System, prompt),
+                new Message(ChatRole.User, userPrompot)
+            ]), cancellationToken);
+            
+            
+            var interestChat = res.MaxBy(c => c.score);
+            if (interestChat is null) return;
+            
+            if (ignoreMessageCount)
+                messages.Enqueue(interestChat.reply + "\n");
 
-            if (!res.IsSuccessStatusCode)
-            {
-                var message = await res.Content.ReadAsStringAsync(cancellationToken);
-                Logger.LogWarning("Deepseek service call failed: {}, message: {}", 
-                    res.StatusCode, message);
-                return;
-            }
+            await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
+                new PlainMessage(interestChat.reply));
 
-            var data = await res.Content.ReadFromJsonAsync<Response>(cancellationToken);
-
-            if (data is null || data.choices.Count == 0)
-            {
-                Logger.LogWarning("Deepseek returned an empty response");
-                return;
-            }
-
-            var chat = data.choices[0];
-
-            var content = chat.message.content;
-
-            try
-            {
-                Logger.LogInformation("Deekseep bot: {}", content);
-
-                content = content.Replace("```json", "");
-                content = content.Replace("```", "");
-
-                var groupChats = JsonSerializer.Deserialize<List<GroupChatResponse>>(content);
-                if (groupChats is null) return;
-
-                var interestChat = groupChats.MaxBy(c => c.score);
-                if (interestChat is null) return;
-
-                if (ignoreMessageCount)
-                    messages.Enqueue(interestChat.reply + "\n");
-
-                await MiraiService.SendMessageToSomeGroup([groupId], default,
-                    new PlainMessage(interestChat.reply));
-
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, "An exception thrown when submitting to deepseek");
-            }
         }, cancellationToken);
 
     }

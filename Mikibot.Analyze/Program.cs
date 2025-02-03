@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
 using Mikibot.Database;
 using Mikibot.Analyze.MiraiHttp;
@@ -11,6 +12,7 @@ using Mikibot.Crawler.Http.Bilibili;
 using Mikibot.Analyze.Bot;
 using Mikibot.Analyze.Bot.FoodDice;
 using Mikibot.Analyze.Generic;
+using Mikibot.Analyze.Service.Ai;
 
 var appBuilder = ContainerInitializer.Create();
 
@@ -55,8 +57,9 @@ appBuilder.RegisterType<PingtiItemReplaceService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<SubscribeService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<FoodDiceService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<PermissionService>().AsSelf().SingleInstance();
-appBuilder.RegisterType<DeepSeekChatbot>().AsSelf().SingleInstance();
+appBuilder.RegisterType<LlmChatbot>().AsSelf().SingleInstance();
 appBuilder.RegisterType<ChatHistoryService>().AsSelf().SingleInstance();
+appBuilder.RegisterType<OllamaChatService>().As<IBotChatService>().SingleInstance();
 
 var appContainer = appBuilder.Build();
 
@@ -85,7 +88,7 @@ var optionaSelector = app.Resolve<OptionSelectorService>();
 var pingti = app.Resolve<PingtiItemReplaceService>();
 var subscribe = app.Resolve<SubscribeService>();
 var foodDice = app.Resolve<FoodDiceService>();
-var chatBot = app.Resolve<DeepSeekChatbot>();
+var chatBot = app.Resolve<LlmChatbot>();
 var chatHistory = app.Resolve<ChatHistoryService>();
 
 logger.LogInformation("Starting schedule module...");
