@@ -48,6 +48,13 @@ public class OllamaChatService : IBotChatService
         Logger.LogInformation("Ollama: {}", content);
         try
         {
+            var thinkTagIndex = content.IndexOf("</think>", StringComparison.InvariantCulture);
+            if (thinkTagIndex > 0)
+            {
+                thinkTagIndex += "</think>".Length;
+                content = content[thinkTagIndex..];
+            }
+            
             if (content.StartsWith('{'))
             {
                 return [JsonSerializer.Deserialize<GroupChatResponse>(content)!];
