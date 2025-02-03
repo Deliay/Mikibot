@@ -20,8 +20,11 @@ public class OllamaChatService : IBotChatService
 
         this.ollamaModel = Environment.GetEnvironmentVariable("OLLAMA_MODEL")
                           ?? "deepseek-r1:14b";
-        
-        this.ollamaClient = new OllamaApiClient(ollamaEndpoint, ollamaModel);
+
+        var client = new HttpClient();
+        client.Timeout = TimeSpan.FromMinutes(3);
+        client.BaseAddress = ollamaEndpoint;
+        ollamaClient = new OllamaApiClient(client, ollamaModel);
     }
     
     public async ValueTask<List<GroupChatResponse>> ChatAsync(Chat chat, CancellationToken cancellationToken = default)
@@ -31,6 +34,10 @@ public class OllamaChatService : IBotChatService
             Model = ollamaModel,
             Prompt = chat.ToPlainText(),
             Stream = false,
+            Options = new RequestOptions()
+            {
+                Temperature = chat.temperature,
+            },
         }, cancellationToken).ToListAsync(cancellationToken);
 
         var response = result.FirstOrDefault();
