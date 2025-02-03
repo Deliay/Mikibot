@@ -27,7 +27,6 @@ public class OllamaChatService : IBotChatService
         var result = await ollamaClient.CompleteAsync(chats, new ChatOptions()
         {
             Temperature = chat.temperature,
-            ResponseFormat = ChatResponseFormat.Json,
         }, cancellationToken);
 
         var content = result.Message.Text;
