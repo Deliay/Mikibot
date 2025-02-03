@@ -27,12 +27,13 @@ public class OllamaChatService : IBotChatService
         var result = await ollamaClient.CompleteAsync(chats, new ChatOptions()
         {
             Temperature = chat.temperature,
+            ResponseFormat = ChatResponseFormat.Json,
         }, cancellationToken);
 
+        Logger.LogInformation("Ollama: {}", JsonSerializer.Serialize(result));
+        
         var content = result.Message.Text;
             
-        Logger.LogInformation("Ollama: {}", content);
-
         try
         {
             return JsonSerializer.Deserialize<List<GroupChatResponse>>(content ?? "") ?? [];
