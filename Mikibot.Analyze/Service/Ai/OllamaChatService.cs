@@ -51,7 +51,7 @@ public class OllamaChatService : IBotChatService
             var thinkTagIndex = content.IndexOf("</think>", StringComparison.InvariantCulture);
             if (thinkTagIndex > 0)
             {
-                thinkTagIndex += "</think>".Length;
+                thinkTagIndex += "</think>".Length + 1;
                 content = content[thinkTagIndex..];
             }
             
