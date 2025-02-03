@@ -36,15 +36,15 @@ public class LlmChatbot(
     private readonly Dictionary<string, DateTimeOffset> lastAtAt = [];
 
     private const string BasicPrompt =
-        "以上面的人设作为角色设定，帮我分析user提供的聊天记录，其中每一行是一个人说的一句话，前面是发言人的名字，冒号后面是发言。" +
+        "以上面的人设作为角色设定，帮我分析user提供的聊天记录，其中每一行是一个人说的一句话。" +
         "评估上面角色对群内话题感兴趣程度的分值(0-100分，70分以下则认为无需参与该话题，70分则认为可以参与，85分以上则十分有兴趣)" +
         "并给出你的回复，字数可以从1-25字不等，请灵活的安排你要回复的内容，需要长的时候长，需要短的时候短。" +
         "且你单个回复的内容只能选择一个话题，并且以自然说话的语气方式进行回复，" +
-        "能参与到群聊中不被认出是机器人。发言列表中越靠后的参与值相比前面的尽量高，但也要按照角色来思考话题是否感兴趣，不能仅看发言先后顺序。" +
-        "回复文本不用太正式，回复内容也尽量口语化，" +
-        "尽可能进行锐评和攻击。如果输入中有“你之前的发言被下面这个人at了，并对你进行了回复，" +
+        "发言列表中越靠后的参与值相比前面的尽量高，但也要按照角色来思考话题是否感兴趣，不能仅看发言先后顺序。" +
+        "回复文本不用太正式，回复内容也尽量口语化，尽可能地带有攻击性。" +
+        "如果输入中有“你之前的发言被下面这个人at了，并对你进行了回复，" +
         "证明你的发言被别人引用了，请结合这行字下面的发言人说的话，及其发言人历史的发言进行回复。" +
-        "请尽量分析上下文中有可能的主题，以 JSON数组的形式输出，" +
+        "请尽量分析上下文中有可能的主题，以JSON数组的形式输出，以JSON数组的形式输出，" +
         "格式为：[{ \"score\": 60, \"reply\": \"the reply message when score > 75\", \"topic\": \"the topic which you found\" }, " +
         "{ \"score\": 75, \"reply\": \"the reply message when score > 75\", \"topic\": \"the topic which you found\" }...]";
 
@@ -228,8 +228,8 @@ public class LlmChatbot(
                 var recentMessage = string.Join('\n', await db.ChatbotGroupChatHistories
                     .Where(c => c.GroupId == groupId && c.UserId == userId)
                     .OrderByDescending(c => c.Id)
-                    .Take(20)
-                    .Select(c => c.Message)
+                    .Take(5)
+                    .Select(c => $"- {c.Message}")
                     .ToListAsync(cancellationToken));
                 
                 messageList = msg + "\n" + messageList
