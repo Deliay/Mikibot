@@ -30,12 +30,18 @@ public class OllamaChatService : IBotChatService
             ResponseFormat = ChatResponseFormat.Json,
         }, cancellationToken);
 
-        Logger.LogInformation("Ollama: {}", JsonSerializer.Serialize(result));
         
-        var content = result.Message.Text;
+        var content = result.Message.Text?.Trim();
             
+        Logger.LogInformation("Ollama: {}", content);
         try
         {
+            if (content is null) return [];
+            if (content.StartsWith('{'))
+            {
+                return [JsonSerializer.Deserialize<GroupChatResponse>(content)!];
+            }
+            
             return JsonSerializer.Deserialize<List<GroupChatResponse>>(content ?? "") ?? [];
         }
         catch
