@@ -44,9 +44,8 @@ public class LlmChatbot(
         "回复文本不用太正式，回复内容也尽量口语化，尽可能地带有攻击性。" +
         "如果输入中有“你之前的发言被下面这个人at了，并对你进行了回复，" +
         "证明你的发言被别人引用了，请结合这行字下面的发言人说的话，及其发言人历史的发言进行回复。" +
-        "请尽量分析上下文中有可能的主题，以JSON数组的形式输出，以JSON数组的形式输出，" +
-        "格式为：[{ \"score\": 60, \"reply\": \"the reply message when score > 75\", \"topic\": \"the topic which you found\" }, " +
-        "{ \"score\": 75, \"reply\": \"the reply message when score > 75\", \"topic\": \"the topic which you found\" }...]";
+        "请尽量分析上下文中有可能的所有主题，以JSON数组的形式输出，以JSON数组的形式输出，" +
+        "JSON格式为：[{ \"score\": 60, \"reply\": \"你回复的消息\", \"topic\": \"你推测的关于这个的话题\" },...]";
 
     private const string Chatbot = "Chatbot";
     
@@ -235,7 +234,7 @@ public class LlmChatbot(
                 messageList = msg + "\n" + messageList
                 + "你之前的发言被下面这个人at了，并对你进行了回复，" +
                 "他这段时间的发言如下，这里发言仅供参考：" + recentMessage +
-                "\n请结合他的最近发言和特别针对下面这条消息给出回应：\n"
+                "\n\n特别针对下面这条消息给出回应：\n"
                 + lastMessage;
             }
 
