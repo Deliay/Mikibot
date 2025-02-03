@@ -1,42 +1,46 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
+using OllamaSharp;
+using OllamaSharp.Models;
 
 namespace Mikibot.Analyze.Service.Ai;
 
 public class OllamaChatService : IBotChatService
 {
-    public ILogger<OllamaChatClient> Logger { get; }
-    private readonly OllamaChatClient ollamaClient;
+    public ILogger<OllamaChatService> Logger { get; }
+    private readonly OllamaApiClient ollamaClient;
+    private readonly string ollamaModel;
 
-    public OllamaChatService(ILogger<OllamaChatClient> logger)
+    public OllamaChatService(ILogger<OllamaChatService> logger)
     {
         Logger = logger;
         var ollamaEndpoint = new Uri(Environment.GetEnvironmentVariable("OLLAMA_ENDPOINT")
                                      ?? "http://localhost:11434");
 
-        var ollamaModel = Environment.GetEnvironmentVariable("OLLAMA_MODEL")
+        this.ollamaModel = Environment.GetEnvironmentVariable("OLLAMA_MODEL")
                           ?? "deepseek-r1:14b";
-
-        this.ollamaClient = new OllamaChatClient(ollamaEndpoint, ollamaModel);
+        
+        this.ollamaClient = new OllamaApiClient(ollamaEndpoint, ollamaModel);
     }
     
     public async ValueTask<List<GroupChatResponse>> ChatAsync(Chat chat, CancellationToken cancellationToken = default)
     {
-        var chats = chat.messages.Select(m => m.ToChatMessage()).ToList();
-        var result = await ollamaClient.CompleteAsync(chats, new ChatOptions()
+        var result = await ollamaClient.GenerateAsync(new GenerateRequest()
         {
-            Temperature = chat.temperature,
-            ResponseFormat = ChatResponseFormat.Json,
-        }, cancellationToken);
+            Model = ollamaModel,
+            Prompt = chat.ToPlainText(),
+            Stream = false,
+        }, cancellationToken).ToListAsync(cancellationToken);
 
+        var response = result.FirstOrDefault();
         
-        var content = result.Message.Text?.Trim();
-            
+        var content = response?.Response;
+        if (content is null) return [];
+        
         Logger.LogInformation("Ollama: {}", content);
         try
         {
-            if (content is null) return [];
             if (content.StartsWith('{'))
             {
                 return [JsonSerializer.Deserialize<GroupChatResponse>(content)!];

@@ -14,10 +14,14 @@ public record Message(ChatRole role, string content)
     }
 }
 
-public record Chat(List<Message> messages,
+public record Chat(
+    List<Message> messages,
     string model = "deepseek-chat",
     float temperature = 1.3f,
-    bool search_enabled = true);
+    bool search_enabled = true)
+{
+    public string ToPlainText() => string.Join('\n', messages.Select(m => m.content));
+}
 
 public record GroupChatResponse(int score, string topic, string reply);
 
