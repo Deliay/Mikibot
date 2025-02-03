@@ -55,6 +55,9 @@ public class OllamaChatService : IBotChatService
                 content = content[thinkTagIndex..];
             }
             
+            content = content.Replace("```json", "");
+            content = content.Replace("```", "");
+
             if (content.StartsWith('{'))
             {
                 return [JsonSerializer.Deserialize<GroupChatResponse>(content)!];
