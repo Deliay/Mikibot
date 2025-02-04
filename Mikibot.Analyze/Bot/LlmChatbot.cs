@@ -223,6 +223,7 @@ public class LlmChatbot(
                     .OrderByDescending(c => c.Id)
                     .Take(5)
                     .Select(c => $"- {c.Message}")
+                    .Reverse()
                     .ToListAsync(cancellationToken));
                 
                 messageList = msg + "\n" + messageList
