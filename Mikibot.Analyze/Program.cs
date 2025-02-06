@@ -59,7 +59,14 @@ appBuilder.RegisterType<FoodDiceService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<PermissionService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<LlmChatbot>().AsSelf().SingleInstance();
 appBuilder.RegisterType<ChatHistoryService>().AsSelf().SingleInstance();
-appBuilder.RegisterType<OllamaChatService>().As<IBotChatService>().SingleInstance();
+
+var chatbotVendor = Environment.GetEnvironmentVariable("CHATBOT_VENDOR") ?? "ollama";
+
+if (chatbotVendor == "deepseek") 
+    appBuilder.RegisterType<DeepSeekAiChatService>().As<IBotChatService>().SingleInstance();
+else
+    appBuilder.RegisterType<OllamaChatService>().As<IBotChatService>().SingleInstance();
+
 
 var appContainer = appBuilder.Build();
 
