@@ -61,13 +61,8 @@ appBuilder.RegisterType<LlmChatbot>().AsSelf().SingleInstance();
 appBuilder.RegisterType<ChatHistoryService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<ChatbotSwitchService>().AsSelf().SingleInstance();
 
-var chatbotVendor = Environment.GetEnvironmentVariable("CHATBOT_VENDOR") ?? "ollama";
-
-if (chatbotVendor == "deepseek") 
-    appBuilder.RegisterType<DeepSeekAiChatService>().As<IBotChatService>().SingleInstance();
-else
-    appBuilder.RegisterType<OllamaChatService>().As<IBotChatService>().SingleInstance();
-
+appBuilder.RegisterType<DeepSeekAiChatService>().As<IBotChatService>().SingleInstance();
+appBuilder.RegisterType<OllamaChatService>().As<IBotChatService>().SingleInstance();
 
 var appContainer = appBuilder.Build();
 

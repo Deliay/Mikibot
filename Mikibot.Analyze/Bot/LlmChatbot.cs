@@ -27,7 +27,7 @@ public class LlmChatbot(
     ILogger<LlmChatbot> logger,
     PermissionService permissions,
     MikibotDatabaseContext db,
-    IBotChatService botChatService)
+    ChatbotSwitchService chatbotSwitchService)
     : MiraiGroupMessageProcessor<LlmChatbot>(miraiService, logger)
 {
     private readonly Dictionary<string, Queue<string>> _recentMessages = [];
@@ -238,7 +238,7 @@ public class LlmChatbot(
             Logger.LogInformation("prompt: {}", prompt);
             Logger.LogInformation("user prompt: {}", userPrompot);
 
-            var res = await botChatService.ChatAsync(new Chat(
+            var res = await chatbotSwitchService.Chatbot.ChatAsync(new Chat(
             [
                 new Message(ChatRole.System, prompt),
                 new Message(ChatRole.User, userPrompot)
