@@ -63,6 +63,7 @@ appBuilder.RegisterType<ChatbotSwitchService>().AsSelf().SingleInstance();
 
 appBuilder.RegisterType<DeepSeekAiChatService>().As<IBotChatService>().SingleInstance();
 appBuilder.RegisterType<OllamaChatService>().As<IBotChatService>().SingleInstance();
+appBuilder.RegisterType<ChatbotManagerService>().AsSelf().SingleInstance();
 
 var appContainer = appBuilder.Build();
 
