@@ -28,5 +28,7 @@ public record GroupChatResponse(int score, string topic, string reply);
 
 public interface IBotChatService
 {
+    public string Id { get; }
+    
     public ValueTask<List<GroupChatResponse>> ChatAsync(Chat chat, CancellationToken cancellationToken = default);
 }

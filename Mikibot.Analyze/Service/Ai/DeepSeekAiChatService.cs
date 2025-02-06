@@ -23,7 +23,9 @@ public class DeepSeekAiChatService : IBotChatService
         _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
         _httpClient.Timeout = TimeSpan.FromSeconds(60);
     }
-    
+
+    public string Id => "deepseek";
+
     public async ValueTask<List<GroupChatResponse>> ChatAsync(Chat chat, CancellationToken cancellationToken = default)
     {
         var res = await _httpClient.PostAsJsonAsync("https://api.deepseek.com/chat/completions", chat, cancellationToken);

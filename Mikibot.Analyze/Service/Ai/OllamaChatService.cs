@@ -26,7 +26,9 @@ public class OllamaChatService : IBotChatService
         client.BaseAddress = ollamaEndpoint;
         ollamaClient = new OllamaApiClient(client, ollamaModel);
     }
-    
+
+    public string Id => "ollama";
+
     public async ValueTask<List<GroupChatResponse>> ChatAsync(Chat chat, CancellationToken cancellationToken = default)
     {
         var result = await ollamaClient.GenerateAsync(new GenerateRequest()
