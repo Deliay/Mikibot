@@ -94,6 +94,7 @@ var subscribe = app.Resolve<SubscribeService>();
 var foodDice = app.Resolve<FoodDiceService>();
 var chatBot = app.Resolve<LlmChatbot>();
 var chatHistory = app.Resolve<ChatHistoryService>();
+var chatBotSwitchService = app.Resolve<ChatbotManagerService>();
 
 logger.LogInformation("Starting schedule module...");
 await Task.WhenAll(
@@ -106,5 +107,6 @@ await Task.WhenAll(
     subscribe.Run(token),
     foodDice.Run(token),
     chatBot.Run(token),
-    chatHistory.Run(token)
+    chatHistory.Run(token),
+    chatBotSwitchService.Run(token),
 ]);
