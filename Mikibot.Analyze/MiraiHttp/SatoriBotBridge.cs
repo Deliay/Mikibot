@@ -30,8 +30,8 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
             ImageMessage { Base64.Length: > 0 } image => new ImageElement() { Src = $"blob://{image.Base64}" },
             ImageMessage { Path.Length: > 0 } image => new ImageElement() { Src = image.Path },
             VoiceMessage { Url.Length: > 0 } image => new AudioElement() { Src = image.Url, },
+            VoiceMessage { Base64.Length: > 0 } image => new AudioElement() { Src = $"data://{image.Base64}" },
             VoiceMessage { Path.Length: > 0 } image => new AudioElement() { Src = $"file://{image.Path}" },
-            VoiceMessage { Base64.Length: > 0 } image => new AudioElement() { Src = $"blob://{image.Base64}" },
             SourceMessage { MessageId.Length : > 0 } source => new QuoteElement() {  Id = source.MessageId },
             AtMessage { Target.Length :> 0 } at => new AtElement() { Id = at.Target },
             _ => null
