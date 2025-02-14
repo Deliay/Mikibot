@@ -10,14 +10,14 @@ namespace Mikibot.Analyze.Bot;
 
 public struct QVoice
 {
-    public Regex[] MatchRegices { get; set; }
+    public Regex[] MatchRegexs { get; set; }
     public MessageBase[] Messages { get; set; }
 
-    public static QVoice Of(MessageBase[] messageBases, params Regex[] regices)
+    public static QVoice Of(MessageBase[] messageBases, params Regex[] regexes)
     {
-        return new()
+        return new QVoice
         {
-            MatchRegices = regices,
+            MatchRegexs = regexes,
             Messages = messageBases,
         };
     }
@@ -146,7 +146,7 @@ public class AntiBoyFriendFanVoiceService : MiraiGroupMessageProcessor<AntiBoyFr
     private async ValueTask<bool> MatchMessage(Mirai.Net.Data.Shared.Group group, PlainMessage msg, QVoice voice, CancellationToken token)
     {
         var messages = voice.Messages;
-        var regices = voice.MatchRegices;
+        var regices = voice.MatchRegexs;
         foreach (var regex in regices)
         {
             if (!regex.IsMatch(msg.Text)) return false;

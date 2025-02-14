@@ -47,8 +47,6 @@
     <None Include="Bot\Deprecated\AiImageGenerationService.cs" />
     <Compile Remove="Bot\Deprecated\AiVoiceGenerationService.cs" />
     <None Include="Bot\Deprecated\AiVoiceGenerationService.cs" />
-    <Compile Remove="Bot\Deprecated\AntiBoyFriendFanVoiceService.cs" />
-    <None Include="Bot\Deprecated\AntiBoyFriendFanVoiceService.cs" />
     <Compile Remove="Bot\Deprecated\MikiDanmakuProxyService.cs" />
     <None Include="Bot\Deprecated\MikiDanmakuProxyService.cs" />
     <Compile Remove="Bot\Deprecated\MikiLiveEventProxyService.cs" />

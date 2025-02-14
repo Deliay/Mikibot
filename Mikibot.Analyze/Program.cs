@@ -48,7 +48,7 @@ appBuilder.RegisterType<DailyFollowerStatisticService>().AsSelf().SingleInstance
 // appBuilder.RegisterType<MikiLiveEventProxyService>().AsSelf().SingleInstance();
 
 appBuilder.RegisterType<BiliBiliVideoLinkShareProxyService>().AsSelf().SingleInstance();
-// appBuilder.RegisterType<AntiBoyFriendFanVoiceService>().AsSelf().SingleInstance();
+appBuilder.RegisterType<AntiBoyFriendFanVoiceService>().AsSelf().SingleInstance();
 //appBuilder.RegisterType<AiImageGenerationService>().AsSelf().SingleInstance();
 // appBuilder.RegisterType<AiVoiceGenerationService>().AsSelf().SingleInstance();
 // appBuilder.RegisterType<RandomImageService>().AsSelf().SingleInstance();
@@ -95,6 +95,7 @@ var foodDice = app.Resolve<FoodDiceService>();
 var chatBot = app.Resolve<LlmChatbot>();
 var chatHistory = app.Resolve<ChatHistoryService>();
 var chatBotSwitchService = app.Resolve<ChatbotManagerService>();
+var voice = app.Resolve<AntiBoyFriendFanVoiceService>();
 
 logger.LogInformation("Starting schedule module...");
 await Task.WhenAll(
@@ -109,4 +110,5 @@ await Task.WhenAll(
     chatBot.Run(token),
     chatHistory.Run(token),
     chatBotSwitchService.Run(token),
+    voice.Run(token),
 ]);
