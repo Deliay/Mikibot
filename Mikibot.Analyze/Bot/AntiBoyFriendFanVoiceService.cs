@@ -115,7 +115,6 @@ public class AntiBoyFriendFanVoiceService : MiraiGroupMessageProcessor<AntiBoyFr
         [
             new VoiceMessage()
             {
-                Path = path,
                 Base64 = Convert.ToBase64String(File.ReadAllBytes(path)),
             }
         ];
