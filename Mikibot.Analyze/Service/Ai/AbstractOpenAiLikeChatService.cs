@@ -39,7 +39,9 @@ where T : AbstractOpenAiLikeChatService<T>
             return [];
         }
 
-        var data = await res.Content.ReadFromJsonAsync<Response>(cancellationToken);
+        var requestResponse = await res.Content.ReadAsStringAsync(cancellationToken);
+        logger.LogInformation("{} service response: {}", ServiceName, requestResponse);
+        var data = JsonSerializer.Deserialize<Response>(requestResponse);
 
         if (data is null || data.choices.Count == 0)
         {

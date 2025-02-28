@@ -134,7 +134,7 @@ public class LlmChatbot(
                 }
 
                 if (isGroupEnabled)
-                    messages.Enqueue($"{message.Sender.Name}: {plain.Text}\n");
+                    messages.Enqueue($"- {message.Sender.Name}: {plain.Text}\n");
             }
             else if (item is AtMessage at)
             {
@@ -148,21 +148,21 @@ public class LlmChatbot(
 
     private SemaphoreSlim GetLock(string groupId)
     {
-        if (!_locks.TryGetValue(groupId, out var _lock))
+        if (!_locks.TryGetValue(groupId, out var @lock))
         {
-            _locks.Add(groupId, _lock = new SemaphoreSlim(1));
+            _locks.Add(groupId, @lock = new SemaphoreSlim(1));
         }
-        return _lock;
+        return @lock;
     }
 
-    private async ValueTask BeginLock(string groupId, Func<CancellationToken, ValueTask> func, CancellationToken cancellationToken)
+    private async ValueTask BeginLock(string groupId, Func<ValueTask> func, CancellationToken cancellationToken)
     {
-        var _lock = GetLock(groupId);
+        var @lock = GetLock(groupId);
 
-        await _lock.WaitAsync(cancellationToken);
+        await @lock.WaitAsync(cancellationToken);
         try
         {
-            await func(cancellationToken);
+            await func();
         }
         catch (Exception ex)
         {
@@ -170,7 +170,7 @@ public class LlmChatbot(
         }
         finally
         {
-            _lock.Release();
+            @lock.Release();
         }
     }
 
@@ -179,7 +179,7 @@ public class LlmChatbot(
 
         if (!_recentMessages.TryGetValue(groupId, out var messages)) return;
 
-        await BeginLock(groupId, async (cancellationToken) =>
+        await BeginLock(groupId, async () =>
         {
             switch (ignoreMessageCount)
             {
@@ -192,7 +192,7 @@ public class LlmChatbot(
                 {
                     if (lastAtAt.TryGetValue(groupId, out var at))
                     {
-                        if (DateTimeOffset.Now -  at < TimeSpan.FromSeconds(5))
+                        if (DateTimeOffset.Now - at < TimeSpan.FromSeconds(5))
                         {
                             return;
                         }
@@ -222,7 +222,6 @@ public class LlmChatbot(
 
             if (ignoreMessageCount && lastSubmitMessage.TryGetValue(groupId, out var msg))
             {
-
                 var recentMessage = string.Join('\n', await db.ChatbotGroupChatHistories
                     .Where(c => c.GroupId == groupId && c.UserId == userId)
                     .OrderByDescending(c => c.Id)
