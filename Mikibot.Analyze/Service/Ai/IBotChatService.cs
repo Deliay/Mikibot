@@ -18,7 +18,8 @@ public record Chat(
     List<Message> messages,
     string model = "deepseek-chat",
     float temperature = 1.3f,
-    bool search_enabled = true)
+    bool search_enabled = true,
+    bool stream = false)
 {
     public string ToPlainText() => string.Join('\n', messages.Select(m => m.content));
 }
