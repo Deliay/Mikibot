@@ -237,15 +237,12 @@ public class LlmChatbot(
             }
 
             var prompt = await GetPrompt(groupId, cancellationToken);
-            var userPrompot = messageList;
-
-            Logger.LogInformation("prompt: {}", JsonSerializer.Serialize(prompt));
-            Logger.LogInformation("user prompt: {}", JsonSerializer.Serialize(userPrompot));
+            var userPrompt = messageList;
 
             var res = await chatbotSwitchService.Chatbot.ChatAsync(new Chat(
             [
                 new Message(ChatRole.System, prompt),
-                new Message(ChatRole.User, userPrompot)
+                new Message(ChatRole.User, userPrompt)
             ]), cancellationToken);
             
             
