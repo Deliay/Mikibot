@@ -38,8 +38,8 @@ public class LlmChatbot(
     private const string BasicPrompt =
         "以上面的人设作为角色设定，分析user提供的聊天记录，一行是一句发言。" +
         "请在上下文中精炼出最多3个话题，给出回复，字数可以1-25字不等，灵活安排回复内容，要长时长，需短时短。" +
-        "回复措辞和内容口语化表达。以JSON数组的形式输出，以JSON数组的形式输出。" +
-        "JSON格式为：[{ \"topic\": \"推测的话题\", \"reply\": \"回复的消息\", \"score\": 角色设定对话题的兴趣分数(0-100)  },...]";
+        "回复措辞和内容口语化表达。同时对话题与角色设定的关联度评分，从0-100分，以JSON数组的形式输出，以JSON数组的形式输出。" +
+        "JSON格式为：[{ \"topic\": \"推测的话题\", \"reply\": \"回复的消息\", \"score\": 角色设定与话题的关联度(0-100)  },...]";
 
     private const string Chatbot = "Chatbot";
     
@@ -181,24 +181,29 @@ public class LlmChatbot(
 
         await BeginLock(groupId, async (cancellationToken) =>
         {
-            if (!ignoreMessageCount && messages.Count < 15) return;
-            // 最低也要2条
-            if (ignoreMessageCount && messages.Count < 2) return;
-
-            // add 15 seconds colddown to prevent spam
-            if (ignoreMessageCount)
+            switch (ignoreMessageCount)
             {
-                if (lastAtAt.TryGetValue(groupId, out var at))
+                case false when messages.Count < 10:
+                // 最低也要2条
+                case true when messages.Count < 1:
+                    return;
+                // add 15 seconds colddown to prevent spam
+                case true:
                 {
-                    if (DateTimeOffset.Now -  at < TimeSpan.FromSeconds(5))
+                    if (lastAtAt.TryGetValue(groupId, out var at))
                     {
-                        return;
+                        if (DateTimeOffset.Now -  at < TimeSpan.FromSeconds(5))
+                        {
+                            return;
+                        }
                     }
+
+                    break;
                 }
             }
 
-            string messageList = "";
-            string lastMessage = "";
+            var messageList = "";
+            var lastMessage = "";
 
             while (messages.TryDequeue(out var message))
             {
@@ -235,8 +240,8 @@ public class LlmChatbot(
             var prompt = await GetPrompt(groupId, cancellationToken);
             var userPrompot = messageList;
 
-            Logger.LogInformation("prompt: {}", prompt);
-            Logger.LogInformation("user prompt: {}", userPrompot);
+            Logger.LogInformation("prompt: {}", JsonSerializer.Serialize(prompt));
+            Logger.LogInformation("user prompt: {}", JsonSerializer.Serialize(userPrompot));
 
             var res = await chatbotSwitchService.Chatbot.ChatAsync(new Chat(
             [
