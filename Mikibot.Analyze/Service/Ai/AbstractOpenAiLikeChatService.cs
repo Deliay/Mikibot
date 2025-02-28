@@ -28,7 +28,7 @@ where T : AbstractOpenAiLikeChatService<T>
     private static readonly JsonSerializerOptions Options = new()
     {
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-    }
+    };
     
     public async ValueTask<List<GroupChatResponse>> ChatAsync(Chat chat, CancellationToken cancellationToken = default)
     {
