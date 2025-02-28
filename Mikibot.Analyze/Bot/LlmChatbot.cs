@@ -246,7 +246,10 @@ public class LlmChatbot(
             ]), cancellationToken);
             
             
-            var interestChat = res.MaxBy(c => c.score);
+            var interestChat = res
+                .GroupBy(c => c.score)
+                .MaxBy(c => c.Key)
+                ?.MaxBy(c => c.reply.Length);
             if (interestChat is null) return;
             
             if (ignoreMessageCount)
