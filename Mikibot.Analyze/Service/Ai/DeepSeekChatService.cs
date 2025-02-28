@@ -3,7 +3,7 @@
 namespace Mikibot.Analyze.Service.Ai;
 
 public sealed class DeepSeekChatService(ILogger<DeepSeekChatService> logger)
-    : OpenAiChatService<DeepSeekChatService>(logger, new Uri(DeepSeekHost), DeepSeekToken)
+    : AbstractOpenAiLikeChatService<DeepSeekChatService>(logger, new Uri(DeepSeekHost), DeepSeekToken)
 {
     private static readonly string DeepSeekToken = Environment
         .GetEnvironmentVariable("DEEPSEEK_TOKEN")

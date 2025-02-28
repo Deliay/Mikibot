@@ -7,9 +7,9 @@ namespace Mikibot.Analyze.Service.Ai;
 
 public record Choice(Message message);
 public record Response(List<Choice> choices);
-public abstract class OpenAiChatService<T>(ILogger<T> logger, Uri baseUrl, string token, string? overrideModel = null)
+public abstract class AbstractOpenAiLikeChatService<T>(ILogger<T> logger, Uri baseUrl, string token, string? overrideModel = null)
     : IBotChatService
-where T : OpenAiChatService<T>
+where T : AbstractOpenAiLikeChatService<T>
 {
     private static readonly string ServiceName = typeof(T).Name;
     private readonly HttpClient _httpClient = new()

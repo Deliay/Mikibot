@@ -61,7 +61,8 @@ appBuilder.RegisterType<LlmChatbot>().AsSelf().SingleInstance();
 appBuilder.RegisterType<ChatHistoryService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<ChatbotSwitchService>().AsSelf().SingleInstance();
 
-appBuilder.RegisterType<OpenAiChatService>().As<IBotChatService>().SingleInstance();
+appBuilder.RegisterType<Bili2233WorkService>().As<IBotChatService>().SingleInstance();
+appBuilder.RegisterType<DeepSeekChatService>().As<IBotChatService>().SingleInstance();
 appBuilder.RegisterType<OllamaChatService>().As<IBotChatService>().SingleInstance();
 appBuilder.RegisterType<ChatbotManagerService>().AsSelf().SingleInstance();
 
@@ -112,3 +113,4 @@ await Task.WhenAll(
     chatBotSwitchService.Run(token),
     voice.Run(token),
 ]);
+

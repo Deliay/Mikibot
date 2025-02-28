@@ -1,16 +1,21 @@
-﻿namespace Mikibot.Analyze.Service.Ai;
+﻿using Microsoft.Extensions.Logging;
+
+namespace Mikibot.Analyze.Service.Ai;
 
 public class ChatbotSwitchService
 {
     
     private readonly Dictionary<string, IBotChatService> chatbotMap;
 
-    public ChatbotSwitchService(IEnumerable<IBotChatService> chatbots)
+    public ChatbotSwitchService(IEnumerable<IBotChatService> chatbots, ILogger<ChatbotSwitchService> logger)
     {
         chatbotMap = chatbots.ToDictionary(x => x.Id, x => x);
         
-        Chatbot = chatbotMap.Values.FirstOrDefault()
-            ?? throw new ArgumentNullException(nameof(chatbots));
+        Chatbot = chatbotMap.Values
+            .OrderBy(c => c.Id)
+            .FirstOrDefault() ?? throw new ArgumentNullException(nameof(chatbots));
+        
+        logger.LogInformation("Default chatbot service: {}", Chatbot.Id);
     }
 
     public IBotChatService Chatbot { get; private set; }
