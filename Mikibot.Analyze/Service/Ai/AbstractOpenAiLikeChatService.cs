@@ -69,6 +69,7 @@ where T : AbstractOpenAiLikeChatService<T>
 
             content = content.Replace("```json", "");
             content = content.Replace("```", "");
+            content = content[..(content.LastIndexOf(']') + 1)];
 
             return JsonSerializer.Deserialize<List<GroupChatResponse>>(content) ?? [];
         }
