@@ -248,6 +248,7 @@ public class LlmChatbot(
             
             var interestChat = res
                 .GroupBy(c => c.score)
+                .Where(c => c.Key > 75)
                 .MaxBy(c => c.Key)
                 ?.MaxBy(c => c.reply.Length);
             if (interestChat is null) return;
