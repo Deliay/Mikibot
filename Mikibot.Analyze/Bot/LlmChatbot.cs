@@ -19,6 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.AI;
 using Mikibot.Analyze.Service.Ai;
+using Mirai.Net.Utils.Scaffolds;
 
 namespace Mikibot.Analyze.Bot;
 
@@ -30,7 +31,7 @@ public class LlmChatbot(
     ChatbotSwitchService chatbotSwitchService)
     : MiraiGroupMessageProcessor<LlmChatbot>(miraiService, logger)
 {
-    private readonly Dictionary<string, Queue<string>> _recentMessages = [];
+    private readonly Dictionary<string, Queue<(string msg, string id)>> _recentMessages = [];
     private readonly Dictionary<string, SemaphoreSlim> _locks = [];
     private readonly Dictionary<string, string> lastSubmitMessage = [];
     private readonly Dictionary<string, DateTimeOffset> lastAtAt = [];
@@ -134,7 +135,10 @@ public class LlmChatbot(
                 }
 
                 if (isGroupEnabled)
-                    messages.Enqueue($"- {message.Sender.Name}: {plain.Text}\n");
+                {
+                    var id = message.MessageChain.OfType<SourceMessage>().First().MessageId;
+                    messages.Enqueue(($"- {message.Sender.Name}: {plain.Text}\n", id));
+                }
             }
             else if (item is AtMessage at)
             {
@@ -203,11 +207,11 @@ public class LlmChatbot(
             }
 
             var messageList = "";
-            var lastMessage = "";
+            (string msg, string id) lastMessage = default;
 
             while (messages.TryDequeue(out var message))
             {
-                messageList += message;
+                messageList += message.msg;
                 lastMessage = message;
             }
 
@@ -220,7 +224,7 @@ public class LlmChatbot(
                 lastAtAt.Add(groupId, DateTimeOffset.Now);
             }
 
-            if (ignoreMessageCount && lastSubmitMessage.TryGetValue(groupId, out var msg))
+            if (ignoreMessageCount)
             {
                 var recentMessage = string.Join('\n', (await db.ChatbotGroupChatHistories
                     .Where(c => c.GroupId == groupId && c.UserId == userId)
@@ -252,12 +256,20 @@ public class LlmChatbot(
                 .MaxBy(c => c.Key)
                 ?.MaxBy(c => c.reply.Length);
             if (interestChat is null) return;
-            
-            if (ignoreMessageCount)
-                messages.Enqueue(interestChat.reply + "\n");
 
-            await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
-                new PlainMessage($"[{interestChat.score}/100,{interestChat.topic}] {interestChat.reply}"));
+            if (ignoreMessageCount)
+            {
+                await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
+                    new QuoteMessage() { MessageId = lastMessage.id },
+                    new PlainMessage($"({interestChat.topic}) {interestChat.reply}"));
+            }
+            else
+            {
+                await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
+                    new PlainMessage($"({interestChat.topic}) {interestChat.reply}"));
+            }
+            
+
 
         }, cancellationToken);
 

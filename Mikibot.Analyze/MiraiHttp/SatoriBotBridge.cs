@@ -34,6 +34,7 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
             VoiceMessage { Path.Length: > 0 } image => new AudioElement() { Src = $"file://{image.Path}" },
             SourceMessage { MessageId.Length : > 0 } source => new QuoteElement() {  Id = source.MessageId },
             AtMessage { Target.Length :> 0 } at => new AtElement() { Id = at.Target },
+            QuoteMessage quote => new QuoteElement() { Id = quote.MessageId },
             _ => null
         };
     }
