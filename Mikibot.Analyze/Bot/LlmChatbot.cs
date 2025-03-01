@@ -256,7 +256,7 @@ public class LlmChatbot(
                 messages.Enqueue(interestChat.reply + "\n");
 
             await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
-                new PlainMessage($"[{interestChat.score}/100,{interestChat.topic}]{interestChat.reply}"));
+                new PlainMessage($"[{interestChat.score}/100,{interestChat.topic}] {interestChat.reply}"));
 
         }, cancellationToken);
 
