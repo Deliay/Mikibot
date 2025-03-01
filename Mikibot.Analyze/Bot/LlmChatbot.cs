@@ -225,7 +225,7 @@ public class LlmChatbot(
                 var recentMessage = string.Join('\n', (await db.ChatbotGroupChatHistories
                     .Where(c => c.GroupId == groupId && c.UserId == userId)
                     .OrderByDescending(c => c.Id)
-                    .Take(5)
+                    .Take(10)
                     .Select(c => $"- {c.Message}")
                     .ToListAsync(cancellationToken))
                     .AsEnumerable()
