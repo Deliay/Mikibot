@@ -67,6 +67,11 @@ where T : AbstractOpenAiLikeChatService<T>
         {
             logger.LogInformation("{} bot: {}", ServiceName, content);
 
+            if (content.Contains("```"))
+            {
+                content = content[content.IndexOf("```", StringComparison.Ordinal)..];
+            }
+            
             content = content.Replace("```json", "");
             content = content.Replace("```", "");
             content = content[..(content.LastIndexOf(']') + 1)];
