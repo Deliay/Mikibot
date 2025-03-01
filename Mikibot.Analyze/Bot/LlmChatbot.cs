@@ -222,16 +222,16 @@ public class LlmChatbot(
 
             if (ignoreMessageCount && lastSubmitMessage.TryGetValue(groupId, out var msg))
             {
-                var recentMessage = string.Join('\n', await db.ChatbotGroupChatHistories
+                var recentMessage = string.Join('\n', (await db.ChatbotGroupChatHistories
                     .Where(c => c.GroupId == groupId && c.UserId == userId)
                     .OrderByDescending(c => c.Id)
                     .Take(5)
                     .Select(c => $"- {c.Message}")
-                    .Reverse()
-                    .ToListAsync(cancellationToken));
+                    .ToListAsync(cancellationToken))
+                    .AsEnumerable()
+                    .Reverse());
                 
-                messageList = msg + "\n" + messageList
-                + "你之前的发言被下面这个人回复了，他这段时间的发言如下，这里发言仅供参考：" + recentMessage +
+                messageList = "你之前的发言被下面这个人回复了，他这段时间的发言如下，这里发言仅供参考：" + recentMessage +
                 "\n\n特别针对下面这条消息给出回应，针对下面这句话的回应的打分应该是你回应中最高的：\n"
                 + lastMessage;
             }
