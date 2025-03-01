@@ -232,7 +232,7 @@ public class LlmChatbot(
                 
                 messageList = msg + "\n" + messageList
                 + "你之前的发言被下面这个人回复了，他这段时间的发言如下，这里发言仅供参考：" + recentMessage +
-                "\n\n特别针对下面这条消息给出回应：\n"
+                "\n\n特别针对下面这条消息给出回应，针对下面这句话的回应的打分应该是你回应中最高的：\n"
                 + lastMessage;
             }
 
