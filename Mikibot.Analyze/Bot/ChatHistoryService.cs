@@ -28,11 +28,16 @@ internal class ChatHistoryService(
 
         if (string.IsNullOrWhiteSpace(msg)) return;
 
+        var msgId = message.MessageChain.GetSourceMessage()?.MessageId;
+        if (string.IsNullOrWhiteSpace(msgId)) return;
+        
         await db.AddAsync(new ChatbotGroupChatHistory
         {
             GroupId = message.GroupId,
             UserId = message.Sender.Id,
             Message = msg,
+            MessageId = msgId,
+            SentAt = DateTimeOffset.UtcNow,
         }, token);
 
         await db.SaveChangesAsync(token);

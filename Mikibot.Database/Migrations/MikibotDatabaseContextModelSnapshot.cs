@@ -84,11 +84,19 @@ namespace Mikibot.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("MessageId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTimeOffset>("SentAt")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MessageId");
 
                     b.HasIndex("GroupId", "UserId", "Id");
 

@@ -13,4 +13,8 @@ public class ChatbotGroupChatHistory
     public string GroupId { get;set; }
     public string UserId { get; set; }
     public string Message { get; set; }
+    
+    public string? MessageId { get; set; }
+    
+    public DateTimeOffset SentAt { get; set; }
 }
