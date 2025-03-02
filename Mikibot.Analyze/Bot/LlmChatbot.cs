@@ -40,7 +40,8 @@ public class LlmChatbot(
         "以上面的人设作为角色设定，分析user提供的聊天记录，一行是一句发言。" +
         "请在上下文中精炼出最多3个话题，并给出你的回复，字数可以1-25字不等，灵活安排回复内容。" +
         "同时对话题与角色设定的关联度评分，从0-100分，以JSON数组的形式输出，以JSON数组的形式输出。" +
-        "JSON格式为：[{ \"topic\": \"推测的话题\", \"reply\": \"回复的消息\", \"score\": 角色设定与话题的关联度(0-100)  },...]";
+        "消息中会携带消息id，请在话题中带上所关联的消息id。" +
+        "JSON格式为：[{ \"messageId\":\"消息id\", \"topic\": \"推测的话题\", \"reply\": \"回复的消息\", \"score\": 角色设定与话题的关联度(0-100)  },...]";
 
     private const string Chatbot = "Chatbot";
     
@@ -211,7 +212,7 @@ public class LlmChatbot(
 
             while (messages.TryDequeue(out var message))
             {
-                messageList += message.msg;
+                messageList += $"[消息id:{message.id}] {message.msg}";
                 lastMessage = message;
             }
 
@@ -230,7 +231,7 @@ public class LlmChatbot(
                     .Where(c => c.GroupId == groupId && c.UserId == userId)
                     .OrderByDescending(c => c.Id)
                     .Take(10)
-                    .Select(c => $"- {c.Message}")
+                    .Select(c => $"-[消息ID: {c.MessageId}] 消息:{c.Message}")
                     .ToListAsync(cancellationToken))
                     .AsEnumerable()
                     .Reverse());
@@ -257,7 +258,11 @@ public class LlmChatbot(
                 ?.MaxBy(c => c.reply.Length);
             if (interestChat is null) return;
 
-            if (ignoreMessageCount)
+            var messageExists = await db.ChatbotGroupChatHistories
+                .Where(c => c.MessageId == interestChat.messageId)
+                .AnyAsync(cancellationToken);
+            
+            if (messageExists || ignoreMessageCount)
             {
                 await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
                     new QuoteMessage() { MessageId = lastMessage.id },
@@ -268,9 +273,6 @@ public class LlmChatbot(
                 await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
                     new PlainMessage($"({interestChat.topic}) {interestChat.reply}"));
             }
-            
-
-
         }, cancellationToken);
 
     }
