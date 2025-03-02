@@ -76,6 +76,7 @@ where T : AbstractOpenAiLikeChatService<T>
             content = content.Replace("```", "");
             content = content[..(content.LastIndexOf(']') + 1)];
 
+            logger.LogInformation("{} bot after procees: {}", ServiceName, content);
             return JsonSerializer.Deserialize<List<GroupChatResponse>>(content) ?? [];
         }
         catch (Exception ex)
