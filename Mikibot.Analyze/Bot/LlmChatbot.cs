@@ -265,7 +265,7 @@ public class LlmChatbot(
             if (messageExists || ignoreMessageCount)
             {
                 await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
-                    new QuoteMessage() { MessageId = lastMessage.id },
+                    new QuoteMessage() { MessageId = ignoreMessageCount ? lastMessage.id : interestChat.messageId },
                     new PlainMessage($"({interestChat.topic}) {interestChat.reply}"));
             }
             else
