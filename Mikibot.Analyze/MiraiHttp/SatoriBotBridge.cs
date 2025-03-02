@@ -162,15 +162,21 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
         Client?.Dispose();
     }
     
-    public async ValueTask SendMessageToSomeGroup(HashSet<string> groupIds, CancellationToken token, params MessageBase[] messages)
+    public async ValueTask<Dictionary<string, string>> SendMessageToSomeGroup(HashSet<string> groupIds, CancellationToken token, params MessageBase[] messages)
     {
         ArgumentNullException.ThrowIfNull(Bot);
         
         var elements = ConvertMessageToSatori(messages).ToList();
+
+        Dictionary<string, string> resultSet = [];
         foreach (var groupId in groupIds)
         {
-            await Bot.CreateMessageAsync(groupId, elements);
+            var result = await Bot.CreateMessageAsync(groupId, elements, token);
+            
+            resultSet.Add(groupId, result.First().Id);
         }
+
+        return resultSet;
     }
     
     public ValueTask SendMessageToAllGroup(CancellationToken token, params MessageBase[] messages)

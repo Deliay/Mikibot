@@ -286,7 +286,7 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger, ILogger<BotCon
         }));
     }
 
-    public async ValueTask SendMessageToSomeGroup(HashSet<string> groupIds, CancellationToken token, params MessageBase[] messages)
+    public async ValueTask<Dictionary<string, string>> SendMessageToSomeGroup(HashSet<string> groupIds, CancellationToken token, params MessageBase[] messages)
     {
         var groups = await bot.FetchGroups();
         foreach (var group in groups)
@@ -301,5 +301,7 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger, ILogger<BotCon
                 await SendMessageToGroup(new Group { Id = groupId, }, token, messages);
             }
         }
+
+        return [];
     }
 }

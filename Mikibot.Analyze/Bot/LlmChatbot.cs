@@ -227,14 +227,14 @@ public class LlmChatbot(
 
             if (ignoreMessageCount)
             {
-                var recentMessage = string.Join('\n', (await db.ChatbotGroupChatHistories
+                var recentMessage = (await db.ChatbotGroupChatHistories
                     .Where(c => c.GroupId == groupId && c.UserId == userId)
                     .OrderByDescending(c => c.Id)
                     .Take(10)
                     .Select(c => $"-[消息ID: {c.MessageId}] 消息:{c.Message}")
                     .ToListAsync(cancellationToken))
                     .AsEnumerable()
-                    .Reverse());
+                    .Reverse();
                 
                 messageList = "你之前的发言被下面这个人回复了，他这段时间的发言如下，这里发言仅供参考：" + recentMessage +
                 "\n\n特别针对下面这条消息给出回应，针对下面这句话的回应的打分应该是你回应中最高的：\n"
@@ -261,18 +261,32 @@ public class LlmChatbot(
             var messageExists = await db.ChatbotGroupChatHistories
                 .Where(c => c.MessageId == interestChat.messageId)
                 .AnyAsync(cancellationToken);
-            
+
+            Dictionary<string, string> sendResults = null!;
             if (messageExists || ignoreMessageCount)
             {
-                await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
+                sendResults = await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
                     new QuoteMessage() { MessageId = ignoreMessageCount ? lastMessage.id : interestChat.messageId },
                     new PlainMessage($"({interestChat.topic}) {interestChat.reply}"));
             }
             else
             {
-                await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
+                sendResults = await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
                     new PlainMessage($"({interestChat.topic}) {interestChat.reply}"));
             }
+
+            if (sendResults.TryGetValue(groupId, out var result))
+            {
+                await db.ChatbotGroupChatHistories.AddAsync(new ChatbotGroupChatHistory()
+                {
+                    GroupId = groupId,
+                    UserId = MiraiService.UserId,
+                    MessageId = result,
+                    Message = interestChat.reply,
+                }, cancellationToken);
+                await db.SaveChangesAsync(cancellationToken);
+            }
+
         }, cancellationToken);
 
     }

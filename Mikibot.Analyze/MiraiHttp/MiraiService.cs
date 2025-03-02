@@ -93,7 +93,7 @@ public class MiraiService : IDisposable, IMiraiService
         }
     }
         
-    public async ValueTask SendMessageToSomeGroup(HashSet<string> groupIds, CancellationToken token, params MessageBase[] messages)
+    public async ValueTask<Dictionary<string, string>> SendMessageToSomeGroup(HashSet<string> groupIds, CancellationToken token, params MessageBase[] messages)
     {
         foreach (var group in Bot.Groups.Value)
         {
@@ -106,6 +106,8 @@ public class MiraiService : IDisposable, IMiraiService
                 await SendMessageToGroup(group, token, messages);
             }
         }
+
+        return [];
     }
 
     public void Dispose()

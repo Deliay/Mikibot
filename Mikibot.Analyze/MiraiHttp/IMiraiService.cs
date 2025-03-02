@@ -12,7 +12,7 @@ public interface IMiraiService
         
     public string UserId { get; }
         
-    ValueTask SendMessageToSomeGroup(HashSet<string> groupIds, CancellationToken token, params MessageBase[] messages);
+    ValueTask<Dictionary<string, string>> SendMessageToSomeGroup(HashSet<string> groupIds, CancellationToken token, params MessageBase[] messages);
     [Obsolete("Will be removed in future version")]
     ValueTask SendMessageToSliceManGroup(CancellationToken token, params MessageBase[] messages);
     [Obsolete("Will be removed in future version")]

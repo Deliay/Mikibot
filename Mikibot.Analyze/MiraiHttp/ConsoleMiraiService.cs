@@ -39,9 +39,9 @@ public class ConsoleMiraiService : IMiraiService
         return SendMessageToAllGroup(token, messages);
     }
 
-    public ValueTask SendMessageToSomeGroup(HashSet<string> groupIds, CancellationToken token, params MessageBase[] messages)
+    public ValueTask<Dictionary<string, string>> SendMessageToSomeGroup(HashSet<string> groupIds, CancellationToken token, params MessageBase[] messages)
     {
-        return SendMessageToAllGroup(token, messages);
+        return ValueTask.FromResult<Dictionary<string, string>>([]);
     }
 
     public void SubscribeMessage(Action<GroupMessageReceiver> next, CancellationToken token)
