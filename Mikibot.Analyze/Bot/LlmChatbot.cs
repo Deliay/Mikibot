@@ -188,7 +188,7 @@ public class LlmChatbot(
         {
             switch (ignoreMessageCount)
             {
-                case false when messages.Count < 10:
+                case false when messages.Count < 20:
                 // 最低也要2条
                 case true when messages.Count < 1:
                     return;
@@ -253,7 +253,7 @@ public class LlmChatbot(
             
             var interestChat = res
                 .GroupBy(c => c.score)
-                .Where(c => c.Key > 75)
+                .Where(c => c.Key > 85)
                 .MaxBy(c => c.Key)
                 ?.MaxBy(c => c.reply.Length);
             if (interestChat is null) return;
