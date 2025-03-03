@@ -68,6 +68,29 @@ namespace Mikibot.Migrations
                     b.ToTable("ChatbotCharacters");
                 });
 
+            modelBuilder.Entity("Mikibot.Database.Model.ChatbotContext", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Context")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("GroupId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId", "Id");
+
+                    b.ToTable("ChatbotContexts");
+                });
+
             modelBuilder.Entity("Mikibot.Database.Model.ChatbotGroupChatHistory", b =>
                 {
                     b.Property<long>("Id")

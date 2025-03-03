@@ -9,7 +9,7 @@ public class MikibotDatabaseDesignTimeFactory : IDesignTimeDbContextFactory<Miki
     {
         return new MikibotDatabaseContext(new MySqlConfiguration()
         {
-            Host = "10.100.0.4",
+            Host = "192.168.31.137",
             Database = "mikibot",
             Port = 3306,
             User = "zero_apps",
