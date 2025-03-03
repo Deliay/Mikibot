@@ -38,10 +38,12 @@ public class LlmChatbot(
 
     private const string BasicPrompt =
         "以上面的人设作为角色设定，分析user提供的聊天记录，一行是一句发言。" +
-        "请在上下文中精炼出最多3个话题，并给出你的回复，字数可以1-25字不等，灵活安排回复内容。" +
+        "请在上下文中精炼出最多3个话题，并给出你的回复，字数可以1-25字不等，灵活安排回复内容。\n\n" +
+        "如果你的判断需要画图，用你的想象力尽可能地描述图片，并用英文的描述填充在下面的{prompt}占位符里，并填充到最终结果的imageUrl字段中：" +
+        "![image](https://image.pollinations.ai/prompt/{prompt}?width=1024&height=1024&seed=100&model=flux&nologo=true\n\n" +
         "同时对话题与角色设定的关联度评分，从0-100分，以JSON数组的形式输出，以JSON数组的形式输出。如果有政治敏感内容，请用XX替代。" +
         "消息中会携带消息id，请在话题中带上所关联的消息id。" +
-        "JSON格式为：[{ \"messageId\":\"消息id\", \"topic\": \"推测的话题\", \"reply\": \"回复的消息\", \"score\": 角色设定与话题的关联度(0-100)  },...]";
+        "JSON格式为：[{ \"imageUrl\": \"在上面填充的图像url(如果有)\" \"messageId\":\"消息id\", \"topic\": \"推测的话题\", \"reply\": \"回复的消息\", \"score\": 角色设定与话题的关联度(0-100)  },...]";
 
     private const string Chatbot = "Chatbot";
     
@@ -279,7 +281,7 @@ public class LlmChatbot(
                 sendResults = await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
                     new PlainMessage($"({interestChat.topic}) {interestChat.reply}"));
             }
-
+            
             await db.ChatbotContexts.AddRangeAsync([
                 new ChatbotContext()
                 {

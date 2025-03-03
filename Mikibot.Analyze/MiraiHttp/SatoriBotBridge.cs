@@ -21,6 +21,19 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
     private static readonly string EnvSatoriToken
         = Environment.GetEnvironmentVariable("ENV_SATORI_TOKEN") ?? "";
 
+    private static Element ConvertForwardMessage(ForwardMessage forward)
+    {
+        var satoriMessage = new MessageElement()
+        {
+            Forward = true,
+        };
+        foreach (var element in forward.NodeList.SelectMany(n => ConvertMessageToSatori(n.MessageChain)))
+        {
+            satoriMessage.ChildElements.Add(element);
+        }
+        return satoriMessage;
+    }
+    
     private static Element? ConvertSingleMessageElementToSatori(MessageBase message)
     {
         return message switch
@@ -35,6 +48,7 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
             SourceMessage { MessageId.Length : > 0 } source => new QuoteElement() {  Id = source.MessageId },
             AtMessage { Target.Length :> 0 } at => new AtElement() { Id = at.Target },
             QuoteMessage quote => new QuoteElement() { Id = quote.MessageId },
+            ForwardMessage forward => ConvertForwardMessage(forward),
             _ => null
         };
     }
