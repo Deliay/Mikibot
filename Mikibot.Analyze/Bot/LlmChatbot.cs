@@ -279,9 +279,10 @@ public class LlmChatbot(
 
             if (interestChat.imagePrompt is { Length: > 0 })
             {
+                var fileName = $"{Guid.NewGuid().ToString()}.jpg";
                 pendingSendMessages.Add(new ImageMessage()
                 {
-                    Url = $"https://image.pollinations.ai/prompt/{interestChat.imagePrompt}?width=1024&height=1024&seed=100&model=flux&nologo=true"
+                    Url = $"https://image.pollinations.ai/prompt/{interestChat.imagePrompt}/{fileName}?width=1024&height=1024&seed=100&model=flux&nologo=true"
                 });
             }
             
