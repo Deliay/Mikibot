@@ -19,6 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.AI;
 using Mikibot.Analyze.Service.Ai;
+using Mirai.Net.Data.Messages;
 using Mirai.Net.Utils.Scaffolds;
 
 namespace Mikibot.Analyze.Bot;
@@ -260,7 +261,7 @@ public class LlmChatbot(
             
             var interestChat = res
                 .GroupBy(c => c.score)
-                .Where(c => c.Key > 85)
+                .Where(c => ignoreMessageCount ? c.Key > 60 : c.Key >= 85)
                 .MaxBy(c => c.Key)
                 ?.MaxBy(c => c.reply.Length);
             if (interestChat is null) return;
@@ -269,19 +270,19 @@ public class LlmChatbot(
                 .Where(c => c.MessageId == interestChat.messageId)
                 .AnyAsync(cancellationToken);
 
-            Dictionary<string, string> sendResults = null!;
+            List<MessageBase> pendingSendMessages = [];
             if (messageExists || ignoreMessageCount)
             {
-                sendResults = await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
-                    new QuoteMessage() { MessageId = ignoreMessageCount ? lastMessage.id : interestChat.messageId },
-                    new PlainMessage($"({interestChat.topic}) {interestChat.reply}"));
+                pendingSendMessages.Add(new QuoteMessage() { MessageId = ignoreMessageCount ? lastMessage.id : interestChat.messageId });
             }
-            else
+
+            if (interestChat.imageUrl is { Length: > 0 })
             {
-                sendResults = await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
-                    new PlainMessage($"({interestChat.topic}) {interestChat.reply}"));
+                pendingSendMessages.Add(new ImageMessage() { Url = interestChat.imageUrl });
             }
             
+            pendingSendMessages.Add(new PlainMessage($"({interestChat.topic}) {interestChat.reply}"));
+            var sendResults = await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken, pendingSendMessages.ToArray());
             await db.ChatbotContexts.AddRangeAsync([
                 new ChatbotContext()
                 {
