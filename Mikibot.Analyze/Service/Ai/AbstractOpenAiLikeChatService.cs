@@ -71,6 +71,10 @@ where T : AbstractOpenAiLikeChatService<T>
             {
                 content = content[content.IndexOf("```", StringComparison.Ordinal)..];
             }
+            else
+            {
+                content = content[content.IndexOf('[')..];
+            }
             
             content = content.Replace("```json", "");
             content = content.Replace("```", "");
