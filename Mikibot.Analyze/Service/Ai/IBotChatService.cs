@@ -24,7 +24,7 @@ public record Chat(
     public string ToPlainText() => string.Join('\n', messages.Select(m => m.content));
 }
 
-public record GroupChatResponse(string messageId, int score, string topic, string reply, string? imageUrl);
+public record GroupChatResponse(string messageId, int score, string topic, string reply, string? imagePrompt);
 
 
 public interface IBotChatService
