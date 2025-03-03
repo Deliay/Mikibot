@@ -39,10 +39,13 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
         return message switch
         {
             PlainMessage plain => new TextElement() { Text = plain.Text, },
-            ImageMessage { Url.Length: > 0 } image => new ImageElement() { Src = image.Url, },
+            ImageMessage { Url.Length: > 0 } image => new ImageElement() { Src = image.Url, Cache = true, Attributes =
+            {
+                { "title", $"{Guid.NewGuid().ToString()}.jpg" },
+            } },
             ImageMessage { Base64.Length: > 0 } image => new ImageElement() { Src = $"data:application/octet-stream;base64,{image.Base64}" },
             ImageMessage { Path.Length: > 0 } image => new ImageElement() { Src = image.Path },
-            VoiceMessage { Url.Length: > 0 } image => new AudioElement() { Src = image.Url, },
+            VoiceMessage { Url.Length: > 0 } image => new AudioElement() { Src = image.Url },
             VoiceMessage { Base64.Length: > 0 } image => new AudioElement() { Src = $"data:audio/amr;base64,{image.Base64}" },
             VoiceMessage { Path.Length: > 0 } image => new AudioElement() { Src = $"file://{image.Path}" },
             SourceMessage { MessageId.Length : > 0 } source => new QuoteElement() {  Id = source.MessageId },
