@@ -17,6 +17,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Manganese.Text;
 using Microsoft.Extensions.AI;
 using Mikibot.Analyze.Service.Ai;
 using Mirai.Net.Data.Messages;
@@ -236,7 +237,8 @@ public class LlmChatbot(
                     .Select(c => $"-[消息ID: {c.MessageId}] 消息:{c.Message}")
                     .ToListAsync(cancellationToken))
                     .AsEnumerable()
-                    .Reverse();
+                    .Reverse()
+                    .JoinToString("\n");
                 
                 messageList = "你之前的发言被下面这个人回复了，他这段时间的发言如下，这里发言仅供参考：" + recentMessage +
                 "\n\n特别针对下面这条消息给出回应，针对下面这句话的回应的打分应该是你回应中最高的：\n"
