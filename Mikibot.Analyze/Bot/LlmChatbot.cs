@@ -132,24 +132,23 @@ public class LlmChatbot(
         bool isAt = false;
         foreach (var item in message.MessageChain)
         {
-            if (item is PlainMessage plain)
+            switch (item)
             {
-                if (plain.Text.StartsWith('/'))
-                {
+                case PlainMessage plain when plain.Text.StartsWith('/'):
                     await ProcessCommand(group.Id, message.Sender.Id, plain.Text, token);
                     return;
-                }
-
-                if (isGroupEnabled)
+                case PlainMessage plain when !isGroupEnabled:
+                    continue;
+                case PlainMessage plain:
                 {
                     var id = message.MessageChain.OfType<SourceMessage>().First().MessageId;
                     messages.Enqueue(($"- {message.Sender.Name}: {plain.Text}\n", id));
+                    break;
                 }
-            }
-            else if (item is AtMessage at)
-            {
-                // TODO: retrieve bot uin from bot service
-                isAt = at.Target == MiraiService.UserId;
+                case AtMessage at:
+                    // TODO: retrieve bot uin from bot service
+                    isAt = at.Target == MiraiService.UserId;
+                    break;
             }
         }
 
@@ -279,17 +278,36 @@ public class LlmChatbot(
                 pendingSendMessages.Add(new QuoteMessage() { MessageId = ignoreMessageCount ? lastMessage.id : interestChat.messageId });
             }
 
+            bool archiveAsForawrdMsg = false;
             if (interestChat.imagePrompt is { Length: > 0 })
             {
                 var fileName = $"{Guid.NewGuid().ToString()}.jpg";
                 pendingSendMessages.Add(new ImageMessage()
                 {
-                    Url = $"https://image.pollinations.ai/prompt/{interestChat.imagePrompt}/{fileName}?width=1024&height=1024&seed=100&model=flux&nologo=true"
+                    Url = $"https://image.pollinations.ai/prompt/{interestChat.imagePrompt}/{fileName}?width=1024&height=1024&seed=100&model=flux-anime&nologo=true"
                 });
+
+                archiveAsForawrdMsg = true;
             }
             
             pendingSendMessages.Add(new PlainMessage($"({interestChat.topic}) {interestChat.reply}"));
+
+            if (archiveAsForawrdMsg)
+            {
+                pendingSendMessages = [new ForwardMessage()
+                {
+                    NodeList = pendingSendMessages.Select(i => new ForwardMessage.ForwardNode()
+                    {
+                        MessageChain = i,
+                        SenderName = "Zerobot",
+                        SenderId = "123456789",
+                        Time = DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(8)).ToString("yyyy-MM-dd HH:mm:ss")
+                    }),
+                }];
+            }
+            
             var sendResults = await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken, pendingSendMessages.ToArray());
+            
             await db.ChatbotContexts.AddRangeAsync([
                 new ChatbotContext()
                 {

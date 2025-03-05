@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using ExtendedNumerics;
 using Microsoft.Extensions.Logging;
 using Mirai.Net.Data.Messages;
 using Mirai.Net.Data.Messages.Concretes;
@@ -21,17 +22,29 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
     private static readonly string EnvSatoriToken
         = Environment.GetEnvironmentVariable("ENV_SATORI_TOKEN") ?? "";
 
-    private static Element ConvertForwardMessage(ForwardMessage forward)
+    private static MessageElement ConvertForwardMessage(ForwardMessage forward)
     {
-        var satoriMessage = new MessageElement()
+        var root = new MessageElement()
         {
             Forward = true,
         };
-        foreach (var element in forward.NodeList.SelectMany(n => ConvertMessageToSatori(n.MessageChain)))
+        foreach (var node in forward.NodeList)
         {
-            satoriMessage.ChildElements.Add(element);
+            var child = new MessageElement();
+            root.ChildElements.Add(child);
+            child.ChildElements.Add(new AuthorElement()
+            {
+                UserId = node.SenderId,
+                Nickname = node.SenderName,
+            });
+            foreach (var element in node.MessageChain
+                         .Select(ConvertSingleMessageElementToSatori))
+            {
+                if (element is not null) child.ChildElements.Add(element);
+            }
+            
         }
-        return satoriMessage;
+        return root;
     }
     
     private static Element? ConvertSingleMessageElementToSatori(MessageBase message)
