@@ -286,26 +286,24 @@ public class LlmChatbot(
                 {
                     Url = $"https://image.pollinations.ai/prompt/{interestChat.imagePrompt}/{fileName}?width=1024&height=1024&seed=100&model=flux-anime&nologo=true"
                 });
-
-                archiveAsForawrdMsg = true;
             }
             
             pendingSendMessages.Add(new PlainMessage($"({interestChat.topic}) {interestChat.reply}"));
 
-            if (archiveAsForawrdMsg)
-            {
-                pendingSendMessages = [new ForwardMessage()
-                {
-                    NodeList = pendingSendMessages.Select(i => new ForwardMessage.ForwardNode()
-                    {
-                        MessageChain = i,
-                        SenderName = "Zerobot",
-                        SenderId = "123456789",
-                        Time = DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(8)).ToString("yyyy-MM-dd HH:mm:ss")
-                    }),
-                }];
-            }
-            
+            // if (archiveAsForawrdMsg)
+            // {
+            //     pendingSendMessages = [new ForwardMessage()
+            //     {
+            //         NodeList = pendingSendMessages.Select(i => new ForwardMessage.ForwardNode()
+            //         {
+            //             MessageChain = i,
+            //             SenderName = "Zerobot",
+            //             SenderId = "123456789",
+            //             Time = DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(8)).ToString("yyyy-MM-dd HH:mm:ss")
+            //         }),
+            //     }];
+            // }
+            //
             var sendResults = await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken, pendingSendMessages.ToArray());
             
             await db.ChatbotContexts.AddRangeAsync([
