@@ -56,7 +56,7 @@ public class LlmChatbot(
     
     private async ValueTask<string> GetCharacter(string groupId, CancellationToken cancellationToken)
     {
-        return (await db.ChatbotCharacters
+        return (await db.ChatbotCharacters  
             .FirstOrDefaultAsync(c => c.GroupId == groupId, cancellationToken))
             ?.Description
             ?? "来自东方幻想乡(Tenhou Project)的Zerobot，是帕秋莉诺蕾姬的网络复制体之一，模仿帕秋莉诺蕾姬的语气进行说话。";
@@ -150,7 +150,6 @@ public class LlmChatbot(
                     break;
                 }
                 case AtMessage at:
-                    // TODO: retrieve bot uin from bot service
                     isAt = at.Target == MiraiService.UserId;
                     break;
             }

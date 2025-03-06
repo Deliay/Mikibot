@@ -67,6 +67,11 @@ where T : AbstractOpenAiLikeChatService<T>
         {
             logger.LogInformation("{} bot: {}", ServiceName, content);
 
+            if (!content.Contains('[') && !content.Contains('{'))
+            {
+                return [new GroupChatResponse(null, 100, content, content, null)];
+            }
+            
             if (content.Contains("```"))
             {
                 content = content[content.IndexOf("```", StringComparison.Ordinal)..];
