@@ -287,7 +287,7 @@ public class LlmChatbot(
                 var fileName = $"{Guid.NewGuid().ToString()}.jpg";
                 pendingSendMessages.Add(new ImageMessage()
                 {
-                    Url = $"https://image.pollinations.ai/prompt/{interestChat.imagePrompt}/{fileName}?width=1024&height=1024&seed=100&model=flux-anime&nologo=true"
+                    Url = $"https://image.pollinations.ai/prompt/{interestChat.imagePrompt}/{fileName}?width=1024&height=1024&seed=100&model=flux-pro&nologo=true&enhance=true"
                 });
             }
             
