@@ -79,12 +79,12 @@ public class LlmChatbot(
         if (result.avatarPrompt is { Length: > 0 })
         {
             var fileName = Guid.NewGuid().ToString();
-            yield return new ImageMessage() { Url = $"https://image.pollinations.ai/prompt/{result.avatarPrompt}/{fileName}?width=1024&height=1024&seed=100&model=flux-pro&nologo=true&enhance=true" };
+            yield return new ImageMessage() { Url = $"https://image.pollinations.ai/prompt/{result.avatarPrompt}/{fileName}?width=1024&height=1024&seed=100&model=flux-anime&nologo=true&enhance=true" };
         }
         yield return new PlainMessage() { Text = result.character };
     }
     
-    private async ValueTask ProcessCommand(string groupId, string userId, string text, CancellationToken cancellationToken)
+    private async ValueTask ProcessCommand(string messageId, string groupId, string userId, string text, CancellationToken cancellationToken)
     {
         if (text == "/chatbot")
         {
@@ -104,6 +104,13 @@ public class LlmChatbot(
                 .Where(c => c.GroupId == groupId && c.UserId == userId)
                 .ToListAsync(cancellationToken);
 
+            if (histories.Count < 50)
+            {
+                await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
+                    new PlainMessage($"需要至少50条消息才能生成画像~目前你已经发了{histories.Count}条"));
+                return;
+            }
+            
             var chats = string.Join('\n', histories.Select(h => h.Message));
 
 
@@ -126,6 +133,7 @@ public class LlmChatbot(
                 .Where(c => c != null)
                 .Select(c => JsonSerializer.Deserialize<AnalysisResult>(c!)!)
                 .SelectMany(ExpandAnalysis)
+                .Concat([new QuoteMessage() { MessageId = messageId }])
                 .ToArray();
             
             await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken, messages);
@@ -182,18 +190,18 @@ public class LlmChatbot(
         }
 
         bool isAt = false;
+        var id = message.MessageChain.OfType<SourceMessage>().First().MessageId;
         foreach (var item in message.MessageChain)
         {
             switch (item)
             {
                 case PlainMessage plain when plain.Text.StartsWith('/'):
-                    await ProcessCommand(group.Id, message.Sender.Id, plain.Text, token);
+                    await ProcessCommand(id, group.Id, message.Sender.Id, plain.Text, token);
                     return;
                 case PlainMessage plain when !isGroupEnabled:
                     continue;
                 case PlainMessage plain:
                 {
-                    var id = message.MessageChain.OfType<SourceMessage>().First().MessageId;
                     messages.Enqueue(($"- {message.Sender.Name}: {plain.Text}\n", id));
                     break;
                 }
