@@ -29,6 +29,27 @@ public class OllamaChatService : IBotChatService
 
     public string Id => "ollama";
 
+    public async ValueTask<Response?> LlmChatAsync(Chat chat, CancellationToken cancellationToken = default)
+    {
+        var result = await ollamaClient.GenerateAsync(new GenerateRequest()
+        {
+            Model = ollamaModel,
+            Prompt = chat.ToPlainText(),
+            Stream = false,
+            Options = new RequestOptions()
+            {
+                Temperature = chat.temperature,
+            },
+        }, cancellationToken).ToListAsync(cancellationToken);
+
+        var choices = result
+            .Where(item => item is not null)
+            .Select(item => new Choice(new Message(ChatRole.Assistant, item!.Response)))
+            .ToList();
+
+        return new Response(choices);
+    }
+
     public async ValueTask<List<GroupChatResponse>> ChatAsync(Chat chat, CancellationToken cancellationToken = default)
     {
         var result = await ollamaClient.GenerateAsync(new GenerateRequest()

@@ -18,6 +18,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Manganese.Text;
+using MathNet.Numerics;
 using Microsoft.Extensions.AI;
 using Mikibot.Analyze.Service.Ai;
 using Mirai.Net.Data.Messages;
@@ -53,6 +54,11 @@ public class LlmChatbot(
         "JSON格式为：[{ \"imagePrompt\": \"你判断需要画图时这里是图片的prompt\" \"messageId\":\"消息id\", \"topic\": \"推测的话题\", \"reply\": \"回复的消息\", \"score\": 角色设定与话题的关联度(0-100)  },...]";
 
     private const string Chatbot = "Chatbot";
+
+    private const string AnalysisPrompt = "你是一个人格分析机器人，输出格式是JSON，用户将会提供聊天记录，请在400字内总结出聊天记录中体现出的用户画像，" +
+                                          "尽量引用聊天记录中的发言来进行陈述说明，让你的分析更有说服力。同时你还要为其输出其人物的对应绘图大头照关键词。" +
+                                          "你的输出JSON格式为：{\"character\":\"你分析的用户画像\", \"avatarPrompt\":\"对应人物的大头照片关键词\"}";
+    private record AnalysisResult(string character, string avatarPrompt);
     
     private async ValueTask<string> GetCharacter(string groupId, CancellationToken cancellationToken)
     {
@@ -68,6 +74,16 @@ public class LlmChatbot(
             + BasicPrompt;
     }
 
+    private static IEnumerable<MessageBase> ExpandAnalysis(AnalysisResult result)
+    {
+        if (result.avatarPrompt is { Length: > 0 })
+        {
+            var fileName = Guid.NewGuid().ToString();
+            yield return new ImageMessage() { Url = $"https://image.pollinations.ai/prompt/{result.avatarPrompt}/{fileName}?width=1024&height=1024&seed=100&model=flux-pro&nologo=true&enhance=true" };
+        }
+        yield return new PlainMessage() { Text = result.character };
+    }
+    
     private async ValueTask ProcessCommand(string groupId, string userId, string text, CancellationToken cancellationToken)
     {
         if (text == "/chatbot")
@@ -81,6 +97,38 @@ public class LlmChatbot(
                 await permissions.GrantPermission(userId, PermissionService.Group,
                     groupId, Chatbot, cancellationToken);
             }
+        }
+        else if (text.StartsWith("/我的群聊画像"))
+        {
+            var histories = await db.ChatbotGroupChatHistories
+                .Where(c => c.GroupId == groupId && c.UserId == userId)
+                .ToListAsync(cancellationToken);
+
+            var chats = string.Join('\n', histories.Select(h => h.Message));
+
+
+            var result = await chatbotSwitchService.Chatbot
+                .LlmChatAsync(new Chat(
+                [
+                    new Message(ChatRole.System, AnalysisPrompt),
+                    new Message(ChatRole.User, chats)
+                ]), cancellationToken);
+
+            if (result is not { choices.Count: > 0 })
+            {
+                await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
+                    new PlainMessage("AI出错了"));
+                return;
+            }
+            
+            var messages = result.choices.Select(c => c.message
+                    .TryPluckJsonObjectContent(out var jsonContent) ? jsonContent : null)
+                .Where(c => c != null)
+                .Select(c => JsonSerializer.Deserialize<AnalysisResult>(c!)!)
+                .SelectMany(ExpandAnalysis)
+                .ToArray();
+            
+            await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken, messages);
         }
         else if (text.StartsWith("/character"))
         {
@@ -186,20 +234,18 @@ public class LlmChatbot(
         }
     }
 
-    private async ValueTask TryResponse(string groupId, string userId, bool ignoreMessageCount = false, CancellationToken cancellationToken = default)
+    private async ValueTask TryResponse(string groupId, string userId, bool isBotHasBeenMentioned = false, CancellationToken cancellationToken = default)
     {
 
         if (!_recentMessages.TryGetValue(groupId, out var messages)) return;
 
         await BeginLock(groupId, async () =>
         {
-            switch (ignoreMessageCount)
+            switch (isBotHasBeenMentioned)
             {
                 case false when messages.Count < 20:
-                // 最低也要2条
-                case true when messages.Count < 1:
                     return;
-                // add 15 seconds colddown to prevent spam
+                // add 5 seconds cold down to prevent spam
                 case true:
                 {
                     if (lastAtAt.TryGetValue(groupId, out var at))
@@ -226,13 +272,13 @@ public class LlmChatbot(
             lastSubmitMessage.Remove(groupId);
             lastSubmitMessage.Add(groupId, messageList);
 
-            if (ignoreMessageCount)
+            if (isBotHasBeenMentioned)
             {
                 lastAtAt.Remove(groupId);
                 lastAtAt.Add(groupId, DateTimeOffset.Now);
             }
 
-            if (ignoreMessageCount)
+            if (isBotHasBeenMentioned)
             {
                 var recentMessage = (await db.ChatbotGroupChatHistories
                     .Where(c => c.GroupId == groupId && c.UserId == userId)
@@ -266,7 +312,7 @@ public class LlmChatbot(
             
             var interestChat = res
                 .GroupBy(c => c.score)
-                .Where(c => ignoreMessageCount ? c.Key > 60 : c.Key >= 85)
+                .Where(c => isBotHasBeenMentioned ? c.Key > 60 : c.Key >= 85)
                 .MaxBy(c => c.Key)
                 ?.MaxBy(c => c.reply.Length);
             if (interestChat is null) return;
@@ -276,9 +322,9 @@ public class LlmChatbot(
                 .AnyAsync(cancellationToken);
 
             List<MessageBase> pendingSendMessages = [];
-            if (messageExists || ignoreMessageCount)
+            if (messageExists || isBotHasBeenMentioned)
             {
-                pendingSendMessages.Add(new QuoteMessage() { MessageId = ignoreMessageCount ? lastMessage.id : interestChat.messageId });
+                pendingSendMessages.Add(new QuoteMessage() { MessageId = isBotHasBeenMentioned ? lastMessage.id : interestChat.messageId });
             }
 
             bool archiveAsForawrdMsg = false;

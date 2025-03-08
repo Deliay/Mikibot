@@ -7,7 +7,14 @@ using Microsoft.Extensions.Logging;
 namespace Mikibot.Analyze.Service.Ai;
 
 public record Choice(Message message);
-public record Response(List<Choice> choices);
+
+public record Response(List<Choice> choices)
+{
+    public string GetAllStrings()
+    {
+        return string.Join('\n', choices.Select(i => i.message.content));
+    }
+}
 public abstract class AbstractOpenAiLikeChatService<T>(ILogger<T> logger, Uri baseUrl, string token, string? overrideModel = null)
     : IBotChatService
 where T : AbstractOpenAiLikeChatService<T>
@@ -29,8 +36,8 @@ where T : AbstractOpenAiLikeChatService<T>
     {
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
-    
-    public async ValueTask<List<GroupChatResponse>> ChatAsync(Chat chat, CancellationToken cancellationToken = default)
+
+    public async ValueTask<Response?> LlmChatAsync(Chat chat, CancellationToken cancellationToken = default)
     {
         if (overrideModel != null) chat = chat with { model = overrideModel };
         
@@ -44,15 +51,19 @@ where T : AbstractOpenAiLikeChatService<T>
             var message = await res.Content.ReadAsStringAsync(cancellationToken);
             logger.LogWarning("{} service call failed: {}, message: {}", 
                 ServiceName, res.StatusCode, message);
-            return [];
+            return new Response([]);
         }
 
         var requestResponse = await res.Content.ReadAsStringAsync(cancellationToken);
         logger.LogInformation("{} service response: {}", ServiceName,
             JsonSerializer.Serialize(requestResponse, Options));
         
-        var data = JsonSerializer.Deserialize<Response>(requestResponse);
-
+        return JsonSerializer.Deserialize<Response>(requestResponse);
+    }
+    
+    public async ValueTask<List<GroupChatResponse>> ChatAsync(Chat chat, CancellationToken cancellationToken = default)
+    {
+        var data = await LlmChatAsync(chat, cancellationToken);
         if (data is null || data.choices.Count == 0)
         {
             logger.LogWarning("{} returned an empty response", ServiceName);
