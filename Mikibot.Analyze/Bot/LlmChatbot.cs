@@ -103,8 +103,12 @@ public class LlmChatbot(
         {
             var histories = await db.ChatbotGroupChatHistories
                 .Where(c => c.GroupId == groupId && c.UserId == userId)
+                .OrderByDescending(c => c.Id)
+                .Take(300)
                 .ToListAsync(cancellationToken);
 
+            histories.Reverse();
+            
             if (histories.Count < 50)
             {
                 await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
@@ -113,7 +117,7 @@ public class LlmChatbot(
             }
             
             var chats = string.Join('\n', histories.Select(h => h.Message));
-
+            var quote = new QuoteMessage() { MessageId = messageId };
 
             var result = await chatbotSwitchService.Chatbot
                 .LlmChatAsync(new Chat(
@@ -125,6 +129,7 @@ public class LlmChatbot(
             if (result is not { choices.Count: > 0 })
             {
                 await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
+                    quote,
                     new PlainMessage("AI出错了"));
                 return;
             }
@@ -134,7 +139,7 @@ public class LlmChatbot(
                 .Where(c => c != null)
                 .Select(c => JsonSerializer.Deserialize<AnalysisResult>(c!)!)
                 .SelectMany(ExpandAnalysis)
-                .Concat([new QuoteMessage() { MessageId = messageId }])
+                .Concat([quote])
                 .ToArray();
             
             await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken, messages);
