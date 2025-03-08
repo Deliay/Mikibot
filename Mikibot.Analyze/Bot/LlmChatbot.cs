@@ -57,7 +57,7 @@ public class LlmChatbot(
 
     private const string AnalysisPrompt = "你是一个人格分析机器人，输出格式是JSON，用户将会提供聊天记录，请在400字内总结出聊天记录中体现出的用户画像，" +
                                           "尽量引用聊天记录中的发言来进行陈述说明，让你的分析更有说服力，你的点评总是犀利刺耳，直指对方人格本质。" +
-                                          "同时你还要为其输出其人物的对应绘图二次元大头照关键词。" +
+                                          "同时你还要为其输出其人物的对应绘图anime二次元大头照关键词。" +
                                           "你的输出JSON格式为：{\"character\":\"你分析的用户画像\", \"avatarPrompt\":\"对应人物的大头照片关键词\"}";
     private record AnalysisResult(string character, string avatarPrompt);
     
