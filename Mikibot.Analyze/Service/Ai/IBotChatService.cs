@@ -32,7 +32,7 @@ public record Message(ChatRole role, string content)
         var right = content.LastIndexOf(rightChar);
         if (right < 0) return false;
 
-        jsonContent = content[left..right];
+        jsonContent = content[left..(right + 1)];
         return true;
     }
 }
