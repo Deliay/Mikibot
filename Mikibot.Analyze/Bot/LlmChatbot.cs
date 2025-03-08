@@ -109,7 +109,7 @@ public class LlmChatbot(
 
             histories.Reverse();
             
-            if (histories.Count < 50)
+            if (histories.Count < 20)
             {
                 await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
                     new PlainMessage($"需要至少50条消息才能生成画像~目前你已经发了{histories.Count}条"));
