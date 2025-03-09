@@ -188,7 +188,7 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
 
         if (group?.Id == "244534796")
         {
-            logger.LogInformation("Debug raw message: {}", e.Message);
+            logger.LogInformation("Debug raw message: {}", e.Message.Content);
         }
         
         var message = new MessageChain(ConvertMessageToMirai(e.Message));
