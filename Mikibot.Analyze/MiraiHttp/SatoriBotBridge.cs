@@ -81,11 +81,6 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
             if (resource.Src.Contains("127.0.0.1")) resource.Src = new Uri(resource.Src).AbsolutePath;
         }
 
-        if (message is QuoteElement _quote)
-        {
-            logger.LogInformation("Reply message source: {}", ElementSerializer.Serialize(_quote));
-        }
-        
         return message switch
         {
             TextElement plain => new PlainMessage() { Text = plain.Text, },
@@ -190,6 +185,11 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
         var type = e.Channel is not null
             ? MessageReceivers.Group
             : MessageReceivers.Friend;
+
+        if (group?.Id == "244534796")
+        {
+            logger.LogInformation("Debug raw message: {}", e.Message);
+        }
         
         var message = new MessageChain(ConvertMessageToMirai(e.Message));
         foreach (var (next, _) in _subscriber)
