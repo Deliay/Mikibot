@@ -35,6 +35,8 @@ public class MiraiService : IDisposable, IMiraiService
             .Subscribe(next, token);
     }
 
+    public HttpClient HttpClient { get; } = new();
+
     public async ValueTask Run()
     {
         await Bot.LaunchAsync();

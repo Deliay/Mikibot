@@ -22,11 +22,9 @@ public class ImageProcessorService(IMiraiService miraiService, ILogger<ImageProc
         Configuration.Default.ImageFormatsManager.AddImageFormat(GifFormat.Instance);
     }
 
-    private readonly HttpClient httpClient = new();
-
     private async Task<ImageMessage> ProcessPixel(ImageMessage message, CancellationToken cancellationToken = default)
     {
-        await using var stream = await httpClient.GetStreamAsync(message.Url, cancellationToken);
+        await using var stream = await MiraiService.HttpClient.GetStreamAsync(message.Url, cancellationToken);
         var processor = ImageProcessorUtils.WrapStreamProcessor(PixelProcessor.Process);
         var data = await stream.ProcessImageFromStreamToDataUri(processor, cancellationToken);
         return new ImageMessage() { Base64 = data };

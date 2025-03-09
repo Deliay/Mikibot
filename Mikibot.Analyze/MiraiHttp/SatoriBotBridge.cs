@@ -75,6 +75,11 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
 
     private static MessageBase? ConvertSingleMessageElementToSatori(Element message)
     {
+        if (message is ResourceElement resource)
+        {
+            if (resource.Src.Contains("127.0.0.1")) resource.Src = new Uri(resource.Src).AbsolutePath;
+        }
+        
         return message switch
         {
             TextElement plain => new PlainMessage() { Text = plain.Text, },
@@ -134,6 +139,8 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
     private Login CurrentBot { get; set; }
 
     public string UserId => CurrentBot.SelfId!;
+
+    public HttpClient HttpClient { get; } = new() { BaseAddress = new Uri(EnvSatoriEndpoint) };
 
     public async ValueTask Run()
     {

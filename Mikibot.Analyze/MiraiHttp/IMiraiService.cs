@@ -6,6 +6,7 @@ namespace Mikibot.Analyze.MiraiHttp;
 
 public interface IMiraiService
 {
+    HttpClient HttpClient { get; }   
     ValueTask Run();
     ValueTask SendMessageToGroup(Group group, CancellationToken token, params MessageBase[] messages);
     public void SubscribeMessage(Action<GroupMessageReceiver> next, CancellationToken token);

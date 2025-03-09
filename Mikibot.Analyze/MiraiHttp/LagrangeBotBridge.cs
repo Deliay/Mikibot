@@ -86,7 +86,9 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger, ILogger<BotCon
             tcs.TrySetResult();
         }
     }
-    
+
+    public HttpClient HttpClient { get; } = new();
+
     public async ValueTask Run()
     {
         var botKeystore = await GetKeyStore();
