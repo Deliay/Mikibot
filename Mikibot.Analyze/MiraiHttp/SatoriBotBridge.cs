@@ -82,7 +82,7 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
             QuoteElement quote => new QuoteMessage()
             {
                 MessageId = quote.Id,
-                Origin = quote.ChildElements.Select(ConvertSingleMessageElementToSatori),
+                Origin = quote.ChildElements.Select(ConvertSingleMessageElementToSatori).ToList(),
             },
             _ => null
         };
