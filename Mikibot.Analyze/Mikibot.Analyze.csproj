@@ -32,6 +32,7 @@
 	<PackageReference Include="Mikibot.Crawler" Version="1.0.5" />
     <PackageReference Include="Lagrange.Core" Version="0.3.1" />
     <PackageReference Include="SatoriClient-ZeroAshUpdated" Version="1.0.0-alpha.3" />
+    <PackageReference Include="Sdcb.OpenCvSharp4.mini.runtime.debian.12-x64" Version="4.8.0.20231125" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
   </ItemGroup>
 
