@@ -44,11 +44,9 @@ public class ImageProcessorService(IMiraiService miraiService, ILogger<ImageProc
         var processor = GetProcessor(msg);
         if (processor is null) return;
 
-        IEnumerable<QuoteMessage?> quoteMessages = [message.MessageChain.GetQuoteMessage()];
-
         var imageMessages = message.MessageChain
-            .Concat(quoteMessages.Where(q => q is not null).SelectMany(q => q!.Origin))
             .OfType<ImageMessage>().ToList();
+        
         if (imageMessages.Count is 0 or > 10)
         {
             Logger.LogInformation("User triggered command, but no image message found in message chain! Count: {}",

@@ -58,7 +58,6 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
             } },
             ImageMessage { Base64.Length: > 0 } image => new ImageElement() { Src = image.Base64 },
             ImageMessage { Path.Length: > 0 } image => new ImageElement() { Src = image.Path },
-            SourceMessage { MessageId.Length : > 0 } source => new QuoteElement() {  Id = source.MessageId },
             AtMessage { Target.Length :> 0 } at => new AtElement() { Id = at.Target },
             QuoteMessage quote => new QuoteElement() { Id = quote.MessageId },
             ForwardMessage forward => ConvertForwardMessage(forward),
