@@ -19,11 +19,12 @@ public static class PixelProcessor
 
         using var edges = t.T(image.Canny(128, 200));
         using var kernel = t.T(Cv2.GetStructuringElement(MorphShapes.Rect, new Size(2, 2)));
+        Cv2.MorphologyEx(edges, edges, MorphTypes.Close, kernel, iterations: 1);
         using var dilatedEdges = t.T(edges.Dilate(kernel, iterations: 2));
 
         using var borderMask = t.T(edges.CvtColor(ColorConversionCodes.GRAY2BGR));
         using var originalColorEdges = t.T(image.BitwiseAnd(borderMask));
-        using var darkerEdges = t.T(originalColorEdges * 0.5);
+        using var darkerEdges = t.T(originalColorEdges * 0.25);
 
         darkerEdges.ToMat().CopyTo(image, edges);
 
