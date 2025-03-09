@@ -80,6 +80,11 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
             logger.LogInformation("Convert local resource address to remote: {}", resource.Src);
             if (resource.Src.Contains("127.0.0.1")) resource.Src = new Uri(resource.Src).AbsolutePath;
         }
+
+        if (message is QuoteElement _quote)
+        {
+            logger.LogInformation("Reply message source: {}", ElementSerializer.Serialize(_quote));
+        }
         
         return message switch
         {
@@ -107,7 +112,7 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
     {
         ArgumentNullException.ThrowIfNull(Bot);
         
-        await Bot.CreateMessageAsync(group.Id, ConvertMessageToSatori(messages));
+        await Bot.CreateMessageAsync(group.Id, ConvertMessageToSatori(messages), token);
     }
     
     private readonly Dictionary<Action<GroupMessageReceiver>, CancellationTokenRegistration> _subscriber = [];
