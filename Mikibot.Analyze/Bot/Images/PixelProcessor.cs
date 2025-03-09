@@ -38,10 +38,12 @@ public static class PixelProcessor
         var labels = t.NewMat();
         algorithm.GetLabels(labels);
         
-        var smallSize = new Size(scaleSize.Width * 0.25, scaleSize.Height * 0.25);
+        var smallSize = new Size(scaleSize.Width, scaleSize.Height);
+        if (smallSize.Width > 32) smallSize = new Size(32, smallSize.Height * (32D / smallSize.Width)); 
+        if (smallSize.Height > 32) smallSize = new Size(smallSize.Width * (32D / smallSize.Height), 32); 
         using var smallImage = t.T(image.Resize(smallSize, interpolation: InterpolationFlags.Linear));
         var lowPixelImage = t.T(smallImage.Resize(scaleSize, interpolation: InterpolationFlags.Nearest));
-        
+
         Enumerable.Range(0, labelCount).AsParallel().ForAll(label =>
         {
             using var mask = new Mat();
