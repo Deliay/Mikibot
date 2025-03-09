@@ -12,8 +12,8 @@ public static class PixelProcessor
         
         const double maxLenght = 512D;
         var scaleSize = new Size(srcImage.Width, srcImage.Height);
-        if (scaleSize.Width > 1000) scaleSize = new Size(maxLenght, scaleSize.Height * (maxLenght / scaleSize.Width)); 
-        if (scaleSize.Height > 1000) scaleSize = new Size(scaleSize.Width * (maxLenght / scaleSize.Height), maxLenght); 
+        if (scaleSize.Width > maxLenght) scaleSize = new Size(maxLenght, scaleSize.Height * (maxLenght / scaleSize.Width)); 
+        if (scaleSize.Height > maxLenght) scaleSize = new Size(scaleSize.Width * (maxLenght / scaleSize.Height), maxLenght); 
 
         var image = t.T(srcImage.Resize(scaleSize, interpolation: InterpolationFlags.Cubic));
 
@@ -37,10 +37,11 @@ public static class PixelProcessor
         var pixelImage = t.T(t.T(Mat.Zeros(image.Size(), image.Type())).ToMat());
         var labels = t.NewMat();
         algorithm.GetLabels(labels);
-        
+
+        const double lowSize = 128;
         var smallSize = new Size(scaleSize.Width, scaleSize.Height);
-        if (smallSize.Width > 32) smallSize = new Size(32, smallSize.Height * (32D / smallSize.Width)); 
-        if (smallSize.Height > 32) smallSize = new Size(smallSize.Width * (32D / smallSize.Height), 32); 
+        if (smallSize.Width > lowSize) smallSize = new Size(lowSize, smallSize.Height * (lowSize / smallSize.Width)); 
+        if (smallSize.Height > lowSize) smallSize = new Size(smallSize.Width * (lowSize / smallSize.Height), lowSize); 
         using var smallImage = t.T(image.Resize(smallSize, interpolation: InterpolationFlags.Linear));
         var lowPixelImage = t.T(smallImage.Resize(scaleSize, interpolation: InterpolationFlags.Nearest));
 
