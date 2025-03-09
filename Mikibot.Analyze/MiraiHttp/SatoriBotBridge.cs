@@ -79,6 +79,7 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
         {
             TextElement plain => new PlainMessage() { Text = plain.Text, },
             AtElement at => new AtMessage() { Target = at.Id },
+            ImageElement image => new ImageMessage() { Url = image.Src },
             QuoteElement quote => new QuoteMessage()
             {
                 MessageId = quote.Id,
