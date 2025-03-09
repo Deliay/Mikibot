@@ -1,4 +1,5 @@
 ﻿FROM mcr.microsoft.com/dotnet/runtime:9.0 AS base
+RUN apt install 
 USER $APP_UID
 WORKDIR /app
 
