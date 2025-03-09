@@ -20,6 +20,7 @@
     <PackageReference Include="NPOI" Version="2.7.2" />
     <PackageReference Include="OpenCvSharp4" Version="4.10.0.20241108" />
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.10.0.20241108" />
+    <PackageReference Include="OpenCvSharp4.official.runtime.linux-x64" Version="4.10.0.20241108" />
     <PackageReference Include="OpenCvSharp4.runtime.linux-x64" Version="4.10.0.20240717" />
 	  <PackageReference Include="Polly" Version="8.5.0" />
 	  <PackageReference Include="Mirai.Net" Version="2.5.2" />
@@ -32,7 +33,6 @@
 	<PackageReference Include="Mikibot.Crawler" Version="1.0.5" />
     <PackageReference Include="Lagrange.Core" Version="0.3.1" />
     <PackageReference Include="SatoriClient-ZeroAshUpdated" Version="1.0.0-alpha.3" />
-    <PackageReference Include="Sdcb.OpenCvSharp4.mini.runtime.debian.12-x64" Version="4.8.0.20231125" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
   </ItemGroup>
 
