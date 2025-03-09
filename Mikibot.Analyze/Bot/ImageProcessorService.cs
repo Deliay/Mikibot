@@ -23,7 +23,7 @@ public class ImageProcessorService(IMiraiService miraiService, ILogger<ImageProc
         Configuration.Default.ImageFormatsManager.AddImageFormat(GifFormat.Instance);
     }
 
-    private HttpClient httpClient = new();
+    private readonly HttpClient httpClient = new();
 
     private static Func<(int, Image), (int, Image)> WrapStreamProcessor(Func<ReadOnlySpan<byte>, ReadOnlySpan<byte>> processor)
     {
@@ -72,11 +72,11 @@ public class ImageProcessorService(IMiraiService miraiService, ILogger<ImageProc
     {
         if (image.Frames.Count > 1)
         {
-            return (new GifEncoder(), ProcessMultipleFrameImage(image, frameProcessor), "image/gif");
+            return (GifEncoder, ProcessMultipleFrameImage(image, frameProcessor), "image/gif");
         }
         else
         {
-            return (new PngEncoder(), frameProcessor((0, image)).Item2, "image/png");
+            return (PngEncoder, frameProcessor((0, image)).Item2, "image/png");
         }
     }
 

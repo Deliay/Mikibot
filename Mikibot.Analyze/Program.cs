@@ -60,6 +60,7 @@ appBuilder.RegisterType<PermissionService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<LlmChatbot>().AsSelf().SingleInstance();
 appBuilder.RegisterType<ChatHistoryService>().AsSelf().SingleInstance();
 appBuilder.RegisterType<ChatbotSwitchService>().AsSelf().SingleInstance();
+appBuilder.RegisterType<ImageProcessorService>().AsSelf().SingleInstance();
 
 appBuilder.RegisterType<Bili2233WorkService>().As<IBotChatService>().SingleInstance();
 appBuilder.RegisterType<DeepSeekChatService>().As<IBotChatService>().SingleInstance();
@@ -96,7 +97,7 @@ var foodDice = app.Resolve<FoodDiceService>();
 var chatBot = app.Resolve<LlmChatbot>();
 var chatHistory = app.Resolve<ChatHistoryService>();
 var chatBotSwitchService = app.Resolve<ChatbotManagerService>();
-// var voice = app.Resolve<AntiBoyFriendFanVoiceService>();
+var imageProcessorService = app.Resolve<ImageProcessorService>();
 
 logger.LogInformation("Starting schedule module...");
 await Task.WhenAll(
@@ -111,6 +112,6 @@ await Task.WhenAll(
     chatBot.Run(token),
     chatHistory.Run(token),
     chatBotSwitchService.Run(token),
-    // voice.Run(token),
+    imageProcessorService.Run(token),
 ]);
 

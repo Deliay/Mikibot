@@ -15,7 +15,7 @@ public static class PixelProcessor
         if (scaleSize.Width > 1000) scaleSize = new Size(maxLenght, scaleSize.Height * (maxLenght / scaleSize.Width)); 
         if (scaleSize.Height > 1000) scaleSize = new Size(scaleSize.Width * (maxLenght / scaleSize.Height), maxLenght); 
 
-        using var image = t.T(srcImage.Resize(scaleSize, interpolation: InterpolationFlags.Cubic));
+        var image = t.T(srcImage.Resize(scaleSize, interpolation: InterpolationFlags.Cubic));
 
         using var edges = t.T(image.Canny(128, 200));
         using var kernel = t.T(Cv2.GetStructuringElement(MorphShapes.Rect, new Size(2, 2)));
@@ -29,16 +29,14 @@ public static class PixelProcessor
 
         using var algorithm = t.T(SuperpixelSLIC.Create(image, regionSize: 5));
 
-        algorithm.Iterate(10);
+        algorithm.Iterate();
         algorithm.EnforceLabelConnectivity();
 
         var labelCount = algorithm.GetNumberOfSuperpixels();
 
-        using var pixelImage = t.T(t.T(Mat.Zeros(image.Size(), image.Type())).ToMat());
-
-        using var labels = t.NewMat();
+        var pixelImage = t.T(t.T(Mat.Zeros(image.Size(), image.Type())).ToMat());
+        var labels = t.NewMat();
         algorithm.GetLabels(labels);
-
         Enumerable.Range(0, labelCount).AsParallel().ForAll(label =>
         {
             using var mask = new Mat();
@@ -46,6 +44,10 @@ public static class PixelProcessor
             pixelImage[Cv2.BoundingRect(mask)].SetTo(Cv2.Mean(image, mask));
         });
 
+        using var disposePixelImage = pixelImage;
+        using var disposeLabels = labels;
+        using var disposeImage = image;
+        
         return pixelImage.ImEncode();
     }
 }
