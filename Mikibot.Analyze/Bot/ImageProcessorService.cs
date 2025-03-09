@@ -44,8 +44,7 @@ public class ImageProcessorService(IMiraiService miraiService, ILogger<ImageProc
         var processor = GetProcessor(msg);
         if (processor is null) return;
 
-        var imageMessages = message.MessageChain
-            .OfType<ImageMessage>().ToList();
+        var imageMessages = message.MessageChain.OfType<ImageMessage>().ToList();
         
         if (imageMessages.Count is 0 or > 10)
         {

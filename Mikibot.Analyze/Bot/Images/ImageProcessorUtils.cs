@@ -22,8 +22,14 @@ public static class ImageProcessorUtils
         };
     }
 
+    private static void CopyProperties(GifFrameMetadata src, GifFrameMetadata dest)
+    {
+        dest.DisposalMethod = GifDisposalMethod.RestoreToBackground;
+        dest.FrameDelay = src.FrameDelay;
+        dest.HasTransparency = src.HasTransparency;
+    }
 
-    public static Image ProcessMultipleFrameImage(Image image, Func<(int, Image), (int, Image)> frameProcessor)
+    private static Image ProcessMultipleFrameImage(Image image, Func<(int, Image), (int, Image)> frameProcessor)
     {
         var proceedImages = Enumerable.Range(0, image.Frames.Count)
             .Select(i => (i, image.Frames.CloneFrame(i)))
@@ -33,9 +39,17 @@ public static class ImageProcessorUtils
             .ToList();
         var templateFrame = proceedImages[0].Item2.Frames.CloneFrame(0);
     
+        var rootMetadata = templateFrame.Metadata.GetGifMetadata();
+        rootMetadata.RepeatCount = 0;
+        
+        var rootMetadataFrame = templateFrame.Frames.RootFrame.Metadata.GetGifMetadata();
+        CopyProperties(image.Frames.RootFrame.Metadata.GetGifMetadata(), rootMetadataFrame);
+
         foreach (var (index, proceedImage) in proceedImages[1..])
         {
             templateFrame.Frames.InsertFrame(index, proceedImage.Frames.RootFrame);
+            CopyProperties(image.Frames[index].Metadata.GetGifMetadata(),
+                templateFrame.Frames[index].Metadata.GetGifMetadata());
         }
 
         return templateFrame;

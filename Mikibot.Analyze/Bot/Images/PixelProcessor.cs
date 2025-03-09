@@ -27,7 +27,7 @@ public static class PixelProcessor
 
         darkerEdges.ToMat().CopyTo(image, edges);
 
-        using var algorithm = t.T(SuperpixelSLIC.Create(image, regionSize: 5));
+        using var algorithm = t.T(SuperpixelSLIC.Create(image, regionSize: 8));
 
         algorithm.Iterate();
         algorithm.EnforceLabelConnectivity();
@@ -37,16 +37,22 @@ public static class PixelProcessor
         var pixelImage = t.T(t.T(Mat.Zeros(image.Size(), image.Type())).ToMat());
         var labels = t.NewMat();
         algorithm.GetLabels(labels);
+        
+        var smallSize = new Size(scaleSize.Width * 0.25, scaleSize.Height * 0.25);
+        using var smallImage = t.T(image.Resize(smallSize, interpolation: InterpolationFlags.Linear));
+        var lowPixelImage = t.T(smallImage.Resize(scaleSize, interpolation: InterpolationFlags.Nearest));
+        
         Enumerable.Range(0, labelCount).AsParallel().ForAll(label =>
         {
             using var mask = new Mat();
             Cv2.Compare(labels, label, mask, CmpType.EQ);
-            pixelImage[Cv2.BoundingRect(mask)].SetTo(Cv2.Mean(image, mask));
+            pixelImage[Cv2.BoundingRect(mask)].SetTo(Cv2.Mean(lowPixelImage, mask));
         });
 
         using var disposePixelImage = pixelImage;
         using var disposeLabels = labels;
         using var disposeImage = image;
+        using var disposeLowPixelImage = lowPixelImage;
         
         return pixelImage.ImEncode();
     }
