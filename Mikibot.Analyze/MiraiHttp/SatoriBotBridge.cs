@@ -73,10 +73,11 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
             .OfType<Element>();
     }
 
-    private static MessageBase? ConvertSingleMessageElementToSatori(Element message)
+    private MessageBase? ConvertSingleMessageElementToSatori(Element message)
     {
         if (message is ResourceElement resource)
         {
+            logger.LogInformation("Convert local resource address to remote: {}", resource.Src);
             if (resource.Src.Contains("127.0.0.1")) resource.Src = new Uri(resource.Src).AbsolutePath;
         }
         
@@ -93,7 +94,7 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IMi
             _ => null
         };
     }
-    private static IEnumerable<MessageBase> ConvertMessageToMirai(Message e)
+    private IEnumerable<MessageBase> ConvertMessageToMirai(Message e)
     {
         var elements = ElementSerializer.Deserialize(e.Content);
         IEnumerable<MessageBase> source = [new SourceMessage() { MessageId = e.Id, }];
