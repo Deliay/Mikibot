@@ -1,4 +1,6 @@
-﻿using SixLabors.ImageSharp;
+﻿using Mikibot.Analyze.MiraiHttp;
+using Mirai.Net.Data.Messages.Concretes;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.Formats.Png;
@@ -22,13 +24,14 @@ public static class ImageSharpUtils
         };
     }
 
-    public static void CopyProperties(GifFrameMetadata src, GifFrameMetadata dest)
+    private static void CopyProperties(GifFrameMetadata src, GifFrameMetadata dest)
     {
         dest.DisposalMethod = GifDisposalMethod.RestoreToBackground;
         dest.FrameDelay = src.FrameDelay;
         dest.HasTransparency = src.HasTransparency;
     }
-    public static void CopyProperties(Frame src, GifFrameMetadata dest)
+
+    private static void CopyProperties(Frame src, GifFrameMetadata dest)
     {
         dest.DisposalMethod = GifDisposalMethod.RestoreToBackground;
         dest.FrameDelay = src.FrameDelay;
@@ -46,29 +49,11 @@ public static class ImageSharpUtils
             .Select(i => new Frame(i, src.Frames.CloneFrame(i)));
     }
     
-    public static Image ProcessMultipleFrameImage(Image image, Func<Frame, Frame> frameProcessor)
+    public static async ValueTask<Image> ReadImageAsync(this IMiraiService miraiService,
+        ImageMessage message, CancellationToken cancellationToken = default)
     {
-        var proceedImages = image.GetFrames()
-            .AsParallel()
-            .Select(frameProcessor)
-            .OrderBy(f => f.Index)
-            .ToList();
-        var templateFrame = proceedImages[0].Image.Frames.CloneFrame(0);
-    
-        var rootMetadata = templateFrame.Metadata.GetGifMetadata();
-        rootMetadata.RepeatCount = 0;
-        
-        var rootMetadataFrame = templateFrame.Frames.RootFrame.Metadata.GetGifMetadata();
-        CopyProperties(image.Frames.RootFrame.Metadata.GetGifMetadata(), rootMetadataFrame);
-
-        foreach (var (index, proceedImage, _, _) in proceedImages[1..])
-        {
-            templateFrame.Frames.InsertFrame(index, proceedImage.Frames.RootFrame);
-            CopyProperties(image.Frames[index].Metadata.GetGifMetadata(),
-                templateFrame.Frames[index].Metadata.GetGifMetadata());
-        }
-
-        return templateFrame;
+        await using var stream = await miraiService.HttpClient.GetStreamAsync(message.Url, cancellationToken);
+        return await Image.LoadAsync(stream, cancellationToken);
     }
     
     public static async ValueTask<Image> ProcessMultipleFrameImageAsync(Image image,
@@ -102,40 +87,19 @@ public static class ImageSharpUtils
         return templateFrame;
     }
 
-    private static readonly GifEncoder GifEncoder = new();
-    private static readonly PngEncoder PngEncoder = new();
-    
     private static string BuildDataUri(string mimeType, string base64Data)
     {
         return $"data:{mimeType};base64,{base64Data}";
     }
 
-    private static ImageProcessResult ProcessImage(Image image,
-        Func<Frame, Frame> frameProcessor)
+
+    public static async ValueTask<string> ToDataUri(this ImageProcessResult result,
+        CancellationToken cancellationToken = default)
     {
-        if (image.Frames.Count > 1)
-        {
-            return ImageProcessResult.Gif(ProcessMultipleFrameImage(image, frameProcessor));
-        }
-        else
-        {
-            return ImageProcessResult.Png(frameProcessor(Frame.Single(image)).Image);
-        }
+        await using var afterStream = new MemoryStream();
+        await result.Image.SaveAsync(afterStream, result.Encoder, cancellationToken);
+        afterStream.Position = 0;
+        return BuildDataUri(result.MimeType, Convert.ToBase64String(afterStream.ToArray()));
     }
     
-    public static async ValueTask<string> ProcessImageFromStreamToDataUri(this Stream stream,
-        Func<Frame, Frame> frameProcessor,
-        CancellationToken cancellationToken)
-    {
-        using var image = await Image.LoadAsync(stream, cancellationToken);
-        var (encoder, newImage, mimeType) = ProcessImage(image, frameProcessor);
-        using var afterImage = newImage;
-        await using var afterStream = new MemoryStream();
-        await newImage.SaveAsync(afterStream, encoder, cancellationToken);
-        afterStream.Position = 0;
-        var base64String = Convert.ToBase64String(afterStream.ToArray());
-
-        return BuildDataUri(mimeType, base64String);
-    }
-
 }

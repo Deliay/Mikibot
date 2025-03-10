@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Mikibot.Analyze.Bot.Images;
+using Mikibot.Analyze.Bot.Images.Meme;
 using Mikibot.Analyze.Generic;
 using Mikibot.Analyze.MiraiHttp;
 using Mirai.Net.Data.Messages;
@@ -22,27 +23,26 @@ public class ImageProcessorService(IMiraiService miraiService, ILogger<ImageProc
         Configuration.Default.ImageFormatsManager.AddImageFormat(GifFormat.Instance);
     }
 
-    private async Task<ImageMessage> ProcessPixel(ImageMessage message, CancellationToken cancellationToken = default)
+    private Dictionary<string, IImageProcessor> _memeProcessors = [];
+    
+    protected override async ValueTask PreRun(CancellationToken token)
     {
-        Logger.LogInformation("Requesting resource form {}", message.Url);
-        await using var stream = await MiraiService.HttpClient.GetStreamAsync(message.Url, cancellationToken);
-        var processor = ImageSharpUtils.UseRawDataProcessor(OpenCvUtils.Process);
-        var data = await stream.ProcessImageFromStreamToDataUri(processor, cancellationToken);
-        return new ImageMessage() { Base64 = data };
+        _memeProcessors.Add("/像素化", new PixelateProcessor());
+        _memeProcessors.Add("/像素化v2", new PixelateV2Processor());
+        _memeProcessors.Add("/射", new Shoot());
+        
+        foreach (var processor in _memeProcessors.Values)
+        {
+            await processor.InitializeAsync(token);
+        }
     }
 
-    private Func<ImageMessage, CancellationToken, Task<ImageMessage>>? GetProcessor(string command)
-    {
-        if (command.StartsWith("/像素化")) return ProcessPixel;
-        else return null;
-    }
-    
     protected override async ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
     {
         var msg = message.MessageChain.GetPlainMessage();
         
-        var processor = GetProcessor(msg);
-        if (processor is null) return;
+        
+        if (!_memeProcessors.TryGetValue(msg.Trim(), out var processor)) return;
 
         var imageMessages = message.MessageChain.OfType<ImageMessage>().ToList();
         
@@ -53,7 +53,13 @@ public class ImageProcessorService(IMiraiService miraiService, ILogger<ImageProc
             return;
         }
 
-        var processTasks = imageMessages.Select(imageMessage => processor(imageMessage, token));
+        var processTasks = imageMessages.Select(async imageMessage =>
+        {
+            using var image = await MiraiService.ReadImageAsync(imageMessage, token);
+            using var result = await processor.ProcessImage(image, message.MessageChain, token);
+
+            return new ImageMessage() { Base64 = await result.ToDataUri(token) };
+        });
         
         MessageBase[] result = await Task.WhenAll(processTasks);
         
