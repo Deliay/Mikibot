@@ -1,15 +1,17 @@
-﻿namespace Mikibot.Analyze.Bot.Images;
+﻿using SixLabors.ImageSharp.Processing;
+
+namespace Mikibot.Analyze.Bot.Images;
 
 public static class EnumerationUtils
 {
-    public static IEnumerable<T> Loop<T>(this IEnumerable<T> source, int times = 999)
+    public static IEnumerable<Frame> Loop(this IEnumerable<Frame> source, int times = 999)
     {
-        List<T> cache = [];
-
+        List<Frame> cache = [];
+        int index = 1;
         foreach (var item in source)
         {
             cache.Add(item);
-            yield return item;
+            yield return item with { Index = index++ };
         }
 
         var currentTimes = 0;
@@ -17,7 +19,7 @@ public static class EnumerationUtils
         {
             foreach (var item in cache)
             {
-                yield return item;
+                yield return item with { Index = index++, Image = item.Image.Clone((_) => {})};
             }
         }
     }
@@ -34,8 +36,8 @@ public static class EnumerationUtils
         return (a * b) / gcd;
     }
 
-    public static IEnumerable<(T a, T b)> LoopZip<T>(this IEnumerable<T> first,
-        IEnumerable<T> second, int secondMinimalKeepCount)
+    public static IEnumerable<(Frame a, Frame b)> LoopZip(this IEnumerable<Frame> first,
+        IEnumerable<Frame> second, int secondMinimalKeepCount)
     {
         var firstSeq = first.ToList();
         var secondSeq = second.ToList();
@@ -48,9 +50,9 @@ public static class EnumerationUtils
 
         var loopTimes = (total / shortSeq.Count) - 1;
 
-        var frames = firstSeq.Count > secondSeq.Count
+        var frames = (firstSeq.Count > secondSeq.Count
             ? firstSeq.Zip(secondSeq.Loop(loopTimes))
-            : firstSeq.Loop(loopTimes).Zip(secondSeq);
+            : firstSeq.Loop(loopTimes).Zip(secondSeq)).ToList();
         
         foreach (var tuple in frames)
         {

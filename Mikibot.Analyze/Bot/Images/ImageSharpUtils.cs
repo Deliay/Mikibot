@@ -13,14 +13,14 @@ public static class ImageSharpUtils
     {
         return frame =>
         {
-            var (index, img, _, _) = frame;
+            var (index, img, _) = frame;
             using var frameImage = img;
             using var before = new MemoryStream();
             frameImage.SaveAsPng(before);
 
             before.Position = 0;
             var after = processor(before.ToArray());
-            return new Frame(index, Image.Load(after));
+            return Frame.Of(index, Image.Load(after));
         };
     }
 
@@ -29,24 +29,30 @@ public static class ImageSharpUtils
         dest.DisposalMethod = GifDisposalMethod.RestoreToBackground;
         dest.FrameDelay = src.FrameDelay;
         dest.HasTransparency = src.HasTransparency;
+        dest.LocalColorTable = src.LocalColorTable;
+        dest.TransparencyIndex = src.TransparencyIndex;
+        dest.ColorTableMode = src.ColorTableMode;
     }
 
     private static void CopyProperties(Frame src, GifFrameMetadata dest)
     {
-        dest.DisposalMethod = GifDisposalMethod.RestoreToBackground;
-        dest.FrameDelay = src.FrameDelay;
-        dest.HasTransparency = src.HasTransparency;
+        CopyProperties(src.Metadata, dest);
     }
     public static void CopyProperties(Frame src, ImageFrame dest)
     {
         CopyProperties(src, dest.Metadata.GetGifMetadata());
     }
 
+    public static Frame Copy(this ImageFrameCollection frameCollection, int i)
+    {
+        var frame = frameCollection.CloneFrame(i);
+        var gifFrameMetadata = (GifFrameMetadata)frameCollection[i].Metadata.GetGifMetadata().DeepClone();
+        return new Frame(i, frame, gifFrameMetadata);
+    }
+    
     public static IEnumerable<Frame> GetFrames(this Image src)
     {
-        return Enumerable
-            .Range(0, src.Frames.Count)
-            .Select(i => new Frame(i, src.Frames.CloneFrame(i)));
+        return Enumerable.Range(0, src.Frames.Count).Select(i => src.Frames.Copy(i));
     }
     
     public static async ValueTask<Image> ReadImageAsync(this IMiraiService miraiService,
@@ -61,7 +67,7 @@ public static class ImageSharpUtils
         CancellationToken cancellationToken = default)
     {
         var proceedImages = await Enumerable.Range(0, image.Frames.Count)
-            .Select(i => new Frame(i, image.Frames.CloneFrame(i)))
+            .Select(i => image.Frames.Copy(i))
             .AsParallel()
             .Select(frameProcessor)
             .ToAsyncEnumerable()
@@ -77,7 +83,7 @@ public static class ImageSharpUtils
         var rootMetadataFrame = templateFrame.Frames.RootFrame.Metadata.GetGifMetadata();
         CopyProperties(image.Frames.RootFrame.Metadata.GetGifMetadata(), rootMetadataFrame);
 
-        foreach (var (index, proceedImage, _, _) in proceedImages[1..])
+        foreach (var (index, proceedImage, _) in proceedImages[1..]) using (proceedImage)
         {
             templateFrame.Frames.InsertFrame(index, proceedImage.Frames.RootFrame);
             CopyProperties(image.Frames[index].Metadata.GetGifMetadata(),

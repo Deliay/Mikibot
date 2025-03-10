@@ -20,9 +20,12 @@ public abstract class AbstractZipGifMemeProcessor : AbstractTimelineProcessor
         var minimalSeqCount = await GetMinimalSequenceKeepAsync();
 
         var frameIndex = 0;
-        foreach (var (srcFrame, memeFrame) in srcFrames.LoopZip(memeFrames, minimalSeqCount))
+        foreach (var (srcFrame, memeFrame) in srcFrames.LoopZip(memeFrames, minimalSeqCount)) using (srcFrame) using (memeFrame)
         {
-            yield return new Frame(frameIndex++, await MergeAsync(srcFrame.Image, memeFrame.Image, cancellationToken));
+            yield return new Frame(
+                frameIndex++, 
+                await MergeAsync(srcFrame.Image, memeFrame.Image, cancellationToken),
+                srcFrame.Metadata);
         }
     }
 }

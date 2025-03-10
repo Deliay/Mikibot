@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace Mikibot.Analyze.Bot.Images;
 
@@ -15,19 +16,21 @@ public static class FrameUtils
         var fileIndex = 1;
         foreach (var file in enumerateFiles)
         {
-            yield return new Frame(fileIndex++, await Image.LoadAsync(file, cancellationToken));
+            yield return Frame.Of(fileIndex++, await Image.LoadAsync(file, cancellationToken));
         }
     }
 
-    public static IEnumerable<Frame> Slow(this IEnumerable<Frame> src, int times)
+    public static async IAsyncEnumerable<Frame> Slow(this IAsyncEnumerable<Frame> src, int times)
     {
-        var newIndex = 1;
-        foreach (var frame in src)
+        var index = 1;
+        await foreach (var frame in src)
         {
+            yield return frame with { Index = index++ };
             for (var i = 0; i < times; i++)
             {
-                yield return new Frame(newIndex++, frame.Image);
+                yield return frame with { Index = index++, Image = frame.Image.Clone((_) => {})};
             }
         }
+        
     }
 }

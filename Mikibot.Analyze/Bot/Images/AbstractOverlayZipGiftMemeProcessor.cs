@@ -9,8 +9,6 @@ public abstract class AbstractOverlayZipGiftMemeProcessor : AbstractZipGifMemePr
     protected override ValueTask<Image> MergeAsync(Image src, Image meme, CancellationToken cancellationToken = default)
     {
         meme.Mutate(ctx => ctx.Resize(src.Size));
-        src.Mutate(ctx => ctx.DrawImage(meme, 1));
-        
-        return ValueTask.FromResult(src);
+        return ValueTask.FromResult(src.Clone(ctx => ctx.DrawImage(meme, 1f)));
     }
 }

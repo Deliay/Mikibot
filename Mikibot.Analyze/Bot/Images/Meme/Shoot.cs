@@ -4,21 +4,16 @@ public class Shoot : AbstractOverlayZipGiftMemeProcessor
 {
     protected override IAsyncEnumerable<Frame> GetMemeSequenceAsync()
     {
-        return _frames.ToAsyncEnumerable();
+        return FrameUtils.LoadFromMemeResourceFolderAsync(nameof(Shoot).ToLower()).Slow(1);
     }
 
     protected override ValueTask<int> GetMinimalSequenceKeepAsync()
     {
         return ValueTask.FromResult(20);
     }
-
-    private readonly List<Frame> _frames = [];
     
-    public override async ValueTask<bool> InitializeAsync(CancellationToken cancellationToken)
+    public override ValueTask<bool> InitializeAsync(CancellationToken cancellationToken)
     {
-        _frames.AddRange((await FrameUtils.LoadFromMemeResourceFolderAsync(nameof(Shoot).ToLower(), cancellationToken)
-            .ToListAsync(cancellationToken)).Slow(2));
-        
-        return _frames.Count > 0;
+        return ValueTask.FromResult(true);
     }
 }

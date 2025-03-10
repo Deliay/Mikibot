@@ -23,7 +23,7 @@ public class ImageProcessorService(IMiraiService miraiService, ILogger<ImageProc
         Configuration.Default.ImageFormatsManager.AddImageFormat(GifFormat.Instance);
     }
 
-    private Dictionary<string, IImageProcessor> _memeProcessors = [];
+    private readonly Dictionary<string, IImageProcessor> _memeProcessors = [];
     
     protected override async ValueTask PreRun(CancellationToken token)
     {
