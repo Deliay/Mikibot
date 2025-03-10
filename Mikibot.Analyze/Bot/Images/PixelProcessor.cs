@@ -24,7 +24,7 @@ public static class PixelProcessor
 
         using var borderMask = t.T(edges.CvtColor(ColorConversionCodes.GRAY2BGR));
         using var originalColorEdges = t.T(image.BitwiseAnd(borderMask));
-        using var darkerEdges = t.T(originalColorEdges * 0.25);
+        using var darkerEdges = t.T(originalColorEdges * 0.7);
 
         darkerEdges.ToMat().CopyTo(image, edges);
 
