@@ -5,7 +5,7 @@ namespace Mikibot.Analyze.Bot.Images;
 
 public abstract class AbstractPreFrameProcessor : IImageProcessor
 {
-    public abstract ValueTask<bool> InitializeAsync(CancellationToken cancellationToken);
+    public abstract ValueTask<bool> InitializeAsync(CancellationToken cancellationToken = default);
     protected abstract ValueTask<Frame> ProcessFrame(Frame src, MessageChain messages);
 
     public async ValueTask<ImageProcessResult> ProcessImage(Image image,
