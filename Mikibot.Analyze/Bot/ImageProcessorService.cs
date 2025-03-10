@@ -26,7 +26,7 @@ public class ImageProcessorService(IMiraiService miraiService, ILogger<ImageProc
     {
         Logger.LogInformation("Requesting resource form {}", message.Url);
         await using var stream = await MiraiService.HttpClient.GetStreamAsync(message.Url, cancellationToken);
-        var processor = ImageProcessorUtils.WrapStreamProcessor(PixelProcessor.Process);
+        var processor = ImageSharpUtils.UseRawDataProcessor(OpenCvUtils.Process);
         var data = await stream.ProcessImageFromStreamToDataUri(processor, cancellationToken);
         return new ImageMessage() { Base64 = data };
     }
