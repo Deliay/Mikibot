@@ -30,6 +30,7 @@ public class ImageProcessorService(IMiraiService miraiService, ILogger<ImageProc
         _memeProcessors.Add("/像素化", new PixelateProcessor());
         _memeProcessors.Add("/像素化v2", new PixelateV2Processor());
         _memeProcessors.Add("/射", new Shoot());
+        _memeProcessors.Add("/打", new Jerk());
         
         foreach (var processor in _memeProcessors.Values)
         {
