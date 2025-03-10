@@ -18,10 +18,12 @@ public abstract class AbstractTimelineProcessor : IImageProcessor
         {
             case > 1:
             {
-                var template = frames[0].Image.Frames.CloneFrame(0);
-                ImageSharpUtils.CopyProperties(frames[0], template.Frames.RootFrame);
+                using var initFrame = frames[0];
+                var template = initFrame.Image.Frames.CloneFrame(0);
+                template.Metadata.GetGifMetadata().RepeatCount = 0;
+                ImageSharpUtils.CopyProperties(initFrame, template.Frames.RootFrame);
             
-                foreach (var frame in frames[1..])
+                foreach (var frame in frames[1..]) using (frame)
                 {
                     template.Frames.InsertFrame(frame.Index, frame.Image.Frames.RootFrame);
                     ImageSharpUtils.CopyProperties(frame, template.Frames[frame.Index]);
@@ -30,7 +32,10 @@ public abstract class AbstractTimelineProcessor : IImageProcessor
                 return ImageProcessResult.Gif(template);
             }
             case 1:
-                return ImageProcessResult.Png(frames[0].Image);
+            {
+                using var initFrame = frames[0];
+                return ImageProcessResult.Png(initFrame.Image);
+            }
             default:
                 throw new InvalidOperationException("Invalid number of frames");
         }
