@@ -10,7 +10,7 @@ public abstract class AbstractZipGifMemeProcessor : AbstractTimelineProcessor
     
     protected abstract ValueTask<int> GetMinimalSequenceKeepAsync();
     
-    protected abstract ValueTask<Image> MergeAsync(Image src, Image meme, CancellationToken cancellationToken = default);
+    protected abstract ValueTask<Image> MergeAsync(int frameIndex, Image src, Image meme, CancellationToken cancellationToken = default);
     
     protected override async IAsyncEnumerable<Frame> GetFrameSequence(Image src, MessageChain messages,
         [EnumeratorCancellation] CancellationToken cancellationToken)
@@ -24,7 +24,7 @@ public abstract class AbstractZipGifMemeProcessor : AbstractTimelineProcessor
         {
             yield return new Frame(
                 frameIndex++, 
-                await MergeAsync(srcFrame.Image, memeFrame.Image, cancellationToken),
+                await MergeAsync(frameIndex, srcFrame.Image, memeFrame.Image, cancellationToken),
                 srcFrame.Metadata);
         }
     }
