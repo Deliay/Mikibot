@@ -31,6 +31,7 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
         _memeProcessors.Add("/像素化v2", new PixelateV2Processor());
         _memeProcessors.Add("/射", new Shoot());
         _memeProcessors.Add("/打", new Jerk());
+        _memeProcessors.Add("/结婚", new Marry());
         
         foreach (var processor in _memeProcessors.Values)
         {

@@ -24,7 +24,7 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
     private ILifetimeScope _makabakaScope = null!;
     private IBotContext _botContext = null!;
 
-    private static HttpClient MakeTls12SupportHttpClient()
+    private static HttpClient MakeInsecureSslSupportHttpClient()
     {
         var socketsHttpHandler = new SocketsHttpHandler();
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
@@ -39,7 +39,7 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
         return new HttpClient(socketsHttpHandler);
     }
 
-    public HttpClient HttpClient { get; } = MakeTls12SupportHttpClient();
+    public HttpClient HttpClient { get; } = MakeInsecureSslSupportHttpClient();
     
     private Task? _botRunTask;
     public ValueTask Run(CancellationToken cancellationToken = default)

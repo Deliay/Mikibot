@@ -140,4 +140,8 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="resources\meme\marry\" />
+  </ItemGroup>
+
 </Project>

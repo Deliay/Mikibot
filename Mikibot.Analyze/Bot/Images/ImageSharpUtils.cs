@@ -6,6 +6,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Processing;
 
 namespace Mikibot.Analyze.Bot.Images;
 
@@ -50,6 +51,17 @@ public static class ImageSharpUtils
         var frame = frameCollection.CloneFrame(i);
         var gifFrameMetadata = (GifFrameMetadata)frameCollection[i].Metadata.GetGifMetadata().DeepClone();
         return new Frame(i, frame, gifFrameMetadata);
+    }
+
+    public static IImageProcessingContext StableWith(this IImageProcessingContext ctx, Size size)
+    {
+        var targetSize = ctx.GetCurrentSize();
+        targetSize = new Size(size.Width, Convert.ToInt32(1f * size.Width / targetSize.Width * targetSize.Height));
+        targetSize = new Size(Convert.ToInt32(1f * size.Height / targetSize.Height * targetSize.Width), size.Height);
+        
+        ctx.Resize(targetSize);
+
+        return ctx;
     }
     
     public static IEnumerable<Frame> GetFrames(this Image src)
