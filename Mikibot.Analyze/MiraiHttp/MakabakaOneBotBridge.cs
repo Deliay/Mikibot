@@ -118,6 +118,10 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
         var senderId = e.UserId.ToString();
         var groupId = e.GroupId.ToString();
 
+        var msgChain = new MessageChain(await Convert(e.Message).ToListAsync())
+        {
+            new SourceMessage() { MessageId = e.MessageId.ToString() },
+        };
         return new GroupMessageReceiver()
         {
             Sender = new Member()
@@ -126,7 +130,7 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
                 Group = new Group() { Id = groupId},
                 Name = e.Sender?.Nickname,
             },
-            MessageChain = new MessageChain(await Convert(e.Message).ToListAsync()),
+            MessageChain = msgChain,
             Type = MessageReceivers.Group
         };
     }
