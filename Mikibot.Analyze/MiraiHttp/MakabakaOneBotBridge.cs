@@ -20,7 +20,7 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
 {
     private ILifetimeScope _makabakaScope = null!;
     private IBotContext _botContext = null!;
-    public HttpClient HttpClient { get; } = new();
+    public HttpClient HttpClient { get; private set; }
     private Task? _botRunTask;
     public ValueTask Run(CancellationToken cancellationToken = default)
     {
@@ -44,6 +44,7 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
         _botContext.OnGroupMessage += BotContextOnOnGroupMessage;
         
         _botRunTask = bot.StartAsync(cancellationToken);
+        
         return ValueTask.CompletedTask;
     }
 
@@ -93,7 +94,10 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
                     yield return new AtMessage(atSegment.Data.QQ);
                     break;
                 case ImageSegment imageSegment:
-                    Console.WriteLine(JsonSerializer.Serialize(imageSegment.Data));
+                    yield return new ImageMessage()
+                    {
+                        Url = imageSegment.Data.File,
+                    };
                     break;
                 case ReplySegment replySegment:
                 {
