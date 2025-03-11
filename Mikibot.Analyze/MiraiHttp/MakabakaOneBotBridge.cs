@@ -30,9 +30,12 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
             .Build();
         services.AddSingleton(config);
         services.AddSingleton<IConfiguration>(config);
-        services.AddSingleton<IServiceProvider>(sp => new AutofacServiceProvider(sp.GetRequiredService<ILifetimeScope>()));
         
-        _makabakaScope = scope.BeginLifetimeScope(c => c.Populate(services));
+        _makabakaScope = scope.BeginLifetimeScope(c =>
+        {
+            c.Register(ctx => new AutofacServiceProvider(ctx.Resolve<ILifetimeScope>())).As<IServiceProvider>();
+            c.Populate(services);
+        });
         _botContext = _makabakaScope.Resolve<IBotContext>();
         _botContext.OnGroupMessage += BotContextOnOnGroupMessage;
         return ValueTask.CompletedTask;
