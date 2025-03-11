@@ -25,15 +25,16 @@ appBuilder.RegisterType<MikibotDatabaseContext>().AsSelf().InstancePerDependency
 
 appBuilder.Register((_) => MiraiBotConfig.FromEnviroment());
 // #if DEBUG
-// appBuilder.RegisterType<ConsoleMiraiService>().As<IMiraiService>().SingleInstance();
+// appBuilder.RegisterType<ConsoleMiraiService>().As<IQqService>().SingleInstance();
 // appBuilder.RegisterType<LocalOssService>().As<IOssService>().SingleInstance();
 // // appBuilder.RegisterType<ConsoleEmailService>().As<IEmailService>().SingleInstance();
-// // appBuilder.RegisterType<LagrangeBotBridge>().As<IMiraiService>().SingleInstance();
+// // appBuilder.RegisterType<LagrangeBotBridge>().As<IQqService>().SingleInstance();
 // #else
-// appBuilder.RegisterType<LagrangeBotBridge>().As<IMiraiService>().SingleInstance();
-// appBuilder.RegisterType<MiraiService>().As<IMiraiService>().SingleInstance();
-appBuilder.RegisterType<SatoriBotBridge>().As<IMiraiService>().SingleInstance();
+// appBuilder.RegisterType<LagrangeBotBridge>().As<IQqService>().SingleInstance();
+// appBuilder.RegisterType<MiraiService>().As<IQqService>().SingleInstance();
+// appBuilder.RegisterType<SatoriBotBridge>().As<IQqService>().SingleInstance();
 // appBuilder.RegisterType<LocalOssService>().As<IOssService>().SingleInstance();
+appBuilder.RegisterType<MakabakaOneBotBridge>().As<IQqService>().SingleInstance();
 // appBuilder.RegisterType<ConsoleEmailService>().As<IEmailService>().SingleInstance();
 // #endif
 
@@ -83,8 +84,8 @@ logger.LogInformation("Initializing database connection and database structure")
 await db.Database.MigrateAsync(token);
 logger.LogInformation("Done");
 
-var mirai = app.Resolve<IMiraiService>();
-logger.LogInformation("Initializing mirai service...");
+var mirai = app.Resolve<IQqService>();
+logger.LogInformation("Initializing qq service...");
 await mirai.Run();
 
 var statusCrawler = app.Resolve<LiveStatusCrawlService>();

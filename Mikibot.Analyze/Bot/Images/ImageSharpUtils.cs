@@ -1,4 +1,6 @@
-﻿using Mikibot.Analyze.MiraiHttp;
+﻿using System.Diagnostics.CodeAnalysis;
+using Mikibot.Analyze.MiraiHttp;
+using Mikibot.Analyze.Utils;
 using Mirai.Net.Data.Messages.Concretes;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
@@ -55,10 +57,10 @@ public static class ImageSharpUtils
         return Enumerable.Range(0, src.Frames.Count).Select(i => src.Frames.Copy(i));
     }
     
-    public static async ValueTask<Image> ReadImageAsync(this IMiraiService miraiService,
+    public static async ValueTask<Image> ReadImageAsync(this IQqService qqService,
         ImageMessage message, CancellationToken cancellationToken = default)
     {
-        await using var stream = await miraiService.HttpClient.GetStreamAsync(message.Url, cancellationToken);
+        await using var stream = await qqService.HttpClient.GetStreamAsync(message.Url, cancellationToken);
         return await Image.LoadAsync(stream, cancellationToken);
     }
     
@@ -93,19 +95,13 @@ public static class ImageSharpUtils
         return templateFrame;
     }
 
-    private static string BuildDataUri(string mimeType, string base64Data)
-    {
-        return $"data:{mimeType};base64,{base64Data}";
-    }
-
-
     public static async ValueTask<string> ToDataUri(this ImageProcessResult result,
         CancellationToken cancellationToken = default)
     {
         await using var afterStream = new MemoryStream();
         await result.Image.SaveAsync(afterStream, result.Encoder, cancellationToken);
         afterStream.Position = 0;
-        return BuildDataUri(result.MimeType, Convert.ToBase64String(afterStream.ToArray()));
+        return DataUri.Build(result.MimeType, Convert.ToBase64String(afterStream.ToArray()));
     }
     
 }

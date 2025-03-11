@@ -11,12 +11,12 @@ using Mirai.Net.Data.Shared;
 namespace Mikibot.Analyze.Bot;
 
 public class BiliBiliVideoLinkShareProxyService(
-    IMiraiService miraiService,
+    IQqService qqService,
     ILogger<BiliBiliVideoLinkShareProxyService> logger,
     PermissionService permissions,
     HttpClient client,
     BiliVideoCrawler crawler)
-    : MiraiGroupMessageProcessor<BiliBiliVideoLinkShareProxyService>(miraiService, logger)
+    : MiraiGroupMessageProcessor<BiliBiliVideoLinkShareProxyService>(qqService, logger)
 {
     private async ValueTask TrySend(Group group, string? bv, string? av, CancellationToken token)
     {
@@ -24,7 +24,7 @@ public class BiliBiliVideoLinkShareProxyService(
         {
             var result = await crawler.GetVideoInfo(bv, av == null ? null : int.Parse(av!), token);
 
-            await MiraiService.SendMessageToGroup(group, token,
+            await QqService.SendMessageToGroup(group, token,
             [
                 new ImageMessage()
                 {
@@ -85,7 +85,7 @@ public class BiliBiliVideoLinkShareProxyService(
         var author = infoList[3];
         var atImage = image.IndexOf('@', StringComparison.InvariantCulture);
         var fullImage = atImage > 0 ? image[..atImage] : image; 
-        await MiraiService.SendMessageToGroup(group, token,
+        await QqService.SendMessageToGroup(group, token,
         [
             new ImageMessage()
             {

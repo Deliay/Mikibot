@@ -8,7 +8,7 @@ using System.Reactive.Linq;
 
 namespace Mikibot.Analyze.MiraiHttp;
 
-public class MiraiService : IDisposable, IMiraiService
+public class MiraiService : IDisposable, IQqService
 {
     private MiraiBot Bot { get; }
     public ILogger<MiraiService> Logger { get; }
@@ -74,34 +74,10 @@ public class MiraiService : IDisposable, IMiraiService
         }
     }
 
-    private static readonly HashSet<string> allowGroups = new()
-    {
-        "314503649",
-        "139528984"
-    };
-
-    public async ValueTask SendMessageToAllGroup(CancellationToken token, params MessageBase[] messages)
-    {
-        foreach (var group in Bot.Groups.Value)
-        {
-#if DEBUG
-            if (group.Id != "139528984") continue;
-#endif
-            if (token.IsCancellationRequested) break;
-
-            if (allowGroups.Contains(group.Id)) {
-                await SendMessageToGroup(group, token, messages);
-            }
-        }
-    }
-        
     public async ValueTask<Dictionary<string, string>> SendMessageToSomeGroup(HashSet<string> groupIds, CancellationToken token, params MessageBase[] messages)
     {
         foreach (var group in Bot.Groups.Value)
         {
-#if DEBUG
-            if (group.Id != "139528984") continue;
-#endif
             if (token.IsCancellationRequested) break;
 
             if (groupIds.Contains(group.Id)) {

@@ -14,10 +14,10 @@ using System.Threading.Tasks;
 namespace Mikibot.Analyze.Bot;
 
 internal class ChatHistoryService(
-    IMiraiService miraiService,
+    IQqService qqService,
     ILogger<ChatHistoryService> logger,
     MikibotDatabaseContext db)
-    : MiraiGroupMessageProcessor<ChatHistoryService>(miraiService, logger)
+    : MiraiGroupMessageProcessor<ChatHistoryService>(qqService, logger)
 {
     protected override async ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
     {

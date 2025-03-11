@@ -13,8 +13,8 @@ using SixLabors.ImageSharp.Formats.Png;
 
 namespace Mikibot.Analyze.Bot;
 
-public class ImageProcessorService(IMiraiService miraiService, ILogger<ImageProcessorService> logger)
-    : MiraiGroupMessageProcessor<ImageProcessorService>(miraiService, logger)
+public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorService> logger)
+    : MiraiGroupMessageProcessor<ImageProcessorService>(qqService, logger)
 {
     static ImageProcessorService()
     {
@@ -56,7 +56,7 @@ public class ImageProcessorService(IMiraiService miraiService, ILogger<ImageProc
 
         var processTasks = imageMessages.Select(async imageMessage =>
         {
-            using var image = await MiraiService.ReadImageAsync(imageMessage, token);
+            using var image = await QqService.ReadImageAsync(imageMessage, token);
             using var result = await processor.ProcessImage(image, message.MessageChain, token);
 
             return new ImageMessage() { Base64 = await result.ToDataUri(token) };
@@ -64,6 +64,6 @@ public class ImageProcessorService(IMiraiService miraiService, ILogger<ImageProc
         
         MessageBase[] result = await Task.WhenAll(processTasks);
         
-        await MiraiService.SendMessageToSomeGroup([message.Sender.Group.Id], token, result);
+        await QqService.SendMessageToSomeGroup([message.Sender.Group.Id], token, result);
     }
 }

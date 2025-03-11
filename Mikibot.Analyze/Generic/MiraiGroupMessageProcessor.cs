@@ -5,9 +5,9 @@ using Mirai.Net.Data.Messages.Receivers;
 
 namespace Mikibot.Analyze.Generic;
 
-public abstract class MiraiGroupMessageProcessor<T>(IMiraiService miraiService, ILogger<T> logger) where T : MiraiGroupMessageProcessor<T>
+public abstract class MiraiGroupMessageProcessor<T>(IQqService qqService, ILogger<T> logger) where T : MiraiGroupMessageProcessor<T>
 {
-    protected IMiraiService MiraiService => miraiService;
+    protected IQqService QqService => qqService;
     protected ILogger<T> Logger => logger;
 
     private readonly Channel<GroupMessageReceiver> messageQueue = Channel
@@ -38,7 +38,7 @@ public abstract class MiraiGroupMessageProcessor<T>(IMiraiService miraiService, 
     {
         await PreRun(token);
         logger.LogInformation("Mirai group handling message: {}", typeof(T).Name);
-        miraiService.SubscribeMessage(FilterMessage, token);
+        qqService.SubscribeMessage(FilterMessage, token);
         while (!token.IsCancellationRequested)
         {
             try

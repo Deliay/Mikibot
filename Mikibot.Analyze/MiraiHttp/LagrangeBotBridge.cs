@@ -18,7 +18,7 @@ using MessageChain = Lagrange.Core.Message.MessageChain;
 
 namespace Mikibot.Analyze.MiraiHttp;
 
-public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger, ILogger<BotContext> botLogger) : IMiraiService
+public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger, ILogger<BotContext> botLogger) : IQqService
 {
     private static readonly string BotConfigDir = Environment.GetEnvironmentVariable("BOT_CONFIG_DIR") ?? Path.GetTempPath();
 
@@ -128,7 +128,6 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger, ILogger<BotCon
         {
             await bot.LoginByPassword();
         }
-        await bot.LoginByPassword();
         
         logger.LogInformation("等待登录中...");
         await WaitBotOnlineAsync();
@@ -239,38 +238,10 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger, ILogger<BotCon
     ];
     private readonly SemaphoreSlim _lock = new(1);
     private DateTimeOffset latestSentAt = DateTimeOffset.Now;
-    public async ValueTask SendMessageToAllGroup(CancellationToken token, params MessageBase[] messages)
-    {
-        var groups = await bot.FetchGroups();
-        foreach (var group in groups)
-        {
-            var groupId = $"{group.GroupUin}";
-#if DEBUG
-            if (groupId != "139528984") continue;
-#endif
-            if (token.IsCancellationRequested) break;
-
-            if (AllowGroups.Contains(groupId)) {
-                await SendMessageToGroup(new Group { Id = groupId, }, token, messages);
-            }
-        }
-    }
 
     public async ValueTask SendMessageToGroup(Group group, CancellationToken token, params MessageBase[] messages)
     {
         await bot.SendMessage(ConvertMessageToLagrange(uint.Parse(group.Id), new Mirai.Net.Data.Messages.MessageChain(messages)));
-    }
-
-    public async ValueTask SendMessageToSliceManGroup(CancellationToken token, params MessageBase[] messages)
-    {
-        var groups = await bot.FetchGroups();
-        foreach (var group in groups)
-        {
-            var groupId = $"{group.GroupUin}";
-            if (groupId != "139528984") continue;
-            if (token.IsCancellationRequested) break;
-            await SendMessageToGroup(new Group { Id = groupId, }, token, messages);
-        }
     }
 
     private readonly Dictionary<Action<GroupMessageReceiver>, CancellationTokenRegistration> _subscriber = [];

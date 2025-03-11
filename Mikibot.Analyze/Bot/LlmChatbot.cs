@@ -27,12 +27,12 @@ using Mirai.Net.Utils.Scaffolds;
 namespace Mikibot.Analyze.Bot;
 
 public class LlmChatbot(
-    IMiraiService miraiService,
+    IQqService qqService,
     ILogger<LlmChatbot> logger,
     PermissionService permissions,
     MikibotDatabaseContext db,
     ChatbotSwitchService chatbotSwitchService)
-    : MiraiGroupMessageProcessor<LlmChatbot>(miraiService, logger)
+    : MiraiGroupMessageProcessor<LlmChatbot>(qqService, logger)
 {
     private readonly Dictionary<string, Queue<(string msg, string id)>> _recentMessages = [];
     private readonly Dictionary<string, SemaphoreSlim> _locks = [];
@@ -111,7 +111,7 @@ public class LlmChatbot(
             
             if (histories.Count < 20)
             {
-                await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
+                await QqService.SendMessageToSomeGroup([groupId], cancellationToken,
                     new PlainMessage($"需要至少50条消息才能生成画像~目前你已经发了{histories.Count}条"));
                 return;
             }
@@ -128,7 +128,7 @@ public class LlmChatbot(
 
             if (result is not { choices.Count: > 0 })
             {
-                await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
+                await QqService.SendMessageToSomeGroup([groupId], cancellationToken,
                     quote,
                     new PlainMessage("AI出错了"));
                 return;
@@ -142,13 +142,13 @@ public class LlmChatbot(
                 .Concat([quote])
                 .ToArray();
             
-            await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken, messages);
+            await QqService.SendMessageToSomeGroup([groupId], cancellationToken, messages);
         }
         else if (text.StartsWith("/character"))
         {
             if (!await permissions.IsBotOperator(userId, cancellationToken)) return;
 
-            await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
+            await QqService.SendMessageToSomeGroup([groupId], cancellationToken,
                 new PlainMessage(await GetCharacter(groupId, cancellationToken)));
 
         }
@@ -179,7 +179,7 @@ public class LlmChatbot(
 
             await db.SaveChangesAsync(cancellationToken);
 
-            await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken,
+            await QqService.SendMessageToSomeGroup([groupId], cancellationToken,
                 new PlainMessage(await GetCharacter(groupId, cancellationToken)));
         }
     }
@@ -212,7 +212,7 @@ public class LlmChatbot(
                     break;
                 }
                 case AtMessage at:
-                    isAt = at.Target == MiraiService.UserId;
+                    isAt = at.Target == QqService.UserId;
                     break;
             }
         }
@@ -367,7 +367,7 @@ public class LlmChatbot(
             //     }];
             // }
             //
-            var sendResults = await MiraiService.SendMessageToSomeGroup([groupId], cancellationToken, pendingSendMessages.ToArray());
+            var sendResults = await QqService.SendMessageToSomeGroup([groupId], cancellationToken, pendingSendMessages.ToArray());
             
             await db.ChatbotContexts.AddRangeAsync([
                 new ChatbotContext()
@@ -388,7 +388,7 @@ public class LlmChatbot(
                 await db.ChatbotGroupChatHistories.AddAsync(new ChatbotGroupChatHistory()
                 {
                     GroupId = groupId,
-                    UserId = MiraiService.UserId,
+                    UserId = QqService.UserId,
                     MessageId = result,
                     Message = interestChat.reply,
                 }, cancellationToken);

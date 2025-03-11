@@ -9,10 +9,10 @@ using Mirai.Net.Data.Messages.Receivers;
 
 namespace Mikibot.Analyze.Bot.FoodDice;
 
-public class FoodDiceService(IMiraiService miraiService, ILogger<FoodDiceService> logger, MikibotDatabaseContext db)
-    : MiraiGroupMessageProcessor<FoodDiceService>(miraiService, logger)
+public class FoodDiceService(IQqService qqService, ILogger<FoodDiceService> logger, MikibotDatabaseContext db)
+    : MiraiGroupMessageProcessor<FoodDiceService>(qqService, logger)
 {
-    private readonly IMiraiService _miraiService = miraiService;
+    private readonly IQqService qqService = qqService;
     private static readonly RandomFood Wind = new() { Name = "西北风 (还未配置食物数据库)", Category = "食物" };
 
     private const string 食物 = "食物";
@@ -54,7 +54,7 @@ public class FoodDiceService(IMiraiService miraiService, ILogger<FoodDiceService
         
         var food = await RollRandomFood(category, token);
         
-        await _miraiService.SendMessageToSomeGroup([message.GroupId], token,
+        await qqService.SendMessageToSomeGroup([message.GroupId], token,
             new PlainMessage(food.Name));
     }
 }

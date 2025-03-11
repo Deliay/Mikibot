@@ -8,11 +8,11 @@ using Mirai.Net.Data.Messages.Receivers;
 namespace Mikibot.Analyze.Bot;
 
 public class ChatbotManagerService(
-    IMiraiService miraiService,
+    IQqService qqService,
     ILogger<ChatbotManagerService> logger,
     PermissionService permissionService,
     ChatbotSwitchService chatbotSwitchService)
-    : MiraiGroupMessageProcessor<ChatbotManagerService>(miraiService, logger)
+    : MiraiGroupMessageProcessor<ChatbotManagerService>(qqService, logger)
 {
 
     private const string VendorCommand = "/chatbot_vendor";
@@ -29,7 +29,7 @@ public class ChatbotManagerService(
 
             if (!chatbotSwitchService.UpdateChatbot(vendor)) continue;
             
-            await MiraiService.SendMessageToSomeGroup([message.GroupId], token,
+            await QqService.SendMessageToSomeGroup([message.GroupId], token,
                 new PlainMessage($"机器人后端成功更换为 {vendor}"));
 
             return;

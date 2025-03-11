@@ -9,8 +9,8 @@ using Mirai.Net.Data.Messages.Receivers;
 
 namespace Mikibot.Analyze.Bot;
 
-public class PingtiItemReplaceService(IMiraiService miraiService, ILogger<PingtiItemReplaceService> logger)
-    : MiraiGroupMessageProcessor<PingtiItemReplaceService>(miraiService, logger)
+public class PingtiItemReplaceService(IQqService qqService, ILogger<PingtiItemReplaceService> logger)
+    : MiraiGroupMessageProcessor<PingtiItemReplaceService>(qqService, logger)
 {
     private readonly HttpClient client = new()
     {
@@ -91,7 +91,7 @@ public class PingtiItemReplaceService(IMiraiService miraiService, ILogger<Pingti
                         if (messages.Count > 0)
                         {
                             Logger.LogInformation($"处理聚合消息 {groupId} 共 {messages.Count} 条");
-                            await MiraiService.SendMessageToSomeGroup([groupId], token, messages.ToArray());
+                            await QqService.SendMessageToSomeGroup([groupId], token, messages.ToArray());
                             messages.Clear();
                         }
                     }
@@ -131,7 +131,7 @@ public class PingtiItemReplaceService(IMiraiService miraiService, ILogger<Pingti
 
                     if (DateTime.Now - lastSendAt > TimeSpan.FromSeconds(5))
                     {
-                        await MiraiService.SendMessageToGroup(message.Sender.Group, token, messageCache[message.GroupId].ToArray());
+                        await QqService.SendMessageToGroup(message.Sender.Group, token, messageCache[message.GroupId].ToArray());
                         messageCache[message.GroupId].Clear();
                         lastSendTime[message.GroupId] = DateTime.Now;
                     }

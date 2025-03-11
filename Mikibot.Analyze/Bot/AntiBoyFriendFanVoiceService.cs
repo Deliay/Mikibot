@@ -26,8 +26,8 @@ public struct QVoice
 public class AntiBoyFriendFanVoiceService : MiraiGroupMessageProcessor<AntiBoyFriendFanVoiceService>
 {
     public AntiBoyFriendFanVoiceService(
-        IMiraiService miraiService,
-        ILogger<AntiBoyFriendFanVoiceService> logger) : base(miraiService, logger)
+        IQqService qqService,
+        ILogger<AntiBoyFriendFanVoiceService> logger) : base(qqService, logger)
     {
         VoiceBaseDir = Environment.GetEnvironmentVariable("MIKI_VOICE_DIR") ?? Path.GetTempPath();
 
@@ -139,7 +139,7 @@ public class AntiBoyFriendFanVoiceService : MiraiGroupMessageProcessor<AntiBoyFr
     {
         if (CheckTime(lastSentAt, group.Id, TimeSpan.FromSeconds(5)))
         {
-            await MiraiService.SendMessageToGroup(group, token, messages);
+            await QqService.SendMessageToGroup(group, token, messages);
         }
     }
 
