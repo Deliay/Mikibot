@@ -47,6 +47,14 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
             QuoteMessage quoteMessage => new ReplySegment(quoteMessage.MessageId),
         };
     }
+
+    private Message Convert(IEnumerable<MessageBase> message)
+    {
+        var msg = new Message();
+        msg.AddRange(message.Select(Convert));
+        
+        return msg;
+    }
     
     private async IAsyncEnumerable<MessageBase> Convert(Message message, bool omitReply = false)
     {
@@ -121,26 +129,26 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
         }));
     }
 
-    public string UserId { get; set; }
+    public string UserId => _botContext.SelfId.ToString();
     
-    public ValueTask SendMessageToGroup(Group group, CancellationToken token, params MessageBase[] messages)
+    public async ValueTask SendMessageToGroup(Group group, CancellationToken token, params MessageBase[] messages)
     {
-        throw new NotImplementedException();
+        await SendMessageToSomeGroup([group.Id], token, messages);
     }
 
-    public ValueTask<Dictionary<string, string>> SendMessageToSomeGroup(HashSet<string> groupIds, CancellationToken token, params MessageBase[] messages)
+    public async ValueTask<Dictionary<string, string>> SendMessageToSomeGroup(HashSet<string> groupIds, CancellationToken token, params MessageBase[] messages)
     {
-        throw new NotImplementedException();
-    }
+        Dictionary<string, string> resultDict = [];
+        foreach (var groupId in groupIds.Select(ulong.Parse))
+        {
+            var res = await _botContext.SendGroupMessageAsync(groupId, Convert(messages), token);
+            if (res.Data is { MessageId: > 0 })
+            {
+                resultDict.Add(groupId.ToString(), res.Data!.MessageId.ToString());
+            }
+        }
 
-    public ValueTask SendMessageToSliceManGroup(CancellationToken token, params MessageBase[] messages)
-    {
-        throw new NotImplementedException();
-    }
-
-    public ValueTask SendMessageToAllGroup(CancellationToken token, params MessageBase[] messages)
-    {
-        throw new NotImplementedException();
+        return resultDict;
     }
 
     public void Dispose()
