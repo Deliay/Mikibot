@@ -58,7 +58,7 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
 
         var processTasks = imageMessages.Select(async imageMessage =>
         {
-            logger.LogInformation("Starting processing image, url: {}", imageMessage.Url);
+            logger.LogInformation("Processing image, url: {}", imageMessage.Url);
             using var image = await QqService.ReadImageAsync(imageMessage, token);
             using var result = await processor.ProcessImage(image, message.MessageChain, token);
 
