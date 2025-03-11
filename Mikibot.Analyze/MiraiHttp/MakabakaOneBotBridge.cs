@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Security.Authentication;
+using System.Text.Json;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Makabaka;
@@ -20,7 +21,21 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
 {
     private ILifetimeScope _makabakaScope = null!;
     private IBotContext _botContext = null!;
-    public HttpClient HttpClient { get; } = new();
+
+    private static HttpClient MakeTls12SupportHttpClient()
+    {
+        var socketsHttpHandler = new SocketsHttpHandler()
+        {
+            SslOptions =
+            {
+                EnabledSslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13,
+            }
+        };
+        return new HttpClient(socketsHttpHandler);
+    }
+
+    public HttpClient HttpClient { get; } = MakeTls12SupportHttpClient();
+    
     private Task? _botRunTask;
     public ValueTask Run(CancellationToken cancellationToken = default)
     {
