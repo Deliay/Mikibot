@@ -31,6 +31,8 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
                 EnabledSslProtocols = SslProtocols.Tls12,
             }
         };
+        socketsHttpHandler.SslOptions.AllowRenegotiation = true;
+        socketsHttpHandler.SslOptions.AllowTlsResume = true;
         return new HttpClient(socketsHttpHandler);
     }
 
