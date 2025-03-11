@@ -42,10 +42,12 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
     {
         var msg = message.MessageChain.GetPlainMessage();
         
-        
         if (!_memeProcessors.TryGetValue(msg.Trim(), out var processor)) return;
 
-        var imageMessages = message.MessageChain.OfType<ImageMessage>().ToList();
+        var imageMessages = message.MessageChain
+            .Concat(message.MessageChain.OfType<QuoteMessage>().SelectMany(q => q.Origin))
+            .OfType<ImageMessage>()
+            .ToList();
         
         if (imageMessages.Count is 0 or > 10)
         {
