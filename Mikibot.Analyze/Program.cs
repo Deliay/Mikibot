@@ -86,7 +86,7 @@ logger.LogInformation("Done");
 
 var mirai = app.Resolve<IQqService>();
 logger.LogInformation("Initializing qq service...");
-await mirai.Run();
+await mirai.Run(token);
 
 var statusCrawler = app.Resolve<LiveStatusCrawlService>();
 var followerStat = app.Resolve<DailyFollowerStatisticService>();

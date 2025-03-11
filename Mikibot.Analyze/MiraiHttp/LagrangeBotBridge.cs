@@ -89,7 +89,7 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger, ILogger<BotCon
 
     public HttpClient HttpClient { get; } = new();
 
-    public async ValueTask Run()
+    public async ValueTask Run(CancellationToken cancellationToken = default)
     {
         var botKeystore = await GetKeyStore();
         bot = BotFactory.Create(new BotConfig()

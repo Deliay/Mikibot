@@ -7,7 +7,7 @@ namespace Mikibot.Analyze.MiraiHttp;
 public interface IQqService
 {
     HttpClient HttpClient { get; }   
-    ValueTask Run();
+    ValueTask Run(CancellationToken cancellationToken = default);
     public string UserId { get; }
     
     public void SubscribeMessage(Action<GroupMessageReceiver> next, CancellationToken token);

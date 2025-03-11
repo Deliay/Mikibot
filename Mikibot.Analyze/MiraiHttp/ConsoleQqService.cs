@@ -19,7 +19,7 @@ public class ConsoleQqService : IQqService
 
     public HttpClient HttpClient { get; } = new();
 
-    public ValueTask Run()
+    public ValueTask Run(CancellationToken cancellationToken = default)
     {
         Logger.LogInformation("Console mirai service started");
         return ValueTask.CompletedTask;

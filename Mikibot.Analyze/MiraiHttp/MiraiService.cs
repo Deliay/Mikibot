@@ -37,7 +37,7 @@ public class MiraiService : IDisposable, IQqService
 
     public HttpClient HttpClient { get; } = new();
 
-    public async ValueTask Run()
+    public async ValueTask Run(CancellationToken cancellationToken = default)
     {
         await Bot.LaunchAsync();
     }

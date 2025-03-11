@@ -6,6 +6,7 @@ using Makabaka.Events;
 using Makabaka.Messages;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Mikibot.Analyze.Utils;
 using Mirai.Net.Data.Messages;
@@ -20,7 +21,8 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
     private ILifetimeScope _makabakaScope = null!;
     private IBotContext _botContext = null!;
     public HttpClient HttpClient { get; } = new();
-    public ValueTask Run()
+    private Task? _botRunTask;
+    public ValueTask Run(CancellationToken cancellationToken = default)
     {
         IServiceCollection services = new ServiceCollection();
         services.AddMakabaka();
@@ -36,12 +38,22 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
             c.Register(ctx => new AutofacServiceProvider(ctx.Resolve<ILifetimeScope>())).As<IServiceProvider>();
             c.Populate(services);
         });
+        var bot = _makabakaScope.Resolve<IHostedService>();
+        
         _botContext = _makabakaScope.Resolve<IBotContext>();
         _botContext.OnGroupMessage += BotContextOnOnGroupMessage;
+        
+        _botRunTask = bot.StartAsync(cancellationToken);
         return ValueTask.CompletedTask;
     }
 
-    private Segment Convert(MessageBase message)
+    private Segment? Trace(MessageBase message)
+    {
+        logger.LogInformation("Unsupported message: {}", message.ToString());
+        return null;
+    }
+    
+    private Segment? Convert(MessageBase message)
     {
         return message switch
         {
@@ -56,13 +68,14 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
             }.Uri.ToString()),
             AtMessage atMessage => new AtSegment(atMessage.Target),
             QuoteMessage quoteMessage => new ReplySegment(quoteMessage.MessageId),
+            _ => Trace(message),
         };
     }
 
     private Message Convert(IEnumerable<MessageBase> message)
     {
         var msg = new Message();
-        msg.AddRange(message.Select(Convert));
+        msg.AddRange(message.Select(Convert).Where(m => m is not null)!);
         
         return msg;
     }

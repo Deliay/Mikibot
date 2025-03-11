@@ -142,11 +142,11 @@ public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IQq
 
     public HttpClient HttpClient { get; } = new() { BaseAddress = new Uri(EnvSatoriEndpoint) };
 
-    public async ValueTask Run()
+    public async ValueTask Run(CancellationToken cancellationToken = default)
     {
         Client = new SatoriClient(EnvSatoriEndpoint, EnvSatoriToken);
-        CurrentBot = await Client.GetLoginAsync();
-        Bot = await Client.GetBotAsync();
+        CurrentBot = await Client.GetLoginAsync(cancellationToken);
+        Bot = await Client.GetBotAsync(cancellationToken: cancellationToken);
         Bot.MessageCreated += BotOnMessageCreated;
 
         logger.LogInformation("准备启动机器人，账号 {}", CurrentBot.SelfId);
