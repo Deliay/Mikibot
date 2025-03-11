@@ -20,7 +20,7 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
 {
     private ILifetimeScope _makabakaScope = null!;
     private IBotContext _botContext = null!;
-    public HttpClient HttpClient { get; private set; }
+    public HttpClient HttpClient { get; } = new();
     private Task? _botRunTask;
     public ValueTask Run(CancellationToken cancellationToken = default)
     {
