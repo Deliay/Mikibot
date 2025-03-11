@@ -4,6 +4,7 @@ using Autofac.Extensions.DependencyInjection;
 using Makabaka;
 using Makabaka.Events;
 using Makabaka.Messages;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Mikibot.Analyze.Utils;
@@ -23,6 +24,10 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
     {
         IServiceCollection services = new ServiceCollection();
         services.AddMakabaka();
+        services.AddSingleton(new ConfigurationBuilder()
+            .AddCommandLine(Environment.GetCommandLineArgs())
+            .AddEnvironmentVariables()
+            .Build());
         
         _makabakaScope = scope.BeginLifetimeScope(c => c.Populate(services));
         _botContext = _makabakaScope.Resolve<IBotContext>();
