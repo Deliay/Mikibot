@@ -28,7 +28,7 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
         {
             SslOptions =
             {
-                EnabledSslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13,
+                EnabledSslProtocols = SslProtocols.Tls12,
             }
         };
         return new HttpClient(socketsHttpHandler);
