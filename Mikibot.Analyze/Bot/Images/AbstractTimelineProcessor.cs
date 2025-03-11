@@ -1,5 +1,6 @@
 ﻿using Mirai.Net.Data.Messages;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace Mikibot.Analyze.Bot.Images;
 
@@ -10,6 +11,15 @@ public abstract class AbstractTimelineProcessor : IImageProcessor
 
     public async ValueTask<ImageProcessResult> ProcessImage(Image image, MessageChain messages, CancellationToken cancellationToken = default)
     {
+        image.Mutate(ctx =>
+        {
+            var size = image.Size;
+            if (image.Width > 512) size = new Size(512, Convert.ToInt32(size.Height * (512d / size.Width)));
+            if (image.Height > 512) size = new Size(Convert.ToInt32(size.Width * (512d / size.Height)), 512);
+
+            ctx.Resize(size);
+        });
+
         var frames = await GetFrameSequence(image, messages, cancellationToken)
             .OrderBy(f => f.Index)
             .ToListAsync(cancellationToken);
