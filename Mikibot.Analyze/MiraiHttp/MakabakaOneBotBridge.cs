@@ -1,4 +1,6 @@
-﻿using System.Security.Authentication;
+﻿using System.Net.Security;
+using System.Runtime.InteropServices;
+using System.Security.Authentication;
 using System.Text.Json;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -29,10 +31,17 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
             SslOptions =
             {
                 EnabledSslProtocols = SslProtocols.Tls12,
-            }
+            },
         };
-        socketsHttpHandler.SslOptions.AllowRenegotiation = true;
-        socketsHttpHandler.SslOptions.AllowTlsResume = true;
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            socketsHttpHandler.SslOptions.CipherSuitesPolicy = new CipherSuitesPolicy(
+            [
+                TlsCipherSuite.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+                TlsCipherSuite.TLS_RSA_WITH_AES_256_GCM_SHA384,
+                TlsCipherSuite.TLS_RSA_WITH_AES_128_GCM_SHA256,
+            ]);
+        }
         return new HttpClient(socketsHttpHandler);
     }
 
