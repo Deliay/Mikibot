@@ -26,13 +26,7 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
 
     private static HttpClient MakeTls12SupportHttpClient()
     {
-        var socketsHttpHandler = new SocketsHttpHandler()
-        {
-            SslOptions =
-            {
-                EnabledSslProtocols = SslProtocols.Tls12,
-            },
-        };
+        var socketsHttpHandler = new SocketsHttpHandler();
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             socketsHttpHandler.SslOptions.CipherSuitesPolicy = new CipherSuitesPolicy(
