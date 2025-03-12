@@ -4,7 +4,7 @@ public class Punch : AbstractOverlayZipGiftMemeProcessor
 {
     protected override IAsyncEnumerable<Frame> GetMemeSequenceAsync()
     {
-        return FrameUtils.LoadFromMemeResourceFolderAsync(nameof(Punch).ToLower()).Slow(1);
+        return FrameUtils.LoadFromMemeResourceFolderAsync(nameof(Punch).ToLower());
     }
 
     protected override ValueTask<int> GetMinimalSequenceKeepAsync()
