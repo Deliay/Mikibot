@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Mikibot.Analyze.Bot.Images;
-using Mikibot.Analyze.Bot.Images.Meme;
 using Mikibot.Analyze.Generic;
 using Mikibot.Analyze.MiraiHttp;
 using Mirai.Net.Data.Messages;
@@ -10,6 +9,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Processing.Processors.Effects;
 
 namespace Mikibot.Analyze.Bot;
 
@@ -23,21 +23,19 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
         Configuration.Default.ImageFormatsManager.AddImageFormat(GifFormat.Instance);
     }
 
-    private readonly Dictionary<string, IImageProcessor> _memeProcessors = [];
+    private readonly Dictionary<string, Memes.Factory> _memeProcessors = [];
     
-    protected override async ValueTask PreRun(CancellationToken token)
+    protected override ValueTask PreRun(CancellationToken token)
     {
-        _memeProcessors.Add("/像素化", new PixelateProcessor());
-        _memeProcessors.Add("/像素化v2", new PixelateV2Processor());
-        _memeProcessors.Add("/射", new Shoot());
-        _memeProcessors.Add("/打", new Jerk());
-        _memeProcessors.Add("/结婚", new Marry());
-        _memeProcessors.Add("/👊", new Punch());
-        
-        foreach (var processor in _memeProcessors.Values)
+        var autoComposeMemeFolders = Directory.EnumerateDirectories(Path.Combine("resources", "meme", "auto"));
+        foreach (var autoComposeMemeFolder in autoComposeMemeFolders)
         {
-            await processor.InitializeAsync(token);
+            _memeProcessors.Add("/" + autoComposeMemeFolder, Memes.AutoCompose(autoComposeMemeFolder));
         }
+        _memeProcessors.Add("/marry", Memes.Marry);
+        _memeProcessors.Add("/像素化", Memes.Pixelate());
+        
+        return ValueTask.CompletedTask;
     }
 
     protected override async ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
@@ -61,8 +59,8 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
         var processTasks = imageMessages.Select(async imageMessage =>
         {
             logger.LogInformation("Processing image, url: {}", imageMessage.Url);
-            using var image = await QqService.ReadImageAsync(imageMessage, token);
-            using var result = await processor.ProcessImage(image, message.MessageChain, token);
+            using var image = await QqService.ReadImageAsync(imageMessage.Url, token);
+            using var result = await processor(image, message.MessageChain, token);
 
             return new ImageMessage() { Base64 = await result.ToDataUri(token) };
         });
