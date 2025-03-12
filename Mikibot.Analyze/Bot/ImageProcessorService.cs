@@ -32,6 +32,7 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
         _memeProcessors.Add("/射", new Shoot());
         _memeProcessors.Add("/打", new Jerk());
         _memeProcessors.Add("/结婚", new Marry());
+        _memeProcessors.Add("/👊", new Jerk());
         
         foreach (var processor in _memeProcessors.Values)
         {
