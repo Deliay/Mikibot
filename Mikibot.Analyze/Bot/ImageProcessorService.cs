@@ -60,11 +60,8 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
         {
             logger.LogInformation("Processing image, url: {}", imageMessage.Url);
             using var image = await QqService.ReadImageAsync(imageMessage.Url, token);
-            using var result = await processor(image, message.MessageChain, token);
-
-            var base64 = await result.ToDataUri(token);
-            
-            return new ImageMessage() { Base64 = base64 };
+            var result = await processor(image, message.MessageChain, token);
+            return new ImageMessage() { Base64 = await result.ToDataUri(token) };
         });
         
         MessageBase[] result = await Task.WhenAll(processTasks);
