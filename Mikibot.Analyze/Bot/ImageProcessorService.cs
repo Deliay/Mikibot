@@ -61,10 +61,7 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
         {
             logger.LogInformation("Processing image, url: {}", imageMessage.Url);
             using var image = await QqService.ReadImageAsync(imageMessage.Url, token);
-            var result = await processor(image, message.MessageChain, token);
-            Console.WriteLine("isDisposed?: " + typeof(Image)
-                .GetField("isDisposed", BindingFlags.NonPublic | BindingFlags.Instance)!
-                .GetValue(result.Image));
+            using var result = await processor(image, message.MessageChain, token);
             return new ImageMessage() { Base64 = await result.ToDataUri(token) };
         });
         
