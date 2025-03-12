@@ -25,15 +25,25 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
     }
 
     private readonly Dictionary<string, Memes.Factory> _memeProcessors = [];
-    
+
+    private readonly Dictionary<string, string> _knownCommandMapping = new()
+    {
+        { "marry", "结婚" },
+        { "jerk", "打" },
+        { "punch", "👊" },
+    };
     protected override ValueTask PreRun(CancellationToken token)
     {
         var autoComposeMemeFolders = Directory.EnumerateDirectories(Path.Combine("resources", "meme", "auto"));
         foreach (var autoComposeMemeFolder in autoComposeMemeFolders)
         {
             _memeProcessors.Add("/" + autoComposeMemeFolder, Memes.AutoCompose(autoComposeMemeFolder));
+            if (_knownCommandMapping.TryGetValue(autoComposeMemeFolder, out var knownCommand))
+            {
+                _memeProcessors.Add("/" + knownCommand, Memes.AutoCompose(autoComposeMemeFolder));
+            }
         }
-        _memeProcessors.Add("/marry", Memes.Marry);
+        _memeProcessors.Add("/结婚", Memes.Marry);
         _memeProcessors.Add("/像素化", Filters.Pixelate());
         
         return ValueTask.CompletedTask;
