@@ -2,8 +2,6 @@
 using MemeFactory.Core.Utilities;
 using Mirai.Net.Data.Messages;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp.Processing.Processors.Effects;
 
 namespace Mikibot.Analyze.Bot.Images;
 
@@ -23,7 +21,7 @@ public static class Memes
         CancellationToken cancellationToken = default)
     {
         using var sequence = await Frames
-            .LoadFromFolderAsync(Path.Combine("resources",folder), "*.png", cancellationToken)
+            .LoadFromFolderAsync(folder, "*.png", cancellationToken)
             .Slow(slowTimes)
             .ToSequenceAsync(cancellationToken);
         using var baseSequence = await image.ExtractFrames().ToSequenceAsync(cancellationToken);;
@@ -42,29 +40,9 @@ public static class Memes
         return (image, msg, token) => SequenceZip(image, folder, slowTimes, token);
     }
 
-    public static Factory Pixelate()
-    {
-        return async (image, _, token) =>
-        {
-            using var sequence = await image.ExtractFrames().ToSequenceAsync(token);
-
-            return await sequence.EachFrame((f, _) =>
-            {
-                f.Image.Mutate(ctx =>
-                {
-                    var oilSize = Convert.ToInt32(ctx.GetCurrentSize().Width * (1d / 20));
-                    var pixelSize = Convert.ToInt32(ctx.GetCurrentSize().Width * (1d / 40));
-                    ctx.ApplyProcessor(new OilPaintingProcessor(5, oilSize));
-                    ctx.ApplyProcessor(new PixelateProcessor(pixelSize));
-                });
-                return ValueTask.FromResult(f);
-            }, cancellationToken: token).AutoComposeAsync(token);
-        };
-    }
-    
     public static async ValueTask<MemeResult> Marry(Image image, MessageChain message, CancellationToken cancellationToken)
     {
-        var resources = await Frames.LoadFromFolderAsync($"resources/{nameof(Marry).ToLower()}", "*.png", cancellationToken)
+        var resources = await Frames.LoadFromFolderAsync(Path.Combine("resources", "meme", "marry"), "*.png", cancellationToken)
             .ToListAsync(cancellationToken);
         using var left = resources[0];
         using var right = resources[1];

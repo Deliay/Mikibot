@@ -33,7 +33,7 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
             _memeProcessors.Add("/" + autoComposeMemeFolder, Memes.AutoCompose(autoComposeMemeFolder));
         }
         _memeProcessors.Add("/marry", Memes.Marry);
-        _memeProcessors.Add("/像素化", Memes.Pixelate());
+        _memeProcessors.Add("/像素化", Filters.Pixelate());
         
         return ValueTask.CompletedTask;
     }
