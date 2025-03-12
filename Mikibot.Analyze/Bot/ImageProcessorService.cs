@@ -51,20 +51,12 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
 
     private Memes.Factory? ComposeAll(string command)
     {
-        List<Memes.Factory> factories = [];
-        var slashPos = command.IndexOf('/');
-        var slashPos2 = command.IndexOf('/', slashPos + 1);
-        while (slashPos > 0)
-        {
-            command = command[slashPos..slashPos2];
-            if (_memeProcessors.TryGetValue(command.Trim(), out var processor))
-            {
-                factories.Add(processor);
-            }
-
-            slashPos = slashPos2;
-        }
-
+        var factories = command.Split('/')
+            .Select(s => s.Trim())
+            .Where(_memeProcessors.ContainsKey)
+            .Select(s => _memeProcessors[s])
+            .ToList();
+        
         return factories.Count switch
         {
             1 => factories[0],
