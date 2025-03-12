@@ -63,6 +63,16 @@ public static class ImageSharpUtils
 
         return ctx;
     }
+
+    public static Point LeftBottom(this Size dest, Size src)
+    {
+        return new Point(0, dest.Height - src.Height);
+    }
+    
+    public static Point RightBottom(this Size dest, Size src)
+    {
+        return new Point(dest.Width - src.Width, dest.Height - src.Height);
+    }
     
     public static IEnumerable<Frame> GetFrames(this Image src)
     {
@@ -88,8 +98,9 @@ public static class ImageSharpUtils
             .SelectAwait(p => p)
             .OrderBy(f => f.Index)
             .ToListAsync(cancellationToken);
-        
-        var templateFrame = proceedImages[0].Image.Frames.CloneFrame(0);
+
+        using var rootFrame = proceedImages[0];
+        var templateFrame = rootFrame.Image.Frames.CloneFrame(0);
     
         var rootMetadata = templateFrame.Metadata.GetGifMetadata();
         rootMetadata.RepeatCount = 0;

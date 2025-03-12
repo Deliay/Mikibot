@@ -35,8 +35,8 @@ public class Marry : AbstractPreFrameProcessor
             });
             var currentSize = ctx.GetCurrentSize();
             ctx
-                .DrawImage(localLeft, new Point(0, currentSize.Height - localLeft.Height), 1.0f)
-                .DrawImage(localRight, new Point(currentSize.Width - localRight.Width, currentSize.Height - localRight.Height), 1.0f);
+                .DrawImage(localLeft, currentSize.LeftBottom(localLeft.Size), 1.0f)
+                .DrawImage(localRight, currentSize.RightBottom(localRight.Size), 1.0f);
         });
 
         return ValueTask.FromResult(src);

@@ -31,6 +31,5 @@ public static class FrameUtils
                 yield return frame with { Index = index++, Image = frame.Image.Clone((_) => {})};
             }
         }
-        
     }
 }
