@@ -16,7 +16,8 @@ public class PixelateV2Processor : AbstractPreFrameProcessor
     {
         src.Image.Mutate(ctx =>
         {
-            ctx.ApplyProcessor(new SixLabors.ImageSharp.Processing.Processors.Effects.PixelateProcessor(10));
+            var pixelSize = Convert.ToInt32(ctx.GetCurrentSize().Width * (1d / 40));
+            ctx.ApplyProcessor(new SixLabors.ImageSharp.Processing.Processors.Effects.PixelateProcessor(pixelSize));
         });
         return ValueTask.FromResult(src);
     }

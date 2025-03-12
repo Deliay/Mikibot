@@ -106,13 +106,12 @@ public static class ImageSharpUtils
         rootMetadata.RepeatCount = 0;
         
         var rootMetadataFrame = templateFrame.Frames.RootFrame.Metadata.GetGifMetadata();
-        CopyProperties(image.Frames.RootFrame.Metadata.GetGifMetadata(), rootMetadataFrame);
+        rootMetadataFrame.HasTransparency = false;
 
         foreach (var (index, proceedImage, _) in proceedImages[1..]) using (proceedImage)
         {
             templateFrame.Frames.InsertFrame(index, proceedImage.Frames.RootFrame);
-            CopyProperties(image.Frames[index].Metadata.GetGifMetadata(),
-                templateFrame.Frames[index].Metadata.GetGifMetadata());
+            templateFrame.Frames[index].Metadata.GetGifMetadata().HasTransparency = false;
         }
 
         return templateFrame;
