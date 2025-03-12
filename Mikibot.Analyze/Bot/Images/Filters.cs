@@ -1,6 +1,8 @@
 ﻿using System.Runtime.CompilerServices;
 using MemeFactory.Core.Processing;
 using MemeFactory.Core.Utilities;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Processors.Effects;
 
@@ -28,45 +30,11 @@ public static class Filters
         };
     }
 
-    public static IEnumerable<Frame> Loop(this IEnumerable<Frame> source, int times = 999)
-    {
-        List<Frame> cache = [];
-        var index = 1;
-        foreach (var item in source)
-        {
-            cache.Add(item);
-            yield return item with { Sequence = index++ };
-        }
 
-        var currentTimes = 0;
-        while (currentTimes++ < times)
-        {
-            foreach (var item in cache)
-            {
-                yield return new Frame(index++, item.Image.Clone((_) => {}));
-            }
-        }
-    }
-
-    public static Memes.Factory Rotation(int circleTimes = 16)
+    public static Memes.Factory Rotation(int circleTimes = 8)
     {
         return (image, _, token) => image.ExtractFrames()
             .Rotation(circleTimes, token)
             .AutoComposeAsync(token);
-    }
-    
-    public static async IAsyncEnumerable<Frame> Rotation(this IAsyncEnumerable<Frame> frames, int circleTimes = 16,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default)
-
-    {
-        var deg = 360f / circleTimes;
-        var allFrames = await frames.ToListAsync(cancellationToken);
-        var total = Algorithms.Lcm(allFrames.Count, circleTimes) / allFrames.Count - 1;
-        var baseSize = allFrames[0].Image.Size;
-        foreach (var frame in allFrames.Loop(total))
-        {
-            frame.Image.Mutate((ctx) => ctx.Rotate(deg * frame.Sequence).Resize(baseSize));
-            yield return frame;
-        }
     }
 }
