@@ -10,7 +10,6 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.Processing.Processors.Effects;
 
 namespace Mikibot.Analyze.Bot;
 
@@ -45,15 +44,53 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
         }
         _memeProcessors.Add("/结婚", Memes.Marry);
         _memeProcessors.Add("/像素化", Filters.Pixelate());
+        _memeProcessors.Add("/旋转", Filters.Rotation());
         
         return ValueTask.CompletedTask;
     }
 
+    private Memes.Factory? ComposeAll(string command)
+    {
+        List<Memes.Factory> factories = [];
+        var slashPos = command.IndexOf('/');
+        var slashPos2 = command.IndexOf('/', slashPos + 1);
+        while (slashPos > 0)
+        {
+            command = command[slashPos..slashPos2];
+            if (_memeProcessors.TryGetValue(command.Trim(), out var processor))
+            {
+                factories.Add(processor);
+            }
+
+            slashPos = slashPos2;
+        }
+
+        return factories.Count switch
+        {
+            1 => factories[0],
+            0 => null,
+            _ => (async (image, message, token) =>
+            {
+                var headFactory = factories[0];
+                var currentFrame = await headFactory(image, message, token).ConfigureAwait(false);
+                foreach (var factory in factories[1..])
+                {
+                    using var lastFrame = currentFrame;
+                    currentFrame = await factory(currentFrame.Image, message, token);
+                }
+
+                return currentFrame;
+            })
+        };
+    }
+    
     protected override async ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
     {
         var msg = message.MessageChain.GetPlainMessage();
-        
-        if (!_memeProcessors.TryGetValue(msg.Trim(), out var processor)) return;
+
+        var processor = ComposeAll(msg);
+
+        if (processor is null) return;
 
         var imageMessages = message.MessageChain
             .Concat(message.MessageChain.OfType<QuoteMessage>().SelectMany(q => q.Origin))

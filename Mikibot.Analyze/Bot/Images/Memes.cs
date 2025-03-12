@@ -1,7 +1,9 @@
-﻿using MemeFactory.Core.Processing;
+﻿using System.Runtime.CompilerServices;
+using MemeFactory.Core.Processing;
 using MemeFactory.Core.Utilities;
 using Mirai.Net.Data.Messages;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace Mikibot.Analyze.Bot.Images;
 
