@@ -57,6 +57,8 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
             .Select(s => _memeProcessors[s])
             .ToList();
         
+        Logger.LogInformation("Match {} meme factory", factories.Count);
+        
         return factories.Count switch
         {
             1 => factories[0],
