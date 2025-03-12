@@ -8,17 +8,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
 	<PackageReference Include="Autofac" Version="8.2.0" />
 	<PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
-	<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
-	<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
+	<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.3" />
+	<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.3" />
     <PackageReference Include="EmberSimpleHttpServer" Version="1.0.0" />
-    <PackageReference Include="Xabe.FFmpeg" Version="5.2.6" />
+    <PackageReference Include="Xabe.FFmpeg" Version="6.0.1" />
     <PackageReference Include="Lagrange.Core" Version="0.3.1" />
   </ItemGroup>
 
