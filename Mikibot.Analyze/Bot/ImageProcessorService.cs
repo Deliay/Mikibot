@@ -51,10 +51,11 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
 
     private Memes.Factory? ComposeAll(string command)
     {
-        var possibleCommands = command.Split('/');
+        var possibleCommands = command.Split('/', StringSplitOptions.RemoveEmptyEntries);
         Logger.LogInformation("Split input commands: {}", string.Join(", ", possibleCommands));
         var factories = possibleCommands
             .Select(s => s.Trim())
+            .Select(s => '/' + s)
             .Where(_memeProcessors.ContainsKey)
             .Select(s => _memeProcessors[s])
             .ToList();
@@ -82,8 +83,10 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
     
     protected override async ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
     {
-        var msg = message.MessageChain.GetPlainMessage();
+        var msg = message.MessageChain.GetPlainMessage().Trim();
 
+        if (!msg.StartsWith('/')) return;
+        
         var processor = ComposeAll(msg);
 
         if (processor is null) return;
