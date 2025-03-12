@@ -62,10 +62,10 @@ public static class Filters
         var deg = 360f / circleTimes;
         var allFrames = await frames.ToListAsync(cancellationToken);
         var total = Algorithms.Lcm(allFrames.Count, circleTimes) / allFrames.Count - 1;
-
+        var baseSize = allFrames[0].Image.Size;
         foreach (var frame in allFrames.Loop(total))
         {
-            frame.Image.Mutate((ctx) => ctx.Rotate(deg * frame.Sequence));
+            frame.Image.Mutate((ctx) => ctx.Rotate(deg * frame.Sequence).Resize(baseSize));
             yield return frame;
         }
     }
