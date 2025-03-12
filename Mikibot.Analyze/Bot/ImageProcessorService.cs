@@ -52,7 +52,7 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
     private Memes.Factory? ComposeAll(string command)
     {
         var possibleCommands = command.Split('/');
-        Logger.LogInformation("Split input commands: {}", possibleCommands.GetEnumerator());
+        Logger.LogInformation("Split input commands: {}", string.Join(", ", possibleCommands));
         var factories = possibleCommands
             .Select(s => s.Trim())
             .Where(_memeProcessors.ContainsKey)
