@@ -30,6 +30,7 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
         { "shoot", "射" },
         { "jerk", "打" },
         { "punch", "👊" },
+        { "chushou", "触手" },
     };
     protected override ValueTask PreRun(CancellationToken token)
     {

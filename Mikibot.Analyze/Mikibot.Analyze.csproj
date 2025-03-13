@@ -202,6 +202,39 @@
     <None Update="resources\meme\auto\shoot\12.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="resources\meme\auto\chushou\chushou_00000.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="resources\meme\auto\chushou\chushou_00001.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="resources\meme\auto\chushou\chushou_00002.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="resources\meme\auto\chushou\chushou_00003.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="resources\meme\auto\chushou\chushou_00004.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="resources\meme\auto\chushou\chushou_00005.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="resources\meme\auto\chushou\chushou_00006.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="resources\meme\auto\chushou\chushou_00007.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="resources\meme\auto\chushou\chushou_00008.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="resources\meme\auto\chushou\chushou_00009.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="resources\meme\auto\chushou\chushou_00010.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -211,7 +244,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="resources\meme\auto\" />
     <Folder Include="resources\meme\marry\" />
   </ItemGroup>
 
