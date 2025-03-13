@@ -232,7 +232,10 @@
     <None Update="resources\meme\auto\chushou\chushou_00009.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="resources\meme\auto\chushou\chushou_00010.png">
+    <None Update="resources\meme\auto\chushou\chushou_000010.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="resources\meme\auto\chushou\chushou_00011.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
