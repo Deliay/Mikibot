@@ -27,7 +27,7 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
 
     private readonly Dictionary<string, string> _knownCommandMapping = new()
     {
-        { "marry", "结婚" },
+        { "shoot", "射" },
         { "jerk", "打" },
         { "punch", "👊" },
     };
@@ -36,6 +36,7 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
         var autoComposeMemeFolders = Directory.EnumerateDirectories(Path.Combine("resources", "meme", "auto"));
         foreach (var autoComposeMemeFolder in autoComposeMemeFolders)
         {
+            Logger.LogInformation("Add {} meme composer", autoComposeMemeFolder);
             _memeProcessors.Add("/" + autoComposeMemeFolder, Memes.AutoCompose(autoComposeMemeFolder));
             if (_knownCommandMapping.TryGetValue(autoComposeMemeFolder, out var knownCommand))
             {
