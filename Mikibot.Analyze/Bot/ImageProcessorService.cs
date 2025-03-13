@@ -36,9 +36,10 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
         var autoComposeMemeFolders = Directory.EnumerateDirectories(Path.Combine("resources", "meme", "auto"));
         foreach (var autoComposeMemeFolder in autoComposeMemeFolders)
         {
-            Logger.LogInformation("Add {} meme composer", autoComposeMemeFolder);
-            _memeProcessors.Add("/" + autoComposeMemeFolder, Memes.AutoCompose(autoComposeMemeFolder));
-            if (_knownCommandMapping.TryGetValue(autoComposeMemeFolder, out var knownCommand))
+            var triggerWord = Path.GetDirectoryName(autoComposeMemeFolder)!;
+            Logger.LogInformation("Add {} meme composer, trigger word: {}", autoComposeMemeFolder, triggerWord);
+            _memeProcessors.Add("/" + triggerWord, Memes.AutoCompose(autoComposeMemeFolder));
+            if (_knownCommandMapping.TryGetValue(triggerWord, out var knownCommand))
             {
                 _memeProcessors.Add("/" + knownCommand, Memes.AutoCompose(autoComposeMemeFolder));
             }
