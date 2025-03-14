@@ -66,11 +66,9 @@ public static class Filters
         };
     }
     public static async IAsyncEnumerable<Frame> SlideV2(this IAsyncEnumerable<Frame> frames,
-        int directionHorizontal = 1, int directionVertical = 0,
+        int directionHorizontal = 1, int directionVertical = 0, int minMoves = 4,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        const int minMoves = 10;
-
         var allFrames = await frames.ToListAsync(cancellationToken);
 
         // padding to more than `minMoves` frames when not enough
@@ -83,7 +81,7 @@ public static class Filters
             using var frame = finalFrames[i];
             Image newFrame = new Image<Rgba32>(frame.Image.Size.Width, frame.Image.Size.Height);
             newFrame.Mutate(ProcessSlide(i, frame.Image));
-            yield return new Frame() { Sequence = i, Image = newFrame };
+            yield return new Frame { Sequence = i, Image = newFrame };
         }
 
         yield break;
@@ -92,11 +90,11 @@ public static class Filters
         {
             return ctx =>
             {
-                var x = Convert.ToInt32(Math.Round((1f * i / finalFrames.Count) * image.Size.Width * directionHorizontal, MidpointRounding.AwayFromZero));
-                var y = Convert.ToInt32(Math.Round((1f * i / finalFrames.Count) * image.Size.Height * directionVertical, MidpointRounding.AwayFromZero));
+                var x = (int)Math.Round(1f * i / finalFrames.Count * image.Size.Width, MidpointRounding.AwayFromZero);
+                var y = (int)Math.Round(1f * i / finalFrames.Count * image.Size.Height, MidpointRounding.AwayFromZero);
 
-                var leftPos = new Point(x - image.Size.Width, y - image.Size.Height);
-                var rightPos = new Point(x, y);
+                var leftPos = new Point((x - image.Size.Width) * directionHorizontal, (y - image.Size.Height) * directionVertical);
+                var rightPos = new Point(x * directionHorizontal, y * directionVertical);
 
                 ctx.DrawImage(image, leftPos, 1f);
                 ctx.DrawImage(image, rightPos, 1f);
