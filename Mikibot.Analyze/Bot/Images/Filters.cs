@@ -77,7 +77,7 @@ public static class Filters
 
             return image.ExtractFrames()
                 .FrameDelay(TimeSpan.FromMilliseconds(frameDelay))
-                .AutoComposeAsync(token);
+                .AutoComposeAsync(frameDelay / 10, token);
         });
     }
 }
