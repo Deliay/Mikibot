@@ -38,67 +38,46 @@ public static class Filters
             .AutoComposeAsync(3, token);
     }
 
-    public static Memes.Factory Slide()
+    private static (int hor, int vert) ParseSlidingArgument(string argument)
+    {
+        var hor = argument.Contains('右') ? -1 : argument.Contains('左') ? 1 : 0;
+        var vert = argument.Contains('下') ? -1 : argument.Contains('上') ? 1 : 0;
+        if (hor == 0 && vert == 0) hor = 1;
+
+        return (hor, vert);
+    }
+    
+    public static Memes.Factory Sliding()
     {
         return (image, argument, token) =>
         {
-            var hor = argument.Contains('右') ? -1 : argument.Contains('左') ? 1 : 0;
-            var vert = argument.Contains('下') ? -1 : argument.Contains('上') ? 1 : 0;
-            if (hor == 0 && vert == 0) hor = 1;
-
+            var (hor, vert) = ParseSlidingArgument(argument);
             return image.ExtractFrames()
-                .Slide(hor, vert, cancellationToken: token)
+                .Sliding(hor, vert, cancellationToken: token)
                 .AutoComposeAsync(3, token);
         };
     }
     
-    public static Memes.Factory SlideV2()
+    public static Memes.Factory SlideTimeline()
     {
         return (image, argument, token) =>
         {
-            var hor = argument.Contains('右') ? -1 : argument.Contains('左') ? 1 : 0;
-            var vert = argument.Contains('下') ? -1 : argument.Contains('上') ? 1 : 0;
-            if (hor == 0 && vert == 0) hor = 1;
-
+            var (hor, vert) = ParseSlidingArgument(argument);
             return image.ExtractFrames()
-                .SlideV2(hor, vert, cancellationToken: token)
+                .TimelineSliding(hor, vert, cancellationToken: token)
                 .AutoComposeAsync(3, token);
         };
     }
-    public static async IAsyncEnumerable<Frame> SlideV2(this IAsyncEnumerable<Frame> frames,
-        int directionHorizontal = 1, int directionVertical = 0, int minMoves = 4,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+
+    public static Memes.Factory FrameDelay()
     {
-        var allFrames = await frames.ToListAsync(cancellationToken);
-
-        // padding to more than `minMoves` frames when not enough
-        var targetFrames = allFrames.Count;
-        var loopTimes = (minMoves + targetFrames - 1) / targetFrames;
-
-        var finalFrames = allFrames.Loop(loopTimes - 1).ToList();
-        for (var i = 0; i < finalFrames.Count; i++)
+        return ((image, arguments, token) =>
         {
-            using var frame = finalFrames[i];
-            Image newFrame = new Image<Rgba32>(frame.Image.Size.Width, frame.Image.Size.Height);
-            newFrame.Mutate(ProcessSlide(i, frame.Image));
-            yield return new Frame { Sequence = i, Image = newFrame };
-        }
+            var frameDelay = int.TryParse(arguments, out var inputDelay) ? inputDelay : 20;
 
-        yield break;
-
-        Action<IImageProcessingContext> ProcessSlide(int i, Image image)
-        {
-            return ctx =>
-            {
-                var x = (int)Math.Round(1f * i / finalFrames.Count * image.Size.Width, MidpointRounding.AwayFromZero);
-                var y = (int)Math.Round(1f * i / finalFrames.Count * image.Size.Height, MidpointRounding.AwayFromZero);
-
-                var leftPos = new Point((x - image.Size.Width) * directionHorizontal, (y - image.Size.Height) * directionVertical);
-                var rightPos = new Point(x * directionHorizontal, y * directionVertical);
-
-                ctx.DrawImage(image, leftPos, 1f);
-                ctx.DrawImage(image, rightPos, 1f);
-            };
-        }
+            return image.ExtractFrames()
+                .FrameDelay(TimeSpan.FromMilliseconds(frameDelay))
+                .AutoComposeAsync(token);
+        });
     }
 }

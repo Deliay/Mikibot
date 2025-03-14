@@ -48,8 +48,9 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
         _memeProcessors.Add("/结婚", Memes.Marry);
         _memeProcessors.Add("/像素化", Filters.Pixelate());
         _memeProcessors.Add("/旋转", Filters.Rotation());
-        _memeProcessors.Add("/滑", Filters.Slide());
-        _memeProcessors.Add("/肉编滑", Filters.SlideV2());
+        _memeProcessors.Add("/滑", Filters.Sliding());
+        _memeProcessors.Add("/轴也滑", Filters.SlideTimeline());
+        _memeProcessors.Add("/间隔", Filters.FrameDelay());
         
         return ValueTask.CompletedTask;
     }
