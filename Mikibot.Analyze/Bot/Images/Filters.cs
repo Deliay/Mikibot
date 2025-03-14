@@ -64,7 +64,7 @@ public static class Filters
                 .SlideV2(hor, vert, cancellationToken: token)
                 .AutoComposeAsync(token);
         };
-    }public static async IAsyncEnumerable<Frame> Slide(this IAsyncEnumerable<Frame> frames,
+    }public static async IAsyncEnumerable<Frame> SlideV2(this IAsyncEnumerable<Frame> frames,
         int directionHorizontal = 1, int directionVertical = 0,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
