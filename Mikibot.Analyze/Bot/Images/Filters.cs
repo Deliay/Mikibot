@@ -42,7 +42,7 @@ public static class Filters
     {
         return (image, argument, token) =>
         {
-            var hor = argument.Contains('左') ? -1 : argument.Contains('右') ? 1 : 0;
+            var hor = argument.Contains('右') ? -1 : argument.Contains('左') ? 1 : 0;
             var vert = argument.Contains('下') ? -1 : argument.Contains('上') ? 1 : 0;
             if (hor == 0 && vert == 0) hor = 1;
 
