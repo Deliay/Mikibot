@@ -35,7 +35,7 @@ public static class Filters
     {
         return (image, _, token) => image.ExtractFrames()
             .Rotation(circleTimes, token)
-            .AutoComposeAsync(30, token);
+            .AutoComposeAsync(3, token);
     }
 
     public static Memes.Factory Slide()
@@ -48,7 +48,7 @@ public static class Filters
 
             return image.ExtractFrames()
                 .Slide(hor, vert, cancellationToken: token)
-                .AutoComposeAsync(30, token);
+                .AutoComposeAsync(3, token);
         };
     }
     
@@ -62,7 +62,7 @@ public static class Filters
 
             return image.ExtractFrames()
                 .SlideV2(hor, vert, cancellationToken: token)
-                .AutoComposeAsync(30, token);
+                .AutoComposeAsync(3, token);
         };
     }
     public static async IAsyncEnumerable<Frame> SlideV2(this IAsyncEnumerable<Frame> frames,

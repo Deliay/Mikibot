@@ -32,7 +32,7 @@ public static class Memes
         
         return await baseSequence
             .FrameBasedZipSequence(merger, DrawLeftBottom, cancellationToken)
-            .AutoComposeAsync(30, cancellationToken);
+            .AutoComposeAsync(3, cancellationToken);
     }
 
     public delegate ValueTask<MemeResult> NoArgumentFactory(Image image, CancellationToken cancellationToken = default);
@@ -55,6 +55,6 @@ public static class Memes
         return await baseSequence
             .EachFrame(DrawLeftBottomSingle(left), cancellationToken)
             .EachFrame(DrawRightCenterSingle(right), cancellationToken)
-            .AutoComposeAsync(30, cancellationToken);
+            .AutoComposeAsync(3, cancellationToken);
     }
 }
