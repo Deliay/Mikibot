@@ -24,7 +24,7 @@ public static class Memes
     {
         using var sequence = await Frames
             .LoadFromFolderAsync(folder, "*.png", cancellationToken)
-            .Slow(slowTimes)
+            .DuplicateFrame(slowTimes)
             .ToSequenceAsync(cancellationToken);
         using var baseSequence = await image.ExtractFrames().ToSequenceAsync(cancellationToken);;
 
