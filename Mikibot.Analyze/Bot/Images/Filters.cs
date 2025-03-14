@@ -38,17 +38,18 @@ public static class Filters
             .AutoComposeAsync(token);
     }
 
-    public static Memes.Factory SlideLeft()
+    public static Memes.Factory Slide()
     {
-        return (image, _, token) => image.ExtractFrames()
-            .Slide(1, cancellationToken: token)
-            .AutoComposeAsync(token);
+        return (image, argument, token) =>
+        {
+            var hor = argument.Contains('左') ? -1 : argument.Contains('右') ? 1 : 0;
+            var vert = argument.Contains('下') ? -1 : argument.Contains('上') ? 1 : 0;
+            if (hor == 0 && vert == 0) hor = 1;
+
+            return image.ExtractFrames()
+                .Slide(hor, vert, cancellationToken: token)
+                .AutoComposeAsync(token);
+        };
     }
     
-    public static Memes.Factory SlideRight()
-    {
-        return (image, _, token) => image.ExtractFrames()
-            .Slide(-1, cancellationToken: token)
-            .AutoComposeAsync(token);
-    }
 }

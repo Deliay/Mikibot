@@ -48,37 +48,38 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
         _memeProcessors.Add("/结婚", Memes.Marry);
         _memeProcessors.Add("/像素化", Filters.Pixelate());
         _memeProcessors.Add("/旋转", Filters.Rotation());
-        _memeProcessors.Add("/左滑", Filters.SlideLeft());
-        _memeProcessors.Add("/右滑", Filters.SlideRight());
+        _memeProcessors.Add("/滑", Filters.Slide());
         
         return ValueTask.CompletedTask;
     }
 
-    private Memes.Factory? ComposeAll(string command)
+    private Memes.NoArgumentFactory? ComposeAll(string command)
     {
         var possibleCommands = command.Split('/', StringSplitOptions.RemoveEmptyEntries);
         Logger.LogInformation("Split input commands: {}", string.Join(", ", possibleCommands));
         var factories = possibleCommands
             .Select(s => s.Trim())
             .Select(s => '/' + s)
-            .Where(_memeProcessors.ContainsKey)
-            .Select(s => _memeProcessors[s])
+            .Select(s => s.Split(':'))
+            .Select(s => (s[0], s.Length > 1 ? s[1] : ""))
+            .Where(p => _memeProcessors.ContainsKey(p.Item1))
+            .Select(p => (factory: _memeProcessors[p.Item1], argument: p.Item2))
             .ToList();
         
         Logger.LogInformation("Match {} meme factory", factories.Count);
         
         return factories.Count switch
         {
-            1 => factories[0],
+            1 => (image, token) => factories[0].factory(image, factories[0].argument, token),
             0 => null,
-            _ => (async (image, message, token) =>
+            _ => (async (image, token) =>
             {
-                var headFactory = factories[0];
-                var currentFrame = await headFactory(image, message, token).ConfigureAwait(false);
-                foreach (var factory in factories[1..])
+                var head = factories[0];
+                var currentFrame = await head.factory(image, head.argument, token).ConfigureAwait(false);
+                foreach (var next in factories[1..])
                 {
                     using var lastFrame = currentFrame;
-                    currentFrame = await factory(currentFrame.Image, message, token);
+                    currentFrame = await next.factory(currentFrame.Image, next.argument, token);
                 }
 
                 return currentFrame;
@@ -112,7 +113,7 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
         {
             logger.LogInformation("Processing image, url: {}", imageMessage.Url);
             using var image = await QqService.ReadImageAsync(imageMessage.Url, token);
-            using var result = await processor(image, message.MessageChain, token);
+            using var result = await processor(image, token);
             return new ImageMessage() { Base64 = await result.ToDataUri(token) };
         });
         

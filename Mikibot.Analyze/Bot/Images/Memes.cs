@@ -35,14 +35,15 @@ public static class Memes
             .AutoComposeAsync(cancellationToken);
     }
 
-    public delegate ValueTask<MemeResult> Factory(Image image, MessageChain message, CancellationToken cancellationToken = default);
+    public delegate ValueTask<MemeResult> NoArgumentFactory(Image image, CancellationToken cancellationToken = default);
+    public delegate ValueTask<MemeResult> Factory(Image image, string arguments, CancellationToken cancellationToken = default);
     
     public static Factory AutoCompose(string folder, int slowTimes = 1)
     {
         return (image, msg, token) => SequenceZip(image, folder, slowTimes, token);
     }
 
-    public static async ValueTask<MemeResult> Marry(Image image, MessageChain message, CancellationToken cancellationToken)
+    public static async ValueTask<MemeResult> Marry(Image image, string message, CancellationToken cancellationToken)
     {
         var resources = await Frames.LoadFromFolderAsync(Path.Combine("resources", "meme", "marry"), "*.png", cancellationToken)
             .ToListAsync(cancellationToken);
