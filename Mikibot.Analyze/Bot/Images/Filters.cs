@@ -64,7 +64,8 @@ public static class Filters
                 .SlideV2(hor, vert, cancellationToken: token)
                 .AutoComposeAsync(token);
         };
-    }public static async IAsyncEnumerable<Frame> SlideV2(this IAsyncEnumerable<Frame> frames,
+    }
+    public static async IAsyncEnumerable<Frame> SlideV2(this IAsyncEnumerable<Frame> frames,
         int directionHorizontal = 1, int directionVertical = 0,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
@@ -75,7 +76,6 @@ public static class Filters
         // padding to more than `minMoves` frames when not enough
         var targetFrames = allFrames.Count;
         var loopTimes = (minMoves + targetFrames - 1) / targetFrames;
-        targetFrames = loopTimes * targetFrames;
 
         var finalFrames = allFrames.Loop(loopTimes - 1).ToList();
         for (var i = 0; i < finalFrames.Count; i++)
@@ -92,15 +92,11 @@ public static class Filters
         {
             return ctx =>
             {
-                var x = (1f * i / finalFrames.Count) * image.Size.Width;
-                var y = (1f * i / finalFrames.Count) * image.Size.Height;
+                var x = Convert.ToInt32(Math.Round((1f * i / finalFrames.Count) * image.Size.Width * directionHorizontal, MidpointRounding.AwayFromZero));
+                var y = Convert.ToInt32(Math.Round((1f * i / finalFrames.Count) * image.Size.Height * directionVertical, MidpointRounding.AwayFromZero));
 
-                var leftPos = new Point(
-                    Convert.ToInt32((x - image.Size.Width) * directionHorizontal),
-                    Convert.ToInt32((y - image.Size.Height) * directionVertical));
-                var rightPos = new Point(
-                    Convert.ToInt32(x * directionHorizontal),
-                    Convert.ToInt32(y * directionVertical));
+                var leftPos = new Point(x - image.Size.Width, y - image.Size.Height);
+                var rightPos = new Point(x, y);
 
                 ctx.DrawImage(image, leftPos, 1f);
                 ctx.DrawImage(image, rightPos, 1f);
