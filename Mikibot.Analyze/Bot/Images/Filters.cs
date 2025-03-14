@@ -64,8 +64,7 @@ public static class Filters
                 .SlideV2(hor, vert, cancellationToken: token)
                 .AutoComposeAsync(token);
         };
-    }
-    public static async IAsyncEnumerable<Frame> SlideV2(this IAsyncEnumerable<Frame> frames,
+    }public static async IAsyncEnumerable<Frame> Slide(this IAsyncEnumerable<Frame> frames,
         int directionHorizontal = 1, int directionVertical = 0,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
@@ -77,17 +76,13 @@ public static class Filters
         var targetFrames = allFrames.Count;
         var loopTimes = (minMoves + targetFrames - 1) / targetFrames;
         targetFrames = loopTimes * targetFrames;
-        
-        var imageSize = allFrames[0].Image.Size;
-        var eachX = Convert.ToInt32((1f * imageSize.Width / targetFrames));
-        var eachY = Convert.ToInt32((1f * imageSize.Height / targetFrames));
 
         var finalFrames = allFrames.Loop(loopTimes - 1).ToList();
         for (var i = 0; i < finalFrames.Count; i++)
         {
-            using var image = finalFrames[i];
-            Image newFrame = new Image<Rgba32>(imageSize.Width, imageSize.Height);
-            newFrame.Mutate(ProcessSlide(i, image.Image));
+            using var frame = finalFrames[i];
+            Image newFrame = new Image<Rgba32>(frame.Image.Size.Width, frame.Image.Size.Height);
+            newFrame.Mutate(ProcessSlide(i, frame.Image));
             yield return new Frame() { Sequence = i, Image = newFrame };
         }
 
@@ -97,17 +92,15 @@ public static class Filters
         {
             return ctx =>
             {
-                var leftX = directionHorizontal != 0 ? 0 - eachX * i : 0;
-                var leftY = directionVertical != 0 ? 0 - eachY * i : 0;
-                var leftPos = new Point(
-                    (leftX) * directionHorizontal,
-                    (leftY) * directionVertical);
+                var x = (1f * i / finalFrames.Count) * image.Size.Width;
+                var y = (1f * i / finalFrames.Count) * image.Size.Height;
 
-                var rightX = directionHorizontal != 0 ? imageSize.Width - eachX * i : 0;
-                var rightY = directionVertical != 0 ? imageSize.Height - eachY * i : 0;
+                var leftPos = new Point(
+                    Convert.ToInt32((x - image.Size.Width) * directionHorizontal),
+                    Convert.ToInt32((y - image.Size.Height) * directionVertical));
                 var rightPos = new Point(
-                    (rightX) * directionHorizontal,
-                    (rightY) * directionVertical);
+                    Convert.ToInt32(x * directionHorizontal),
+                    Convert.ToInt32(y * directionVertical));
 
                 ctx.DrawImage(image, leftPos, 1f);
                 ctx.DrawImage(image, rightPos, 1f);
