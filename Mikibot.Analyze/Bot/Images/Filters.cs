@@ -37,4 +37,18 @@ public static class Filters
             .Rotation(circleTimes, token)
             .AutoComposeAsync(token);
     }
+
+    public static Memes.Factory SlideLeft()
+    {
+        return (image, _, token) => image.ExtractFrames()
+            .Slide(1, cancellationToken: token)
+            .AutoComposeAsync(token);
+    }
+    
+    public static Memes.Factory SlideRight()
+    {
+        return (image, _, token) => image.ExtractFrames()
+            .Slide(-1, cancellationToken: token)
+            .AutoComposeAsync(token);
+    }
 }
