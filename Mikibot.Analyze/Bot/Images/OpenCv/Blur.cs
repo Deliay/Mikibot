@@ -4,7 +4,7 @@ namespace Mikibot.Analyze.Bot.Images.OpenCv;
 
 public static class Blur
 { 
-    public static Mat RadialBlur(this Mat src, Point? axisValue = null, int iterateCount = 10)
+    public static Mat RadialBlur(this Mat src, Point axis, int iterateCount = 10)
     {
         
         var width = src.Cols;
@@ -12,8 +12,6 @@ public static class Blur
         var dest = new Mat(height, width, MatType.CV_32FC3);
         src.ConvertTo(dest, MatType.CV_32FC3);
         
-        var axis = axisValue ?? new Point(0.5, 0.5);
-
         var center = new Point(
             width * MathF.Min(MathF.Abs(axis.X), 1f),
             height * MathF.Min(MathF.Abs(axis.Y), 1f));

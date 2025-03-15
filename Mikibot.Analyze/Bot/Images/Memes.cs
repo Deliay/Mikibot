@@ -299,7 +299,7 @@ public static class Memes
         {
             if (!int.TryParse(arguments, out var iteration)) iteration = 10;
 
-            Point? center = null;
+            var center = new Point(0.5, 0.5);
             if (TryParseNumberPair(arguments, out var numberPair))
                 center = new Point(numberPair.Value.x, numberPair.Value.y);
             
