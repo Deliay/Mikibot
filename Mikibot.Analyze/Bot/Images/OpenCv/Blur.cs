@@ -14,7 +14,9 @@ public static class Blur
         
         var axis = axisValue ?? new Point(0.5, 0.5);
 
-        var center = new Point(width * axis.X, height * axis.Y);
+        var center = new Point(
+            width * MathF.Max(MathF.Abs(axis.X), 1f),
+            height * MathF.Max(MathF.Abs(axis.Y), 1f));
         
         Parallel.For(0, height, (y) =>
         {
