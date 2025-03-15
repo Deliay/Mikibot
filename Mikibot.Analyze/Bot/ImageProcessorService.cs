@@ -32,6 +32,8 @@ public class ImageProcessorService(
     };
     protected override ValueTask PreRun(CancellationToken token)
     {
+        memeCommandHandler.RegisterStaticMethods(typeof(Memes));
+        
         var autoComposeMemeFolders = Directory.EnumerateDirectories(Path.Combine("resources", "meme", "auto"));
         foreach (var autoComposeMemeFolder in autoComposeMemeFolders)
         {
@@ -43,7 +45,6 @@ public class ImageProcessorService(
                 memeCommandHandler.Register(knownCommand, "木有参数", Memes.AutoCompose(autoComposeMemeFolder));
             }
         }
-        memeCommandHandler.RegisterStaticMethods(typeof(Memes));
         
         Logger.LogInformation("Total {} meme processor has been registered.", memeCommandHandler.MemeProcessors.Count);
         return ValueTask.CompletedTask;
