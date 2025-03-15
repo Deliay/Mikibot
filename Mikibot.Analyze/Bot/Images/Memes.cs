@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using MemeFactory.Core.Processing;
 using MemeFactory.Core.Utilities;
+using Mikibot.Analyze.Bot.Images.OpenCv;
 using Mirai.Net.Data.Messages;
 using NPOI.SS.Formula.Functions;
 using SixLabors.ImageSharp;
@@ -270,28 +271,18 @@ public static class Memes
     [MemeCommandMapping("", "高斯模糊")]
     public static Factory GaussianBlur() => (seq, arguments, token) => seq.GaussianBlur();
 
-    [MemeCommandMapping("", "径向模糊")]
+    [MemeCommandMapping("[迭代次数=10]", "径向模糊")]
     public static Factory RadialBlur()
     {
         return (seq, arguments, token) =>
         {
-            if (!float.TryParse(arguments, out var amount)) 
-                throw new AfterProcessError(nameof(RadialBlur), $"数值{arguments}解析失败");
+            if (!int.TryParse(arguments, out var iteration)) iteration = 10;
             
-            return RadialBlurCore(seq, amount);
+            iteration = Math.Min(iteration, 20);
+            return seq.OpenCv(mat => ValueTask.FromResult(mat.RadialBlur(iterateCount: iteration)),
+                cancellationToken: token);
         };
 
-        async IAsyncEnumerable<Frame> RadialBlurCore(IAsyncEnumerable<Frame> frames, float amount)
-        {
-            await foreach (var frame in frames) using(frame)
-            {
-                var newImage = new Image<Rgba32>(frame.Image.Width, frame.Image.Height);
-                newImage.Mutate(ctx => ctx.DrawImage(frame.Image, 1f));
-                using var blurImage = SimdRadialBlurImageProcessor.Apply(newImage, amount);
-                newImage.Mutate(ctx => ctx.DrawImage(blurImage, 1f));
-                yield return frame with { Image = newImage };
-            }
-        }
     }
 
     [MemeCommandMapping("", "高斯锐化")]
