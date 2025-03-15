@@ -17,9 +17,7 @@ public static class OpenCvFrameProcessExtensions
             await frame.Image.SaveAsPngAsync(ms, cancellationToken);
             ms.Position = 0;
             using var mat = Cv2.ImDecode(ms.GetBuffer(), ImreadModes.Color);
-            mat.SaveImage($@"Y:\TMP\12\frames\f_{frame.Sequence}.png");
             using var newMat = await transform(mat);
-            newMat.SaveImage($@"Y:\TMP\12\frames\g_{frame.Sequence}.png");
             Cv2.ImEncode(".png", newMat, out var buf);
             yield return frame with { Image = Image.Load(buf) };
         }
