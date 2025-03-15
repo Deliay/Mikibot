@@ -13,6 +13,7 @@ public static class Blur
         src.ConvertTo(dest, MatType.CV_32FC3);
         
         var center = new Point(width * (axis.X / 100), height * (axis.Y / 100));
+        Console.WriteLine($"center: w{center.X}/{width}/{axis.X}, h{center.Y}/{height}/{axis.Y}");
 
         Parallel.For(0, height, (y) =>
         {
