@@ -115,7 +115,7 @@ public static class Memes
             if (int.TryParse(numStr, out var parsedSlidingTimes))
             {
                 if (parsedSlidingTimes is > 64 or < 1)
-                    throw new AfterProcessError(nameof(ParseSlidingArgument), "不准滑那么多😡 (1-64)")
+                    throw new AfterProcessError(nameof(ParseSlidingArgument), "不准滑那么多😡 (1-64)");
             }
         }
         var hor = argument.Contains('右') ? -1 : argument.Contains('左') ? 1 : 0;
