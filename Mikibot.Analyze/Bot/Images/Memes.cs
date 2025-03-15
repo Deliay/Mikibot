@@ -102,13 +102,24 @@ public static class Memes
         };
     }
 
-    private static (int hor, int vert) ParseSlidingArgument(string argument)
+    private static (int hor, int vert, int slidingTimes) ParseSlidingArgument(string argument)
     {
+        var numStart = argument.FirstOrDefault(char.IsNumber);
+        var slidingTimes = 16;
+        if (numStart != 0)
+        {
+            var numEnd = argument.LastOrDefault(char.IsNumber);
+            var numStartPos = argument.IndexOf(numStart);
+            var numEndPos = argument.IndexOf(numEnd);
+            var numStr = argument[numStartPos..(numEndPos + 1)];
+            if (int.TryParse(numStr, out var parsedSlidingTimes))
+                slidingTimes = Math.Max(64, parsedSlidingTimes);
+        }
         var hor = argument.Contains('右') ? -1 : argument.Contains('左') ? 1 : 0;
         var vert = argument.Contains('下') ? -1 : argument.Contains('上') ? 1 : 0;
         if (hor == 0 && vert == 0) hor = 1;
 
-        return (hor, vert);
+        return (hor, vert, slidingTimes);
     }
     
     [MemeCommandMapping("[上下][左右]", "滑")]
@@ -116,8 +127,9 @@ public static class Memes
     {
         return (seq, argument, token) =>
         {
-            var (hor, vert) = ParseSlidingArgument(argument);
-            return seq.Sliding(-hor, -vert, cancellationToken: token);
+            
+            var (hor, vert, slidingTimes) = ParseSlidingArgument(argument);
+            return seq.Sliding(-hor, -vert, slidingTimes, cancellationToken: token);
         };
     }
     
@@ -126,8 +138,8 @@ public static class Memes
     {
         return (seq, argument, token) =>
         {
-            var (hor, vert) = ParseSlidingArgument(argument);
-            return seq.TimelineSliding(hor, vert, cancellationToken: token);
+            var (hor, vert, slidingTimes) = ParseSlidingArgument(argument);
+            return seq.TimelineSliding(hor, vert, slidingTimes, cancellationToken: token);
         };
     }
 
