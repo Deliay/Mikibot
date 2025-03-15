@@ -113,7 +113,10 @@ public static class Memes
             var numEndPos = argument.LastIndexOf(numEnd);
             var numStr = argument[numStartPos..(numEndPos + 1)];
             if (int.TryParse(numStr, out var parsedSlidingTimes))
-                slidingTimes = Math.Max(64, parsedSlidingTimes);
+            {
+                if (parsedSlidingTimes is > 64 or < 1)
+                    throw new AfterProcessError(nameof(ParseSlidingArgument), "不准滑那么多😡 (1-64)")
+            }
         }
         var hor = argument.Contains('右') ? -1 : argument.Contains('左') ? 1 : 0;
         var vert = argument.Contains('下') ? -1 : argument.Contains('上') ? 1 : 0;
