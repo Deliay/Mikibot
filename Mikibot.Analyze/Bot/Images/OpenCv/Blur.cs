@@ -17,7 +17,7 @@ public static class Blur
         var center = new Point(
             width * MathF.Max(MathF.Abs(axis.X), 1f),
             height * MathF.Max(MathF.Abs(axis.Y), 1f));
-        
+        Console.WriteLine($"center: w{center.X}/{width}, h{center.Y}/{height}");
         Parallel.For(0, height, (y) =>
         {
             for (var x = 0; x < width; x++)
