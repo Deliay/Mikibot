@@ -301,9 +301,11 @@ public static class Memes
 
             var center = new Point(0.5, 0.5);
             if (TryParseNumberPair(arguments, out var numberPair))
+            {
+                Console.WriteLine($"{arguments} Parse OK");
                 center = new Point(numberPair.Value.x, numberPair.Value.y);
+            }
             
-            Console.WriteLine($"center: {center.X},{center.Y}");
             if (center.Y < 0 || center.X < 0) throw new AfterProcessError(nameof(RadialBlur), "中心点取值[0-1]");
             
             iteration = Math.Min(iteration, 20);
