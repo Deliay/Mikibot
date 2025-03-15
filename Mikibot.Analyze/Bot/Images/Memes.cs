@@ -92,9 +92,9 @@ public static class Memes
     
     
     [MemeCommandMapping("没有参数","旋转")]
-    public static Factory Rotation(int circleTimes = 8)
+    public static Factory Rotation()
     {
-        return (seq, _, token) => seq.Rotation(circleTimes, token);
+        return (seq, _, token) => seq.Rotation(cancellationToken: token);
     }
 
     private static (int hor, int vert) ParseSlidingArgument(string argument)
