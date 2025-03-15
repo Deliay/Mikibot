@@ -163,6 +163,9 @@ public static class Memes
             using var result = await seq.AutoComposeAsync(frameDelay, token);
             await foreach (var extractFrame in result.Image.ExtractFrames().WithCancellation(token))
             {
+                var gifFrameMetadata = extractFrame.Image.Frames.RootFrame.Metadata.GetGifMetadata();
+                var srcMetadata = result.Image.Frames[extractFrame.Sequence].Metadata.GetGifMetadata();
+                gifFrameMetadata.FrameDelay = srcMetadata.FrameDelay;
                 yield return extractFrame;
             }
         }
