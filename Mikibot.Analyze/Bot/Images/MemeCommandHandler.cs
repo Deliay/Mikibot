@@ -31,7 +31,7 @@ public class MemeCommandHandler(ILogger<MemeCommandHandler> logger)
             foreach (var attributeCommand in attribute.Commands)
             {
                 logger.LogInformation("Adding {} with delegate {}", attributeCommand, methodInfo.Name);
-                _memeProcessors.Add(attributeCommand, methodInfo.CreateDelegate<Memes.Factory>());
+                _memeProcessors.Add(attributeCommand, methodInfo.CreateDelegate<Func<Memes.Factory>>()());
             }
         }
     }
