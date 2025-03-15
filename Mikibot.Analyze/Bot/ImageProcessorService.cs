@@ -54,9 +54,9 @@ public class ImageProcessorService(
         var groupId = message.Sender.Group.Id;
         var msg = message.MessageChain.GetPlainMessage().Trim();
 
+        Logger.LogInformation("Meme processor, processing: {}", msg);
         if (!msg.StartsWith('/')) return;
 
-        Logger.LogInformation("Meme processor, processing: {}", msg);
         if (msg.StartsWith("//帮"))
         {
             var helpStr = string.Join(" | ", memeCommandHandler.MemeHelpers
