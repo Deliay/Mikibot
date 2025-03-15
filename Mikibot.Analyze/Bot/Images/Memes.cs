@@ -154,7 +154,7 @@ public static class Memes
             var frameDelay = int.TryParse(arguments, out var inputDelay)
                 ? inputDelay
                 : throw new AfterProcessError(nameof(FrameDelay), "间隔必须是数字");
-            return FrameDelayCore(seq, frameDelay, token);
+            return FrameDelayCore(seq, frameDelay / 10, token);
         };
 
         async IAsyncEnumerable<Frame> FrameDelayCore(IAsyncEnumerable<Frame> seq, int frameDelay,
