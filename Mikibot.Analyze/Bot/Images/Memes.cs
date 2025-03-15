@@ -299,16 +299,14 @@ public static class Memes
         {
             if (!int.TryParse(arguments, out var iteration)) iteration = 10;
 
-            var center = new Point(0.5, 0.5);
+            var center = new Point(50, 50);
             if (TryParseNumberPair(arguments, out var numberPair))
             {
-                Console.WriteLine($"Center point {arguments} Parse OK");
                 center = new Point(numberPair.Value.x, numberPair.Value.y);
             }
 
-            Console.WriteLine($"Center point :{center.X}, {center.Y}");
             
-            if (center.Y < 0 || center.X < 0) throw new AfterProcessError(nameof(RadialBlur), "中心点取值[0-1]");
+            if (center.Y is < 0 or > 100 || center.X is < 0 or > 100) throw new AfterProcessError(nameof(RadialBlur), "中心点取值[0-100]");
             
             iteration = Math.Min(iteration, 20);
             return seq.OpenCv(mat => ValueTask.FromResult(mat.RadialBlur(center, iteration)),
