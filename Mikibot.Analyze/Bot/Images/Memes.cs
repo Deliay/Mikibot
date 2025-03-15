@@ -91,10 +91,14 @@ public static class Memes
     }
     
     
-    [MemeCommandMapping("","旋转")]
+    [MemeCommandMapping("[旋转次数]","旋转")]
     public static Factory Rotation()
     {
-        return (seq, _, token) => seq.Rotation(cancellationToken: token);
+        return (seq, arguments, token) =>
+        {
+            if (!int.TryParse(arguments, out var size)) size = 5;
+            return seq.Rotation(size, token);
+        };
     }
 
     private static (int hor, int vert) ParseSlidingArgument(string argument)
