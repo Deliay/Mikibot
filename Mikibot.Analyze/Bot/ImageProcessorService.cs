@@ -44,6 +44,8 @@ public class ImageProcessorService(
             }
         }
         memeCommandHandler.RegisterStaticMethods(typeof(Memes));
+        
+        Logger.LogInformation("Total {} meme processor has been registered.", memeCommandHandler.MemeProcessors.Count);
         return ValueTask.CompletedTask;
     }
 
