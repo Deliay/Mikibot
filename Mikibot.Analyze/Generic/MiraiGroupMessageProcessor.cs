@@ -36,7 +36,15 @@ public abstract class MiraiGroupMessageProcessor<T>(IQqService qqService, ILogge
 
     public async Task Run(CancellationToken token)
     {
-        await PreRun(token);
+        try
+        {
+            await PreRun(token);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "PreRun lifecycle exception");
+            return;
+        }
         logger.LogInformation("Mirai group handling message: {}", typeof(T).Name);
         qqService.SubscribeMessage(FilterMessage, token);
         while (!token.IsCancellationRequested)
