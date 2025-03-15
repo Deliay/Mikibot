@@ -97,6 +97,7 @@ public static class Memes
         return (seq, arguments, token) =>
         {
             if (!int.TryParse(arguments, out var size)) size = 5;
+            if (size is < 1 or > 64) throw new AfterProcessError(nameof(Rotation), "不准转这么多😡(1-64)");
             return seq.Rotation(size, token);
         };
     }
