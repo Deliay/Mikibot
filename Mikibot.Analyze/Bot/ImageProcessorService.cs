@@ -100,7 +100,15 @@ public class ImageProcessorService(
             var (frames, errors) = processor(seq, token);
             var frameDelay = !msg.Contains("间隔") ? 8 : -1;
             using var imageResult = await frames.AutoComposeAsync(frameDelay, token);
-            yield return new ImageMessage() { Base64 = await imageResult.ToDataUri(token) };
+            var frameCount = imageResult.Image.Frames.Count;
+            if (frameCount > 1000)
+            {
+                yield return new PlainMessage($"生成了{frameCount}帧超过1000了，发不出来┑(￣Д ￣)┍");
+            }
+            else
+            {
+                yield return new ImageMessage() { Base64 = await imageResult.ToDataUri(token) };
+            }
             if (errors is { Count: > 0 })
             {
                 yield return new PlainMessage(string.Join('\n', errors.Select(v => v.Message)));
