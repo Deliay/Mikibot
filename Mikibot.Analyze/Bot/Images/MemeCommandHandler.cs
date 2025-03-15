@@ -32,6 +32,7 @@ public class MemeCommandHandler(ILogger<MemeCommandHandler> logger)
             {
                 logger.LogInformation("Adding {} with delegate {}", attributeCommand, methodInfo.Name);
                 _memeProcessors.Add(attributeCommand, methodInfo.CreateDelegate<Func<Memes.Factory>>()());
+                _memeHelper.Add(attributeCommand, attribute.Help);
             }
         }
     }
