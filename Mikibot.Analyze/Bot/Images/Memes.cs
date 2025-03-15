@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using MemeFactory.Core.Processing;
 using MemeFactory.Core.Utilities;
 using Mikibot.Analyze.Bot.Images.OpenCv;
@@ -7,6 +8,7 @@ using NPOI.SS.Formula.Functions;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using Point = OpenCvSharp.Point;
 
 namespace Mikibot.Analyze.Bot.Images;
 
@@ -271,15 +273,38 @@ public static class Memes
     [MemeCommandMapping("", "高斯模糊")]
     public static Factory GaussianBlur() => (seq, arguments, token) => seq.GaussianBlur();
 
+    private static bool TryParseNumberPair(string argument, [NotNullWhen(true)]out (float x, float y)? numberPair)
+    {
+        numberPair = null;
+        var leftIdx = argument.IndexOf('(');
+        if (leftIdx < 0) return false;
+        
+        var rightIdx = argument.IndexOf(')', leftIdx + 1);
+        if (rightIdx < 0) return false;
+        
+        var pairStr = argument[(leftIdx + 1)..rightIdx];
+        var pairStrArr = pairStr.Split(',', 2);
+
+        var xStatus = float.TryParse(pairStrArr[0], out var x);
+        var yStatus = float.TryParse(pairStrArr[1], out var y);
+        numberPair = (x, y);
+        
+        return xStatus && yStatus;
+    }
+    
     [MemeCommandMapping("[迭代次数=10]", "径向模糊")]
     public static Factory RadialBlur()
     {
         return (seq, arguments, token) =>
         {
             if (!int.TryParse(arguments, out var iteration)) iteration = 10;
+
+            Point? center = null;
+            if (TryParseNumberPair(arguments, out var numberPair))
+                center = new Point(numberPair.Value.x, numberPair.Value.y);
             
             iteration = Math.Min(iteration, 20);
-            return seq.OpenCv(mat => ValueTask.FromResult(mat.RadialBlur(iterateCount: iteration)),
+            return seq.OpenCv(mat => ValueTask.FromResult(mat.RadialBlur(center, iteration)),
                 cancellationToken: token);
         };
 
