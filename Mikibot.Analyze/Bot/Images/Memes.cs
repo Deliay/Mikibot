@@ -71,7 +71,7 @@ public static class Memes
         return (image, msg, token) => SequenceZip(image, folder, slowTimes, token);
     }
 
-    [MemeCommandMapping("结婚")]
+    [MemeCommandMapping("没有参数","结婚")]
     public static Factory Marry() => MarryCore;
     private static async IAsyncEnumerable<Frame> MarryCore(IAsyncEnumerable<Frame> frames, string message,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -91,7 +91,7 @@ public static class Memes
     }
     
     
-    [MemeCommandMapping("旋转")]
+    [MemeCommandMapping("没有参数","旋转")]
     public static Factory Rotation(int circleTimes = 8)
     {
         return (seq, _, token) => seq.Rotation(circleTimes, token);
@@ -106,7 +106,7 @@ public static class Memes
         return (hor, vert);
     }
     
-    [MemeCommandMapping("滑")]
+    [MemeCommandMapping("[上下][左右]", "滑")]
     public static Factory Sliding()
     {
         return (seq, argument, token) =>
@@ -116,7 +116,7 @@ public static class Memes
         };
     }
     
-    [MemeCommandMapping("轴也滑")]
+    [MemeCommandMapping("[上下][左右]", "轴也滑")]
     public static Factory SlideTimeline()
     {
         return (seq, argument, token) =>
@@ -126,7 +126,7 @@ public static class Memes
         };
     }
 
-    [MemeCommandMapping("间隔")]
+    [MemeCommandMapping("[毫秒] ", "间隔")]
     public static Factory FrameDelay()
     {
         return (seq, arguments, token) =>
@@ -148,7 +148,7 @@ public static class Memes
         }
     }
     
-    [MemeCommandMapping("肚皮里擦特烦然么", "复制")]
+    [MemeCommandMapping("[次数]", "肚皮里擦特烦然么", "复制")]
     public static Factory DuplicateFrame()
         => (seq, arguments, _) => seq.DuplicateFrame(int.TryParse(arguments, out var times) ? times : 1);
     
@@ -163,7 +163,7 @@ public static class Memes
         }
     }
 
-    [MemeCommandMapping("循环")]
+    [MemeCommandMapping("[次数(可选)]", "循环")]
     public static Factory Loop()
         => (seq, arguments, token) => LoopCore(seq, int.TryParse(arguments, out var times) ? times : 1, token);
 
@@ -185,14 +185,14 @@ public static class Memes
         return (_) => true;
     }
     
-    [MemeCommandMapping("镜像")]
+    [MemeCommandMapping("[v] // (v - 垂直镜像, 其他值水平镜像)","镜像")]
     public static Factory Flip() => (seq, arguments, token) =>
     {
         var flipMode = arguments.Contains('v') ? FlipMode.Vertical : FlipMode.Horizontal;
         return seq.Flip(flipMode);
     };
 
-    [MemeCommandMapping("大小")]
+    [MemeCommandMapping("[宽][x*][高]", "大小")]
     public static Factory Resize() => (seq, arguments, token) =>
     {
         var resolution = arguments.Contains('x') ? arguments.Split('x') : arguments.Split('*');
@@ -213,7 +213,7 @@ public static class Memes
         });
     };
 
-    [MemeCommandMapping("背景")]
+    [MemeCommandMapping("[#颜色]", "背景")]
     public static Factory BackgroundColor() => (seq, arguments, token) =>
     {
         if (!Color.TryParseHex(arguments, out var color))
@@ -222,7 +222,7 @@ public static class Memes
         return seq.BackgroundColor(color);
     };
 
-    [MemeCommandMapping("发光")]
+    [MemeCommandMapping("[#颜色] // 可选", "发光")]
     public static Factory Glow() => (seq, arguments, token) =>
     {
         if (!Color.TryParseHex(arguments, out var color))
@@ -231,7 +231,7 @@ public static class Memes
         return seq.Glow(color);
     };
 
-    [MemeCommandMapping("晕影")]
+    [MemeCommandMapping("[#颜色]", "晕影")]
     public static Factory Vignette() => (seq, arguments, token) =>
     {
         if (!Color.TryParseHex(arguments, out var color))
@@ -240,28 +240,28 @@ public static class Memes
         return seq.Vignette(color);
     };
 
-    [MemeCommandMapping("镜头模糊")]
+    [MemeCommandMapping("木有参数", "镜头模糊")]
     public static Factory BokehBlur() => (seq, arguments, token) => seq.BokehBlur();
     
-    [MemeCommandMapping("高斯模糊")]
+    [MemeCommandMapping("木有参数", "高斯模糊")]
     public static Factory GaussianBlur() => (seq, arguments, token) => seq.GaussianBlur();
 
-    [MemeCommandMapping("高斯锐化")]
+    [MemeCommandMapping("木有参数", "高斯锐化")]
     public static Factory GaussianSharpen() => (seq, arguments, token) => seq.GaussianSharpen();
 
-    [MemeCommandMapping("黑白")]
+    [MemeCommandMapping("木有参数", "黑白")]
     public static Factory BlackWhite() => (seq, arguments, token) => seq.BlackWhite();
     
-    [MemeCommandMapping("反相")]
+    [MemeCommandMapping("木有参数", "反相")]
     public static Factory Invert() => (seq, arguments, token) => seq.Invert(-1);
     
-    [MemeCommandMapping("胶卷")]
+    [MemeCommandMapping("木有参数", "胶卷")]
     public static Factory Kodachrome() => (seq, arguments, token) => seq.Kodachrome();
 
-    [MemeCommandMapping("拍立得")]
+    [MemeCommandMapping("木有参数", "拍立得")]
     public static Factory Polaroid() => (seq, arguments, token) => seq.Polaroid();
 
-    [MemeCommandMapping("像素化")]
+    [MemeCommandMapping("[大小] // 可选，默认5", "像素化")]
     public static Factory Pixelate() => (seq, arguments, token) =>
     {
         if (!int.TryParse(arguments, out var size)) size = 5;
@@ -269,7 +269,7 @@ public static class Memes
         return seq.Pixelate(size);
     };
 
-    [MemeCommandMapping("对比度")]
+    [MemeCommandMapping("[数值]", "对比度")]
     public static Factory Contrast() => (seq, arguments, token) =>
     {
         if (!float.TryParse(arguments, out var amount)) 
@@ -278,7 +278,7 @@ public static class Memes
         return seq.Contrast(amount);
     };
 
-    [MemeCommandMapping("透明度")]
+    [MemeCommandMapping("[数值]", "透明度")]
     public static Factory Opacity() => (seq, arguments, token) =>
     {
         if (!float.TryParse(arguments, out var amount)) 
@@ -287,7 +287,7 @@ public static class Memes
         return seq.Opacity(amount);
     };
 
-    [MemeCommandMapping("色相")]
+    [MemeCommandMapping("[数值]", "色相")]
     public static Factory Hue() => (seq, arguments, token) =>
     {
         if (!float.TryParse(arguments, out var amount)) 
@@ -296,7 +296,7 @@ public static class Memes
         return seq.Hue(amount);
     };
 
-    [MemeCommandMapping("饱和度")]
+    [MemeCommandMapping("[数值]", "饱和度")]
     public static Factory Saturate() => (seq, arguments, token) =>
     {
         if (!float.TryParse(arguments, out var amount)) 
@@ -305,7 +305,7 @@ public static class Memes
         return seq.Saturate(amount);
     };
     
-    [MemeCommandMapping("亮度")]
+    [MemeCommandMapping("[数值]", "亮度")]
     public static Factory Lightness() => (seq, arguments, token) =>
     {
         if (!float.TryParse(arguments, out var amount)) 
@@ -314,7 +314,7 @@ public static class Memes
         return seq.Lightness(amount);
     };
     
-    [MemeCommandMapping("明度")]
+    [MemeCommandMapping("[数值]", "明度")]
     public static Factory Brightness() => (seq, arguments, token) =>
     {
         if (!float.TryParse(arguments, out var amount)) 

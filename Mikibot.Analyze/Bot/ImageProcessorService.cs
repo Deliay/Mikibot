@@ -37,21 +37,30 @@ public class ImageProcessorService(
         {
             var triggerWord = Path.GetFileName(autoComposeMemeFolder)!;
             Logger.LogInformation("Add {} meme composer, trigger word: {}", autoComposeMemeFolder, triggerWord);
-            memeCommandHandler.Register(triggerWord, Memes.AutoCompose(autoComposeMemeFolder));
+            memeCommandHandler.Register(triggerWord, "木有参数", Memes.AutoCompose(autoComposeMemeFolder));
             if (_knownCommandMapping.TryGetValue(triggerWord, out var knownCommand))
             {
-                memeCommandHandler.Register(knownCommand, Memes.AutoCompose(autoComposeMemeFolder));
+                memeCommandHandler.Register(knownCommand, "木有参数", Memes.AutoCompose(autoComposeMemeFolder));
             }
         }
-        
+        memeCommandHandler.RegisterStaticMethods(typeof(Memes));
         return ValueTask.CompletedTask;
     }
 
     protected override async ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
     {
+        var groupId = message.Sender.Group.Id;
         var msg = message.MessageChain.GetPlainMessage().Trim();
 
         if (!msg.StartsWith('/')) return;
+
+        if (msg.StartsWith("//帮"))
+        {
+            var helpStr = string.Join(" | ", memeCommandHandler.MemeHelpers
+                .Select(p => $"/{p.Key}:{p.Value}"));
+            await QqService.SendMessageToSomeGroup([groupId], token, new PlainMessage(helpStr));
+            return;
+        }
         
         var processor = memeCommandHandler.GetComposePipeline(msg);
 
@@ -73,7 +82,7 @@ public class ImageProcessorService(
             .SelectMany(RunImage)
             .ToArrayAsync(token);
         
-        await QqService.SendMessageToSomeGroup([message.Sender.Group.Id], token, result);
+        await QqService.SendMessageToSomeGroup([groupId], token, result);
         
         return;
         async IAsyncEnumerable<MessageBase> RunImage(ImageMessage imageMessage)

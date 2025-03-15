@@ -6,15 +6,19 @@ namespace Mikibot.Analyze.Bot.Images;
 public class MemeCommandHandler(ILogger<MemeCommandHandler> logger)
 {
     private readonly Dictionary<string, Memes.Factory> _memeProcessors = [];
+    private readonly Dictionary<string, string> _memeHelper = [];
+
+    public IReadOnlyDictionary<string, Memes.Factory> MemeProcessors => _memeProcessors;
+    public IReadOnlyDictionary<string, string> MemeHelpers => _memeHelper;
     
-    
-    public void Register(string command, Func<Memes.Factory> factoryGetter)
+    public void Register(string command, string help, Func<Memes.Factory> factoryGetter)
     {
-        _memeProcessors.Add(command, factoryGetter());
+        Register(command, help, factoryGetter());
     }
-    public void Register(string command, Memes.Factory factory)
+    public void Register(string command, string help, Memes.Factory factory)
     {
         _memeProcessors.Add(command, factory);
+        _memeHelper.Add(command, help);
     }
     
     public void RegisterStaticMethods(Type type)
