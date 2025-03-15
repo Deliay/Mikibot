@@ -98,7 +98,8 @@ public class ImageProcessorService(
             using var image = await QqService.ReadImageAsync(imageMessage.Url, token);
             using var seq = await image.ExtractFrames().ToSequenceAsync(token);
             var (frames, errors) = processor(seq, token);
-            using var imageResult = await frames.AutoComposeAsync(token);
+            var frameDelay = !msg.Contains("间隔") ? 84 : -1;
+            using var imageResult = await frames.AutoComposeAsync(frameDelay, token);
             yield return new ImageMessage() { Base64 = await imageResult.ToDataUri(token) };
             if (errors is { Count: > 0 })
             {
