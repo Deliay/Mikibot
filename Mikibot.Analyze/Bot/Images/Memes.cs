@@ -303,6 +303,8 @@ public static class Memes
             if (TryParseNumberPair(arguments, out var numberPair))
                 center = new Point(numberPair.Value.x, numberPair.Value.y);
             
+            if (center.Y < 0 || center.X < 0) throw new AfterProcessError(nameof(RadialBlur), "中心点取值[0-1]");
+            
             iteration = Math.Min(iteration, 20);
             return seq.OpenCv(mat => ValueTask.FromResult(mat.RadialBlur(center, iteration)),
                 cancellationToken: token);
