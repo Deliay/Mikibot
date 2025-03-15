@@ -2,6 +2,7 @@
 using MemeFactory.Core.Processing;
 using MemeFactory.Core.Utilities;
 using Mirai.Net.Data.Messages;
+using NPOI.SS.Formula.Functions;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 
@@ -9,6 +10,37 @@ namespace Mikibot.Analyze.Bot.Images;
 
 public static class Memes
 {
+    public class AfterProcessError(string command, string msg) : Exception($"{command}: {msg}") {}
+
+    public readonly record struct ComposeResult(IAsyncEnumerable<Frame> Frames, List<AfterProcessError> Errors)
+    {
+        public ComposeResult Combine(ComposeResult other)
+        {
+            return this with { Errors = [..Errors.Concat(other.Errors)] };
+        }
+    }
+
+    public delegate ComposeResult FactoryComposer(IAsyncEnumerable<Frame> seq,
+        CancellationToken cancellationToken = default);
+
+    public static FactoryComposer Handle((Factory factory, string argument) pair)
+    {
+        var (factory, argument) = pair;
+        return (seq, token) =>
+        {
+            try
+            {
+                return new ComposeResult(factory(seq, argument, token), []);
+            }
+            catch (AfterProcessError e)
+            {
+                return new ComposeResult(seq, [e]);
+            }
+        };
+    }
+    
+    public delegate IAsyncEnumerable<Frame> Factory(IAsyncEnumerable<Frame> seq, string arguments, CancellationToken cancellationToken = default);
+    
     private static readonly FrameMerger DrawLeftBottom = Composers.Draw(Resizer.Auto, Layout.LeftBottom);
     private static readonly FrameMerger DrawRightCenter = Composers.Draw(Resizer.Auto, Layout.RightCenter);
     
@@ -18,43 +50,277 @@ public static class Memes
     private static readonly Func<Frame, FrameProcessor> DrawRightCenterSingle =
         (f) => Composers.Draw(f.Image, Resizer.Auto, Layout.RightCenter);
 
-    public static async ValueTask<MemeResult> SequenceZip(
-        Image image, string folder, int slowTimes = 1,
-        CancellationToken cancellationToken = default)
+    private static async IAsyncEnumerable<Frame> SequenceZip(
+        IAsyncEnumerable<Frame> frames, string folder, int slowTimes = 1,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         using var sequence = await Frames
             .LoadFromFolderAsync(folder, "*.png", cancellationToken)
             .DuplicateFrame(slowTimes)
             .ToSequenceAsync(cancellationToken);
-        using var baseSequence = await image.ExtractFrames().ToSequenceAsync(cancellationToken);;
-
-        var merger = sequence.LcmExpand(-1, cancellationToken);
         
-        return await baseSequence
-            .FrameBasedZipSequence(merger, DrawLeftBottom, cancellationToken)
-            .AutoComposeAsync(3, cancellationToken);
+        using var baseSequence = await frames.ToSequenceAsync(cancellationToken);
+        
+        var merger = sequence.LcmExpand(-1, cancellationToken);
+        var pipeline = baseSequence.FrameBasedZipSequence(merger, DrawLeftBottom, cancellationToken);
+        await foreach (var frame in pipeline) yield return frame;
     }
-
-    public delegate ValueTask<MemeResult> NoArgumentFactory(Image image, CancellationToken cancellationToken = default);
-    public delegate ValueTask<MemeResult> Factory(Image image, string arguments, CancellationToken cancellationToken = default);
     
     public static Factory AutoCompose(string folder, int slowTimes = 1)
     {
         return (image, msg, token) => SequenceZip(image, folder, slowTimes, token);
     }
 
-    public static async ValueTask<MemeResult> Marry(Image image, string message, CancellationToken cancellationToken)
+    [MemeCommandMapping("结婚")]
+    public static Factory Marry() => MarryCore;
+    private static async IAsyncEnumerable<Frame> MarryCore(IAsyncEnumerable<Frame> frames, string message,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var resources = await Frames.LoadFromFolderAsync(Path.Combine("resources", "meme", "marry"), "*.png", cancellationToken)
             .ToListAsync(cancellationToken);
         using var left = resources[0];
         using var right = resources[1];
         
-        using var baseSequence = await image.ExtractFrames().ToSequenceAsync(cancellationToken);
+        using var baseSequence = await frames.ToSequenceAsync(cancellationToken);
 
-        return await baseSequence
+        var pipeline = baseSequence
             .EachFrame(DrawLeftBottomSingle(left), cancellationToken)
-            .EachFrame(DrawRightCenterSingle(right), cancellationToken)
-            .AutoComposeAsync(3, cancellationToken);
+            .EachFrame(DrawRightCenterSingle(right), cancellationToken);
+        
+        await foreach (var frame in pipeline) yield return frame;
     }
+    
+    
+    [MemeCommandMapping("旋转")]
+    public static Factory Rotation(int circleTimes = 8)
+    {
+        return (seq, _, token) => seq.Rotation(circleTimes, token);
+    }
+
+    private static (int hor, int vert) ParseSlidingArgument(string argument)
+    {
+        var hor = argument.Contains('右') ? -1 : argument.Contains('左') ? 1 : 0;
+        var vert = argument.Contains('下') ? -1 : argument.Contains('上') ? 1 : 0;
+        if (hor == 0 && vert == 0) hor = 1;
+
+        return (hor, vert);
+    }
+    
+    [MemeCommandMapping("滑")]
+    public static Factory Sliding()
+    {
+        return (seq, argument, token) =>
+        {
+            var (hor, vert) = ParseSlidingArgument(argument);
+            return seq.Sliding(-hor, -vert, cancellationToken: token);
+        };
+    }
+    
+    [MemeCommandMapping("轴也滑")]
+    public static Factory SlideTimeline()
+    {
+        return (seq, argument, token) =>
+        {
+            var (hor, vert) = ParseSlidingArgument(argument);
+            return seq.TimelineSliding(hor, vert, cancellationToken: token);
+        };
+    }
+
+    [MemeCommandMapping("间隔")]
+    public static Factory FrameDelay()
+    {
+        return (seq, arguments, token) =>
+        {
+            var frameDelay = int.TryParse(arguments, out var inputDelay)
+                ? inputDelay
+                : throw new AfterProcessError(nameof(FrameDelay), "间隔必须是数字");
+            return FrameDelayCore(seq, frameDelay, token);
+        };
+
+        async IAsyncEnumerable<Frame> FrameDelayCore(IAsyncEnumerable<Frame> seq, int frameDelay,
+            [EnumeratorCancellation] CancellationToken token = default)
+        {
+            using var result = await seq.AutoComposeAsync(frameDelay, token);
+            await foreach (var extractFrame in result.Image.ExtractFrames().WithCancellation(token))
+            {
+                yield return extractFrame;
+            }
+        }
+    }
+    
+    [MemeCommandMapping("肚皮里擦特烦然么", "复制")]
+    public static Factory DuplicateFrame()
+        => (seq, arguments, _) => seq.DuplicateFrame(int.TryParse(arguments, out var times) ? times : 1);
+    
+    private static async IAsyncEnumerable<Frame> LoopCore(IAsyncEnumerable<Frame> seq, int times,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var sequence = await seq.ToSequenceAsync(cancellationToken);
+
+        foreach (var frame in sequence.Loop(times))
+        {
+            yield return frame;
+        }
+    }
+
+    [MemeCommandMapping("循环")]
+    public static Factory Loop()
+        => (seq, arguments, token) => LoopCore(seq, int.TryParse(arguments, out var times) ? times : 1, token);
+
+
+    private static Predicate<Frame> RangeFrameFilter(string argument)
+    {
+        if (argument.Length < 2) return (_) => true;
+        var numberStartedAt = char.IsNumber(argument[1]) ? 1 : 2;
+        if (numberStartedAt == 2 && argument.Length < 3) return (_) => true;
+        if (!int.TryParse(argument[numberStartedAt..], out var result)) return (_) => true;
+        
+        if (argument.StartsWith('%')) return (frame) => frame.Sequence % result == 0; 
+        if (argument.StartsWith('<')) return (frame) => frame.Sequence < result; 
+        if (argument.StartsWith('>')) return (frame) => frame.Sequence > result;
+        if (argument.StartsWith("<=")) return (frame) => frame.Sequence <= result;
+        if (argument.StartsWith(">=")) return (frame) => frame.Sequence >= result;
+        if (argument.StartsWith('^')) return (frame) => frame.Sequence == 0;
+
+        return (_) => true;
+    }
+    
+    [MemeCommandMapping("镜像")]
+    public static Factory Flip() => (seq, arguments, token) =>
+    {
+        var flipMode = arguments.Contains('v') ? FlipMode.Vertical : FlipMode.Horizontal;
+        return seq.Flip(flipMode);
+    };
+
+    [MemeCommandMapping("大小")]
+    public static Factory Resize() => (seq, arguments, token) =>
+    {
+        var resolution = arguments.Contains('x') ? arguments.Split('x') : arguments.Split('*');
+        if (resolution.Length != 2) return seq;
+        
+        var width = int.Parse(resolution[0]);
+        var height = int.Parse(resolution[1]);
+        
+        if (width < 16 || height < 16) throw new AfterProcessError(nameof(Resize), "太小了(16-512)");
+        if (width > 512 || height > 512) throw new AfterProcessError(nameof(Resize), "太大了(16-512)");
+
+        return seq.Resize(new ResizeOptions()
+        {
+            Compand = true,
+            Mode = ResizeMode.Stretch,
+            PremultiplyAlpha = true,
+            Size = new Size(width, height),
+        });
+    };
+
+    [MemeCommandMapping("背景")]
+    public static Factory BackgroundColor() => (seq, arguments, token) =>
+    {
+        if (!Color.TryParseHex(arguments, out var color))
+            throw new AfterProcessError(nameof(BackgroundColor), $"颜色{arguments}解析失败");
+
+        return seq.BackgroundColor(color);
+    };
+
+    [MemeCommandMapping("发光")]
+    public static Factory Glow() => (seq, arguments, token) =>
+    {
+        if (!Color.TryParseHex(arguments, out var color))
+            color = Color.ParseHex("#f09200");
+
+        return seq.Glow(color);
+    };
+
+    [MemeCommandMapping("晕影")]
+    public static Factory Vignette() => (seq, arguments, token) =>
+    {
+        if (!Color.TryParseHex(arguments, out var color))
+            throw new AfterProcessError(nameof(Vignette), $"颜色{arguments}解析失败");
+
+        return seq.Vignette(color);
+    };
+
+    [MemeCommandMapping("镜头模糊")]
+    public static Factory BokehBlur() => (seq, arguments, token) => seq.BokehBlur();
+    
+    [MemeCommandMapping("高斯模糊")]
+    public static Factory GaussianBlur() => (seq, arguments, token) => seq.GaussianBlur();
+
+    [MemeCommandMapping("高斯锐化")]
+    public static Factory GaussianSharpen() => (seq, arguments, token) => seq.GaussianSharpen();
+
+    [MemeCommandMapping("黑白")]
+    public static Factory BlackWhite() => (seq, arguments, token) => seq.BlackWhite();
+    
+    [MemeCommandMapping("反相")]
+    public static Factory Invert() => (seq, arguments, token) => seq.Invert(-1);
+    
+    [MemeCommandMapping("胶卷")]
+    public static Factory Kodachrome() => (seq, arguments, token) => seq.Kodachrome();
+
+    [MemeCommandMapping("拍立得")]
+    public static Factory Polaroid() => (seq, arguments, token) => seq.Polaroid();
+
+    [MemeCommandMapping("像素化")]
+    public static Factory Pixelate() => (seq, arguments, token) =>
+    {
+        if (!int.TryParse(arguments, out var size)) size = 5;
+
+        return seq.Pixelate(size);
+    };
+
+    [MemeCommandMapping("对比度")]
+    public static Factory Contrast() => (seq, arguments, token) =>
+    {
+        if (!float.TryParse(arguments, out var amount)) 
+            throw new AfterProcessError(nameof(Contrast), $"数值{arguments}解析失败");
+
+        return seq.Contrast(amount);
+    };
+
+    [MemeCommandMapping("透明度")]
+    public static Factory Opacity() => (seq, arguments, token) =>
+    {
+        if (!float.TryParse(arguments, out var amount)) 
+            throw new AfterProcessError(nameof(Opacity), $"数值{arguments}解析失败");
+
+        return seq.Opacity(amount);
+    };
+
+    [MemeCommandMapping("色相")]
+    public static Factory Hue() => (seq, arguments, token) =>
+    {
+        if (!float.TryParse(arguments, out var amount)) 
+            throw new AfterProcessError(nameof(Hue), $"数值{arguments}解析失败");
+
+        return seq.Hue(amount);
+    };
+
+    [MemeCommandMapping("饱和度")]
+    public static Factory Saturate() => (seq, arguments, token) =>
+    {
+        if (!float.TryParse(arguments, out var amount)) 
+            throw new AfterProcessError(nameof(Saturate), $"数值{arguments}解析失败");
+
+        return seq.Saturate(amount);
+    };
+    
+    [MemeCommandMapping("亮度")]
+    public static Factory Lightness() => (seq, arguments, token) =>
+    {
+        if (!float.TryParse(arguments, out var amount)) 
+            throw new AfterProcessError(nameof(Lightness), $"数值{arguments}解析失败");
+
+        return seq.Lightness(amount);
+    };
+    
+    [MemeCommandMapping("明度")]
+    public static Factory Brightness() => (seq, arguments, token) =>
+    {
+        if (!float.TryParse(arguments, out var amount)) 
+            throw new AfterProcessError(nameof(Brightness), $"数值{arguments}解析失败");
+
+        return seq.Brightness(amount);
+    };
+
 }
