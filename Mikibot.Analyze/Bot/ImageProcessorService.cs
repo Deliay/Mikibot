@@ -62,7 +62,13 @@ public class ImageProcessorService(IQqService qqService, ILogger<ImageProcessorS
         var factories = possibleCommands
             .Select(s => s.Trim())
             .Select(s => '/' + s)
-            .Select(s => s.Split(':'))
+            .Select(s =>
+            {
+                if (s.Contains(':')) return s.Split(':');
+                else if (s.Contains('：')) return s.Split('：');
+                else if (s.Contains('-')) return s.Split('-');
+                else return [s];
+            })
             .Select(s => (s[0], s.Length > 1 ? s[1] : ""))
             .Where(p => _memeProcessors.ContainsKey(p.Item1))
             .Select(p => (factory: _memeProcessors[p.Item1], argument: p.Item2))

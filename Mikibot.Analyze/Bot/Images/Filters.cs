@@ -53,7 +53,7 @@ public static class Filters
         {
             var (hor, vert) = ParseSlidingArgument(argument);
             return image.ExtractFrames()
-                .Sliding(hor, vert, cancellationToken: token)
+                .Sliding(-hor, -vert, cancellationToken: token)
                 .AutoComposeAsync(3, token);
         };
     }
