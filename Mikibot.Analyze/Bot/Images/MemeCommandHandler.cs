@@ -65,7 +65,7 @@ public class MemeCommandHandler(ILogger<MemeCommandHandler> logger)
             {
                 var head = Memes.Handle(factories[0])(seq, token);
                 return factories[1..].Aggregate(head,
-                    (current, next) => current.Combine(Memes.Handle(next)(current.Frames)));
+                    (current, next) => Memes.Handle(next)(current.Frames).CombineError(current));
             })
         };
     }

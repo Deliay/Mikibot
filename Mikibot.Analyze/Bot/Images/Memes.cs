@@ -14,7 +14,7 @@ public static class Memes
 
     public readonly record struct ComposeResult(IAsyncEnumerable<Frame> Frames, List<AfterProcessError> Errors)
     {
-        public ComposeResult Combine(ComposeResult other)
+        public ComposeResult CombineError(ComposeResult other)
         {
             return this with { Errors = [..Errors.Concat(other.Errors)] };
         }
@@ -253,7 +253,7 @@ public static class Memes
     public static Factory BlackWhite() => (seq, arguments, token) => seq.BlackWhite();
     
     [MemeCommandMapping("", "反相")]
-    public static Factory Invert() => (seq, arguments, token) => seq.Invert(-1);
+    public static Factory Invert() => (seq, arguments, token) => seq.Invert(1);
     
     [MemeCommandMapping("", "胶卷")]
     public static Factory Kodachrome() => (seq, arguments, token) => seq.Kodachrome();
