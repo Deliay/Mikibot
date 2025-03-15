@@ -58,6 +58,7 @@ public class ImageProcessorService(
         {
             var helpStr = string.Join(" | ", memeCommandHandler.MemeHelpers
                 .Select(p => $"/{p.Key}:{p.Value}"));
+            Logger.LogInformation("Sending help text to group {}, content: {}", groupId, helpStr);
             await QqService.SendMessageToSomeGroup([groupId], token, new PlainMessage(helpStr));
             return;
         }
