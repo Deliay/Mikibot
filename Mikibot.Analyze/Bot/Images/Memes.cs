@@ -71,7 +71,7 @@ public static class Memes
         return (image, msg, token) => SequenceZip(image, folder, slowTimes, token);
     }
 
-    [MemeCommandMapping("没有参数","结婚")]
+    [MemeCommandMapping("","结婚")]
     public static Factory Marry() => MarryCore;
     private static async IAsyncEnumerable<Frame> MarryCore(IAsyncEnumerable<Frame> frames, string message,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -91,7 +91,7 @@ public static class Memes
     }
     
     
-    [MemeCommandMapping("没有参数","旋转")]
+    [MemeCommandMapping("","旋转")]
     public static Factory Rotation()
     {
         return (seq, _, token) => seq.Rotation(cancellationToken: token);
@@ -240,25 +240,25 @@ public static class Memes
         return seq.Vignette(color);
     };
 
-    [MemeCommandMapping("木有参数", "镜头模糊")]
+    [MemeCommandMapping("", "镜头模糊")]
     public static Factory BokehBlur() => (seq, arguments, token) => seq.BokehBlur();
     
-    [MemeCommandMapping("木有参数", "高斯模糊")]
+    [MemeCommandMapping("", "高斯模糊")]
     public static Factory GaussianBlur() => (seq, arguments, token) => seq.GaussianBlur();
 
-    [MemeCommandMapping("木有参数", "高斯锐化")]
+    [MemeCommandMapping("", "高斯锐化")]
     public static Factory GaussianSharpen() => (seq, arguments, token) => seq.GaussianSharpen();
 
-    [MemeCommandMapping("木有参数", "黑白")]
+    [MemeCommandMapping("", "黑白")]
     public static Factory BlackWhite() => (seq, arguments, token) => seq.BlackWhite();
     
-    [MemeCommandMapping("木有参数", "反相")]
+    [MemeCommandMapping("", "反相")]
     public static Factory Invert() => (seq, arguments, token) => seq.Invert(-1);
     
-    [MemeCommandMapping("木有参数", "胶卷")]
+    [MemeCommandMapping("", "胶卷")]
     public static Factory Kodachrome() => (seq, arguments, token) => seq.Kodachrome();
 
-    [MemeCommandMapping("木有参数", "拍立得")]
+    [MemeCommandMapping("", "拍立得")]
     public static Factory Polaroid() => (seq, arguments, token) => seq.Polaroid();
 
     [MemeCommandMapping("[大小] // 可选，默认5", "像素化")]

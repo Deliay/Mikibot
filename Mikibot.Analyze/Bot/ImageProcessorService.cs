@@ -39,10 +39,10 @@ public class ImageProcessorService(
         {
             var triggerWord = Path.GetFileName(autoComposeMemeFolder)!;
             Logger.LogInformation("Add {} meme composer, trigger word: {}", autoComposeMemeFolder, triggerWord);
-            memeCommandHandler.Register(triggerWord, "木有参数", Memes.AutoCompose(autoComposeMemeFolder));
+            memeCommandHandler.Register(triggerWord, "", Memes.AutoCompose(autoComposeMemeFolder));
             if (_knownCommandMapping.TryGetValue(triggerWord, out var knownCommand))
             {
-                memeCommandHandler.Register(knownCommand, "木有参数", Memes.AutoCompose(autoComposeMemeFolder));
+                memeCommandHandler.Register(knownCommand, "", Memes.AutoCompose(autoComposeMemeFolder));
             }
         }
         
@@ -61,7 +61,9 @@ public class ImageProcessorService(
         if (msg.StartsWith("//帮"))
         {
             var helpStr = string.Join(" | ", memeCommandHandler.MemeHelpers
-                .Select(p => $"/{p.Key}:{p.Value}"));
+                .Select(p => p.Value is { Length: > 0 }
+                    ? $"/{p.Key}:{p.Value}"
+                    : $"/{p.Key}"));
             Logger.LogInformation("Sending help text to group {}, content: {}", groupId, helpStr);
             await QqService.SendMessageToSomeGroup([groupId], token, new PlainMessage(helpStr));
             return;
