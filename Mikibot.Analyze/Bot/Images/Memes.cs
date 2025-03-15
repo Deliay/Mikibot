@@ -110,7 +110,7 @@ public static class Memes
         {
             var numEnd = argument.LastOrDefault(char.IsNumber);
             var numStartPos = argument.IndexOf(numStart);
-            var numEndPos = argument.IndexOf(numEnd);
+            var numEndPos = argument.LastIndexOf(numEnd);
             var numStr = argument[numStartPos..(numEndPos + 1)];
             if (int.TryParse(numStr, out var parsedSlidingTimes))
                 slidingTimes = Math.Max(64, parsedSlidingTimes);
