@@ -4,6 +4,7 @@ using MemeFactory.Core.Utilities;
 using Mirai.Net.Data.Messages;
 using NPOI.SS.Formula.Functions;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
 namespace Mikibot.Analyze.Bot.Images;
@@ -268,6 +269,30 @@ public static class Memes
     
     [MemeCommandMapping("", "高斯模糊")]
     public static Factory GaussianBlur() => (seq, arguments, token) => seq.GaussianBlur();
+
+    [MemeCommandMapping("", "径向模糊")]
+    public static Factory RadialBlur()
+    {
+        return (seq, arguments, token) =>
+        {
+            if (!float.TryParse(arguments, out var amount)) 
+                throw new AfterProcessError(nameof(RadialBlur), $"数值{arguments}解析失败");
+            
+            return RadialBlurCore(seq, amount);
+        };
+
+        async IAsyncEnumerable<Frame> RadialBlurCore(IAsyncEnumerable<Frame> frames, float amount)
+        {
+            await foreach (var frame in frames) using(frame)
+            {
+                var newImage = new Image<Rgba32>(frame.Image.Width, frame.Image.Height);
+                newImage.Mutate(ctx => ctx.DrawImage(frame.Image, 1f));
+                using var blurImage = SimdRadialBlurImageProcessor.Apply(newImage, amount);
+                newImage.Mutate(ctx => ctx.DrawImage(blurImage, 1f));
+                yield return frame with { Image = newImage };
+            }
+        }
+    }
 
     [MemeCommandMapping("", "高斯锐化")]
     public static Factory GaussianSharpen() => (seq, arguments, token) => seq.GaussianSharpen();
