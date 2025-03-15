@@ -288,7 +288,7 @@ public static class Memes
         var xStatus = float.TryParse(pairStrArr[0], out var x);
         var yStatus = float.TryParse(pairStrArr[1], out var y);
         numberPair = (x, y);
-        
+
         return xStatus && yStatus;
     }
     
@@ -303,6 +303,7 @@ public static class Memes
             if (TryParseNumberPair(arguments, out var numberPair))
                 center = new Point(numberPair.Value.x, numberPair.Value.y);
             
+            Console.WriteLine($"center: {center.X},{center.Y}");
             if (center.Y < 0 || center.X < 0) throw new AfterProcessError(nameof(RadialBlur), "中心点取值[0-1]");
             
             iteration = Math.Min(iteration, 20);
