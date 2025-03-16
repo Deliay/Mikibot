@@ -81,7 +81,7 @@ public class ImageProcessorService(
 
                         return lst;
                     })
-                    .Select(p => $"{p.delay * 10}ms x {p.count}f"));
+                    .Select(p => $"{p.delay * 10}ms * {p.count}f"));
             }
 
             yield return new PlainMessage(info);
@@ -101,7 +101,7 @@ public class ImageProcessorService(
             .OfType<ImageMessage>()
             .ToList();
 
-        if (msg == "/娶")
+        if (msg == "/图片信息")
         {
             if (imageMessages.Count == 0) return;
             var infoMsg = await GetImageInfoAsync(imageMessages, token).ToArrayAsync(token);
