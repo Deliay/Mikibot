@@ -67,8 +67,8 @@ public class ImageProcessorService(
             if (image.Metadata.TryGetGifMetadata(out var gif))
             {
                 info += "\n-----gif-----\n";
-                info += "重复: " + (gif.RepeatCount == 0 ? "无限" : gif.RepeatCount + "次");
-                info += "帧间隔: " + string.Join(',', image.Frames
+                info += "\n重复: " + (gif.RepeatCount == 0 ? "无限" : gif.RepeatCount + "次");
+                info += "\n帧间隔: " + string.Join(',', image.Frames
                     .Select(f => f.Metadata.GetGifMetadata().FrameDelay)
                     .Aggregate(new List<(int delay, int count)>(), (lst, currentDelay) =>
                     {
