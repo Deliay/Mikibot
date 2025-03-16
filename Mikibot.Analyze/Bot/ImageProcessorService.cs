@@ -105,7 +105,7 @@ public class ImageProcessorService(
         {
             if (imageMessages.Count == 0) return;
             var infoMsg = await GetImageInfoAsync(imageMessages, token).ToArrayAsync(token);
-            if (infoMsg.Length == 0)
+            if (infoMsg.Length != 0)
             {
                 await QqService.SendMessageToSomeGroup([groupId], token, infoMsg);
             }
