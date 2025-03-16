@@ -101,7 +101,7 @@ public class ImageProcessorService(
             .OfType<ImageMessage>()
             .ToList();
 
-        if (msg == "/图片信息")
+        if (msg == "/信息")
         {
             if (imageMessages.Count == 0) return;
             var infoMsg = await GetImageInfoAsync(imageMessages, token).ToArrayAsync(token);
