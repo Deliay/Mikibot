@@ -454,7 +454,7 @@ public static class Memes
 
         var pair = argument[(startIndex + leftStr.Length)..rightIndex];
         var pairArr = pair.Split(',');
-        if (pairArr.Length != 2) return false;
+        if (pairArr.Length != 3) return false;
 
         var canParseT1 = T1.TryParse(pairArr[0], CultureInfo.InvariantCulture, out var t1);
         var canParseT2 = T2.TryParse(pairArr[1], CultureInfo.InvariantCulture, out var t2);
