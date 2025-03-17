@@ -8,11 +8,14 @@ using Microsoft.ML.OnnxRuntime;
 using Mikibot.Analyze.Bot.Images.OpenCv;
 using Mirai.Net.Data.Messages;
 using NPOI.SS.Formula.Functions;
+using OpenCvSharp;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Processors.Transforms;
+using FlipMode = SixLabors.ImageSharp.Processing.FlipMode;
 using Point = OpenCvSharp.Point;
+using Size = SixLabors.ImageSharp.Size;
 
 namespace Mikibot.Analyze.Bot.Images;
 
@@ -143,7 +146,7 @@ public static class Memes
     private static bool AllowCpuInference = Environment
         .GetEnvironmentVariable("ALLOW_CPU_INFERENCES") is "true";
     
-    [MemeCommandMapping("[modnet|ppseg|rmbg]", "AI抠像")]
+    [MemeCommandMapping("[modnet|ppseg|rmbg]", "AI抠像", "AI抠图")]
     public static Factory AiMatting()
     {
         return ((seq, arguments, token) =>
@@ -165,6 +168,26 @@ public static class Memes
                 yield return frame with { Image = frame.Image.Clone(_ => {}) };
             }
         }
+    }
+
+    
+    [MemeCommandMapping("[x], [y]", "skew")]
+    public static Factory Skew()
+    {
+        return ((seq, arguments, token) => seq.Select(f =>
+        {
+            if (!TryParseNumberPair(arguments, out var degrees))
+                throw new AfterProcessError(nameof(Skew), "参数错误，样例 /skew (x轴角度,y轴角度)");
+            
+            var (x, y) = degrees.Value;
+            
+            f.Image.Mutate(ctx =>
+            {
+                ctx.Skew(x, y, LanczosResampler.Lanczos5);
+            });
+
+            return f;
+        }));
     }
 
     private static (int hor, int vert, int slidingTimes) ParseSlidingArgument(string argument)
@@ -374,7 +397,6 @@ public static class Memes
             return seq.OpenCv(mat => ValueTask.FromResult(mat.RadialBlur(center, iteration)),
                 cancellationToken: token);
         };
-
     }
 
     [MemeCommandMapping("", "高斯锐化")]
