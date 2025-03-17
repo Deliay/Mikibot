@@ -238,6 +238,18 @@
     <None Update="resources\meme\auto\chushou\chushou_00011.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="resources\meme\auto\fupunch\01.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="resources\meme\auto\fupunch\02.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="resources\meme\auto\fupunch\03.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="resources\meme\auto\fupunch\04.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -247,6 +259,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="resources\meme\auto\fupunch\" />
     <Folder Include="resources\meme\marry\" />
   </ItemGroup>
 

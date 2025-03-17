@@ -32,6 +32,8 @@ public class ImageProcessorService(
         { "punch", "👊" },
         { "chushou", "触手" },
     };
+
+    private readonly HashSet<string> _hiddenCommands = ["shoot", "jerk"];
     protected override ValueTask PreRun(CancellationToken token)
     {
         memeCommandHandler.RegisterStaticMethods(typeof(Memes));
@@ -41,11 +43,21 @@ public class ImageProcessorService(
         {
             var triggerWord = Path.GetFileName(autoComposeMemeFolder)!;
             Logger.LogInformation("Add {} meme composer, trigger word: {}", autoComposeMemeFolder, triggerWord);
-            memeCommandHandler.Register(triggerWord, Memes.AutoCompose(autoComposeMemeFolder));
-            if (_knownCommandMapping.TryGetValue(triggerWord, out var knownCommand))
+            if (_hiddenCommands.Contains(triggerWord))
             {
-                memeCommandHandler.Register(knownCommand, Memes.AutoCompose(autoComposeMemeFolder));
+                memeCommandHandler.Register(triggerWord, Memes.AutoCompose(autoComposeMemeFolder));
             }
+            else
+            {
+                memeCommandHandler.Register(triggerWord, "", Memes.AutoCompose(autoComposeMemeFolder));
+            }
+
+            if (!_knownCommandMapping.TryGetValue(triggerWord, out var knownCommand)) continue;
+            
+            if (_hiddenCommands.Contains(triggerWord))
+                memeCommandHandler.Register(knownCommand, Memes.AutoCompose(autoComposeMemeFolder));
+            else 
+                memeCommandHandler.Register(knownCommand, "", Memes.AutoCompose(autoComposeMemeFolder));
         }
         
         Logger.LogInformation("Total {} meme processor has been registered.", memeCommandHandler.MemeProcessors.Count);
