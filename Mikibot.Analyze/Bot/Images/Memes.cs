@@ -2,6 +2,9 @@
 using System.Runtime.CompilerServices;
 using MemeFactory.Core.Processing;
 using MemeFactory.Core.Utilities;
+using MemeFactory.Matting.Onnx;
+using MemeFactory.Matting.Onnx.Models;
+using Microsoft.ML.OnnxRuntime;
 using Mikibot.Analyze.Bot.Images.OpenCv;
 using Mirai.Net.Data.Messages;
 using NPOI.SS.Formula.Functions;
@@ -105,6 +108,63 @@ public static class Memes
             if (size is < 1 or > 64) throw new AfterProcessError(nameof(Rotation), "不准转这么多😡(1-64)");
             return seq.Rotation(size, token);
         };
+    }
+
+    private static bool LoadModel(string env, int size, [NotNullWhen(true)]out ModelConfiguration? modelConfiguration)
+    {
+        modelConfiguration = null;
+        if (Environment.GetEnvironmentVariable(env) is not { Length: > 0 } modelPath) return false;
+        
+        if (modelPath.EndsWith(".onnx")) Console.WriteLine($"Skip {modelPath} due to not a .onnx file");
+
+        modelConfiguration = size switch
+        {
+            512 => new U2NetConfiguration(modelPath),
+            1024 => new RmbgConfiguration(modelPath),
+            _ => null,
+        };
+        return modelConfiguration is not null;
+    }
+
+    private static IEnumerable<(string env, string name, int size)> SupportedModels =
+        [
+            ("MODNET_MODEL", "modnet", 512),
+            ("PPSEG_MATTING_MODEL", "ppseg", 512),
+            ("RMGB_MODEL", "rmbg", 1024)
+        ];
+    
+    private static readonly Dictionary<string, ModelConfiguration> MattingModels = SupportedModels
+        .Select(p => LoadModel(p.env, p.size, out var cfg)
+            ? (success: true, cfg, p.name)
+            : (false, null, null))
+        .Where(c => c.success)
+        .ToDictionary(c => c.name, c => c.cfg);
+
+    private static bool AllowCpuInference = Environment
+        .GetEnvironmentVariable("ALLOW_CPU_INFERENCES") is "true";
+    
+    [MemeCommandMapping("[modnet|ppseg|rmbg]", "AI抠像")]
+    public static Factory AiMatting()
+    {
+        return ((seq, arguments, token) =>
+        {
+            if (!MattingModels.TryGetValue(arguments, out var model))
+                throw new AfterProcessError(nameof(AiMatting), "模型未加载，可用模型：" + string.Join(',', MattingModels.Keys));
+
+            return AiMatting(seq, model, token);
+        });
+
+        async IAsyncEnumerable<Frame> AiMatting(IAsyncEnumerable<Frame> seq, ModelConfiguration model, CancellationToken cancellationtoken)
+        {
+            using var session = AllowCpuInference
+                ? model.GetInferenceSession()
+                : model.GetInferenceSession(SessionOptions.MakeSessionOptionWithCudaProvider());
+            
+            await foreach (var frame in seq.ApplyModel(session, model).WithCancellation(cancellationtoken)) using (frame)
+            {
+                yield return frame with { Image = frame.Image.Clone(_ => {}) };
+            }
+        }
     }
 
     private static (int hor, int vert, int slidingTimes) ParseSlidingArgument(string argument)
