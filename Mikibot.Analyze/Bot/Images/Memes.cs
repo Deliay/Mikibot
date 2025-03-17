@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using MemeFactory.Core.Processing;
 using MemeFactory.Core.Utilities;
@@ -190,6 +192,65 @@ public static class Memes
         }));
     }
 
+    private static ProjectiveTransformBuilder GetTransformBuilder(string arguments)
+    {
+        var builder = new ProjectiveTransformBuilder();
+
+        if (TryParseNamed<float, float>(arguments, "skew", out var skewDegrees))
+        {
+            builder = builder.AppendSkewDegrees(skewDegrees.Value.x, skewDegrees.Value.y, Vector2.Zero);
+        }
+        if (TryParseNamed<string, string, float>(arguments, "taper", out var taper))
+        {
+            builder = builder.AppendTaper(
+                taper.Value.x switch
+                {
+                    "l" => TaperSide.Left,
+                    "r" => TaperSide.Right,
+                    "t" => TaperSide.Top,
+                    "b" => TaperSide.Bottom,
+                    _ => throw new AfterProcessError(nameof(ProjectiveTransform), "taper side只能选l/r/t/b其中一边"),
+                },
+                taper.Value.y switch
+                {
+                    "lt" => TaperCorner.LeftOrTop,
+                    "rb" => TaperCorner.RightOrBottom,
+                    "all" => TaperCorner.Both,
+                    _ => throw new AfterProcessError(nameof(ProjectiveTransform), "taper corner只能选lt/rb/all其中一角"),
+                },
+                taper.Value.z);
+        }
+        if (TryParseNamed<float, float>(arguments, "scale", out var scale))
+        {
+            builder.AppendScale(new Vector2(scale.Value.x, scale.Value.y));
+        }
+        if (TryParseNamed<float, float>(arguments, "move", out var move))
+        {
+            builder.AppendTranslation(new Vector2(move.Value.x, move.Value.y));
+        }
+        if (TryParseNamed<float>(arguments, "rotate", out var rotate))
+        {
+            builder.AppendRotationDegrees(rotate);
+        }
+        
+        return builder;
+    }
+    
+    [MemeCommandMapping("skew(x,y)taper(l/r/t/b,lt/rb/all,f)scale(x,y)move(x,y)rotate(deg)", "transform")]
+    public static Factory ProjectiveTransform()
+    {
+        return (seq, arguments, token) =>
+        {
+            var builder = GetTransformBuilder(arguments);
+
+            return seq.Select(f =>
+            {
+                f.Image.Mutate(ctx => ctx.Transform(builder));
+                return f;
+            });
+        };
+    }
+
     private static (int hor, int vert, int slidingTimes) ParseSlidingArgument(string argument)
     {
         var numStart = argument.FirstOrDefault(char.IsNumber);
@@ -375,6 +436,82 @@ public static class Memes
         numberPair = (x, y);
 
         return xStatus && yStatus;
+    }
+
+    private static bool TryParseNamed<T1, T2, T3>(string argument, string name,
+        out (T1 x, T2 y, T3 z)? namedPair)
+        where T1 : ISpanParsable<T1>
+        where T2 : ISpanParsable<T2>
+        where T3 : ISpanParsable<T3>
+    {
+        namedPair = null;
+        var leftStr = name + "(";
+        var startIndex = argument.IndexOf(leftStr, StringComparison.Ordinal);
+        if (startIndex < 0) return false;
+        
+        var rightIndex = argument.IndexOf(')', startIndex + 1);
+        if (rightIndex < 0) return false;
+
+        var pair = argument[(startIndex + leftStr.Length)..rightIndex];
+        var pairArr = pair.Split(',');
+        if (pairArr.Length != 2) return false;
+
+        var canParseT1 = T1.TryParse(pairArr[0], CultureInfo.InvariantCulture, out var t1);
+        var canParseT2 = T2.TryParse(pairArr[1], CultureInfo.InvariantCulture, out var t2);
+        var canParseT3 = T3.TryParse(pairArr[2], CultureInfo.InvariantCulture, out var t3);
+
+        if (!canParseT1 || !canParseT2 || !canParseT3) return false;
+        
+        namedPair = (t1!, t2!, t3!);
+        return true;
+    }
+
+
+    private static bool TryParseNamed<T1, T2>(string argument, string name,
+        out (T1 x, T2 y)? namedPair)
+        where T1 : ISpanParsable<T1>
+        where T2 : ISpanParsable<T2>
+    {
+        namedPair = null;
+        var leftStr = name + "(";
+        var startIndex = argument.IndexOf(leftStr, StringComparison.Ordinal);
+        if (startIndex < 0) return false;
+        
+        var rightIndex = argument.IndexOf(')', startIndex + 1);
+        if (rightIndex < 0) return false;
+
+        var pair = argument[(startIndex + leftStr.Length)..rightIndex];
+        var pairArr = pair.Split(',');
+        if (pairArr.Length != 2) return false;
+
+        var canParseT1 = T1.TryParse(pairArr[0], CultureInfo.InvariantCulture, out var t1);
+        var canParseT2 = T2.TryParse(pairArr[1], CultureInfo.InvariantCulture, out var t2);
+
+        if (!canParseT1 || !canParseT2) return false;
+        
+        namedPair = (t1!, t2!);
+        return true;
+    }
+    
+    private static bool TryParseNamed<T1>(string argument, string name,
+        out T1? namedPair) where T1 : ISpanParsable<T1>
+    {
+        namedPair = default;
+        var leftStr = name + "(";
+        var startIndex = argument.IndexOf(leftStr, StringComparison.Ordinal);
+        if (startIndex < 0) return false;
+        
+        var rightIndex = argument.IndexOf(')', startIndex + 1);
+        if (rightIndex < 0) return false;
+
+        var pair = argument[(startIndex + leftStr.Length)..rightIndex];
+
+        var canParseT1 = T1.TryParse(pair, CultureInfo.InvariantCulture, out var t1);
+
+        if (!canParseT1) return false;
+        
+        namedPair = t1;
+        return true;
     }
     
     [MemeCommandMapping("[迭代次数=10]", "径向模糊")]
