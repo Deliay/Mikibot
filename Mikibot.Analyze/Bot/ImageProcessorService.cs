@@ -31,6 +31,7 @@ public class ImageProcessorService(
         { "jerk", "打" },
         { "punch", "👊" },
         { "chushou", "触手" },
+        { "fupunch", "敷拳"}
     };
 
     private readonly HashSet<string> _hiddenCommands = ["shoot", "jerk"];
