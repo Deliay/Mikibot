@@ -115,7 +115,7 @@ public static class Memes
         modelConfiguration = null;
         if (Environment.GetEnvironmentVariable(env) is not { Length: > 0 } modelPath) return false;
         
-        if (modelPath.EndsWith(".onnx")) Console.WriteLine($"Skip {modelPath} due to not a .onnx file");
+        if (!modelPath.EndsWith(".onnx")) Console.WriteLine($"Skip {modelPath} due to not a .onnx file");
 
         modelConfiguration = size switch
         {
