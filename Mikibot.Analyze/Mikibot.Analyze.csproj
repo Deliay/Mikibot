@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MemeFactory.Core" Version="1.0.0-alpha.30" />
+    <PackageReference Include="MemeFactory.Core" Version="1.0.0-alpha.31" />
     <PackageReference Include="MemeFactory.Matting.Onnx" Version="1.0.0-alpha.31" />
     <PackageReference Include="Microsoft.ML.OnnxRuntime.Gpu" Version="1.21.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
