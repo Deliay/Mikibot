@@ -41,10 +41,10 @@ public class ImageProcessorService(
         {
             var triggerWord = Path.GetFileName(autoComposeMemeFolder)!;
             Logger.LogInformation("Add {} meme composer, trigger word: {}", autoComposeMemeFolder, triggerWord);
-            memeCommandHandler.Register(triggerWord, "", Memes.AutoCompose(autoComposeMemeFolder));
+            memeCommandHandler.Register(triggerWord, Memes.AutoCompose(autoComposeMemeFolder));
             if (_knownCommandMapping.TryGetValue(triggerWord, out var knownCommand))
             {
-                memeCommandHandler.Register(knownCommand, "", Memes.AutoCompose(autoComposeMemeFolder));
+                memeCommandHandler.Register(knownCommand, Memes.AutoCompose(autoComposeMemeFolder));
             }
         }
         

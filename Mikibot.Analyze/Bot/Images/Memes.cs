@@ -68,7 +68,7 @@ public static class Memes
         
         var merger = sequence.LcmExpand(-1, cancellationToken);
         var pipeline = baseSequence.FrameBasedZipSequence(merger, DrawLeftBottom, cancellationToken);
-        await foreach (var frame in pipeline) yield return frame;
+        await foreach (var frame in pipeline) using(frame) yield return frame with { Image = frame.Image.Clone((_) => {}) };
     }
     
     public static Factory AutoCompose(string folder, int slowTimes = 1)
@@ -92,7 +92,7 @@ public static class Memes
             .EachFrame(DrawLeftBottomSingle(left), cancellationToken)
             .EachFrame(DrawRightCenterSingle(right), cancellationToken);
         
-        await foreach (var frame in pipeline) yield return frame;
+        await foreach (var frame in pipeline) using(frame) yield return frame with { Image = frame.Image.Clone(_ => { }) };
     }
     
     
@@ -213,7 +213,7 @@ public static class Memes
         return (_) => true;
     }
     
-    [MemeCommandMapping("[v] // (v - 垂直镜像, 其他值水平镜像)","镜像")]
+    [MemeCommandMapping("[v] // (v - 垂直镜像, 其他值水平镜像)", "镜像")]
     public static Factory Flip() => (seq, arguments, token) =>
     {
         var flipMode = arguments.Contains('v') ? FlipMode.Vertical : FlipMode.Horizontal;

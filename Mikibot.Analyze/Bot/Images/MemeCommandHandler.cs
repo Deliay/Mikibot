@@ -20,6 +20,10 @@ public class MemeCommandHandler(ILogger<MemeCommandHandler> logger)
         _memeProcessors.Add(command, factory);
         _memeHelper.Add(command, help);
     }
+    public void Register(string command, Memes.Factory factory)
+    {
+        _memeProcessors.Add(command, factory);
+    }
     
     public void RegisterStaticMethods(Type type)
     {
