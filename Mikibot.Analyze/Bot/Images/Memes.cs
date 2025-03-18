@@ -340,7 +340,8 @@ public static class Memes
         => (seq, arguments, token) => LoopCore(seq, int.TryParse(arguments, out var times) ? times : 1, token);
 
     [MemeCommandMapping("", "倒放")]
-    public static Factory Reverse() => (seq, arguments, token) => seq.Reverse(); 
+    public static Factory Reverse() => (seq, arguments, token) => seq
+        .Reverse().Select((f, i) => f with { Sequence = i }); 
 
     private static Predicate<Frame> FrameFilter(string argument)
     {
