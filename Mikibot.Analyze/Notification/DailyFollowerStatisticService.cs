@@ -3,10 +3,8 @@ using Microsoft.Extensions.Logging;
 using Mikibot.Crawler.Http.Bilibili;
 using Mikibot.Database;
 using Mikibot.Analyze.MiraiHttp;
-using Mirai.Net.Data.Messages;
 using Mirai.Net.Data.Messages.Concretes;
 using Mikibot.Database.Model;
-using Mirai.Net.Data.Shared;
 
 namespace Mikibot.Analyze.Notification;
 

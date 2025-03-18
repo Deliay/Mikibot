@@ -6,23 +6,11 @@ using Mikibot.Database;
 using Mikibot.Database.Model;
 using Mirai.Net.Data.Messages.Concretes;
 using Mirai.Net.Data.Messages.Receivers;
-using Mirai.Net.Data.Shared;
-using NPOI.Util;
-using Org.BouncyCastle.Asn1.Ocsp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Json;
-using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Manganese.Text;
-using MathNet.Numerics;
 using Microsoft.Extensions.AI;
 using Mikibot.Analyze.Service.Ai;
 using Mirai.Net.Data.Messages;
-using Mirai.Net.Utils.Scaffolds;
 
 namespace Mikibot.Analyze.Bot;
 

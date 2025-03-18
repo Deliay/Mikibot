@@ -1,11 +1,8 @@
-﻿using System.Collections.Concurrent;
-using ExtendedNumerics;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Mirai.Net.Data.Messages;
 using Mirai.Net.Data.Messages.Concretes;
 using Mirai.Net.Data.Messages.Receivers;
 using Mirai.Net.Data.Shared;
-using Mirai.Net.Utils.Scaffolds;
 using Satori.Client;
 using Satori.Client.Extensions;
 using Satori.Protocol.Elements;

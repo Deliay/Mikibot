@@ -5,11 +5,6 @@ using Mikibot.Database;
 using Mikibot.Database.Model;
 using Mirai.Net.Data.Messages.Concretes;
 using Mirai.Net.Data.Messages.Receivers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mikibot.Analyze.Bot;
 

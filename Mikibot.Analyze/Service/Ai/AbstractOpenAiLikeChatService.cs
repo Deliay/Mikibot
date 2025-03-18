@@ -1,5 +1,4 @@
 ﻿using System.Net.Http.Json;
-using System.Runtime.CompilerServices;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;

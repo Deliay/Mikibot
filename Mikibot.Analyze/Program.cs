@@ -1,12 +1,9 @@
 ﻿using Autofac;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
 using Mikibot.Database;
 using Mikibot.Analyze.MiraiHttp;
 using Mikibot.Analyze.Notification;
-using Mikibot.Analyze.Service;
 using Mikibot.BuildingBlocks.Util;
 using Mikibot.Crawler.Http.Bilibili;
 using Mikibot.Analyze.Bot;

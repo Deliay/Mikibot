@@ -4,15 +4,13 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using MemeFactory.Core.Processing;
 using MemeFactory.Core.Utilities;
+using MemeFactory.Ffmpeg;
 using MemeFactory.Matting.Onnx;
 using MemeFactory.Matting.Onnx.Models;
+using MemeFactory.OpenCv;
+using MemeFactory.OpenCv.Filters;
 using Microsoft.ML.OnnxRuntime;
-using Mikibot.Analyze.Bot.Images.OpenCv;
-using Mirai.Net.Data.Messages;
-using NPOI.SS.Formula.Functions;
-using OpenCvSharp;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Processors.Transforms;
 using FlipMode = SixLabors.ImageSharp.Processing.FlipMode;
@@ -350,7 +348,6 @@ public static class Memes
         if (numberStartedAt == 2 && argument.Length < 3) return (_) => true;
         if (!int.TryParse(argument[numberStartedAt..], out var result)) return (_) => true;
         
-        if (argument.StartsWith('%')) return (frame) => frame.Sequence % result == 0; 
         if (argument.StartsWith('<')) return (frame) => frame.Sequence < result; 
         if (argument.StartsWith('>')) return (frame) => frame.Sequence > result;
         if (argument.StartsWith("<=")) return (frame) => frame.Sequence <= result;
@@ -534,8 +531,7 @@ public static class Memes
             if (center.Y is < 0 or > 100 || center.X is < 0 or > 100) throw new AfterProcessError(nameof(RadialBlur), "中心点取值[0-100]");
             
             iteration = Math.Min(iteration, 20);
-            return seq.OpenCv(mat => ValueTask.FromResult(mat.RadialBlur(center, iteration)),
-                cancellationToken: token);
+            return seq.OpenCv(MemeCv.RadialBlur(center, iteration), cancellationToken: token);
         };
     }
 
@@ -616,4 +612,25 @@ public static class Memes
         return seq.Brightness(amount);
     };
 
+    [MemeCommandMapping("point(x,y),threshold(n) // 全可选", "魔棒抠图")]
+    public static Factory FloodMatting() => ((seq, arguments, token) =>
+    {
+        if (!TryParseNamed<int, int>(arguments, "point", out var point))
+            point = (0, 0);
+        if (!TryParseNamed<int>(arguments, "threshold", out var threshold))
+            threshold = 10;
+        
+        return seq.OpenCv(MemeCv.FloodMatting(new Point(point.Value.x, point.Value.y), threshold), cancellationToken: token);
+    });
+
+    [MemeCommandMapping("[数值0-4,越高越慢]", "速度")]
+    public static Factory SpeedUp() => (seq, arguments, token) =>
+    {
+        if (!float.TryParse(arguments, out var amount)) 
+            throw new AfterProcessError(nameof(SpeedUp), $"数值{arguments}解析失败");
+        if (amount > 4) amount = 4f;
+        if (amount < 0.01) amount = 0.01f;
+
+        return seq.SpeedUp(amount, token);
+    };
 }

@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-using System.Runtime.CompilerServices;
-using MathNet.Numerics;
+﻿using System.Runtime.CompilerServices;
 using MemeFactory.Core.Utilities;
 using Microsoft.Extensions.Logging;
 using Mikibot.Analyze.Bot.Images;
@@ -10,10 +8,6 @@ using Mirai.Net.Data.Messages;
 using Mirai.Net.Data.Messages.Concretes;
 using Mirai.Net.Data.Messages.Receivers;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
-using SixLabors.ImageSharp.Formats.Gif;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.Formats.Png;
 
 namespace Mikibot.Analyze.Bot;
 
@@ -160,7 +154,7 @@ public class ImageProcessorService(
             using var image = await QqService.ReadImageAsync(imageMessage.Url, token);
             using var seq = await image.ExtractFrames().ToSequenceAsync(token);
             var (frames, errors) = processor(seq, token);
-            var frameDelay = !msg.Contains("间隔") ? 8 : -1;
+            var frameDelay = !msg.Contains("间隔") ? 6 : -1;
             using var imageResult = await frames.AutoComposeAsync(frameDelay, token);
             var frameCount = imageResult.Image.Frames.Count;
             if (frameCount > 1000)
