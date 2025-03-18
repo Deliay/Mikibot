@@ -339,8 +339,10 @@ public static class Memes
     public static Factory Loop()
         => (seq, arguments, token) => LoopCore(seq, int.TryParse(arguments, out var times) ? times : 1, token);
 
+    [MemeCommandMapping("", "倒放")]
+    public static Factory Reverse() => (seq, arguments, token) => seq.Reverse(); 
 
-    private static Predicate<Frame> RangeFrameFilter(string argument)
+    private static Predicate<Frame> FrameFilter(string argument)
     {
         if (argument.Length < 2) return (_) => true;
         var numberStartedAt = char.IsNumber(argument[1]) ? 1 : 2;
