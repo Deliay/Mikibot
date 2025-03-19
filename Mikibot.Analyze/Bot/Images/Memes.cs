@@ -386,7 +386,7 @@ public static class Memes
             Mode = ResizeMode.Stretch,
             PremultiplyAlpha = true,
             Size = new Size(width, height),
-            Sampler = LanczosResampler.Lanczos3
+            Sampler = new BicubicResampler()
         });
     };
 
