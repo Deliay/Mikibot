@@ -13,6 +13,7 @@ using MemeFactory.OpenCv;
 using MemeFactory.OpenCv.Filters;
 using Microsoft.ML.OnnxRuntime;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Processors.Transforms;
 using FlipMode = SixLabors.ImageSharp.Processing.FlipMode;
@@ -355,7 +356,8 @@ public static class Memes
         if (argument.StartsWith("<=")) return (frame) => frame.Sequence <= result;
         if (argument.StartsWith(">=")) return (frame) => frame.Sequence >= result;
         if (argument.StartsWith('^')) return (frame) => frame.Sequence == 0;
-
+        
+        
         return (_) => true;
     }
     
@@ -641,5 +643,50 @@ public static class Memes
             {
                 LogLevel = FFMpegLogLevel.Trace,
             }, token);
+    };
+
+    [MemeCommandMapping("size(w,h)=(4,4)", "瓷砖")]
+    public static Factory Tile() => (seq, arguments, token) =>
+    {
+        if (!TryParseNamed<int, int>(arguments, "size", out var size)) size = (4, 4);
+
+        var tileSize = size.Value;
+
+        if (tileSize.x is < 1 or > 64 || tileSize.y is < 1 or > 64)
+            throw new AfterProcessError(nameof(Tile), "必须大于0, 小于64😡");
+
+        return seq.Select(f =>
+        {
+            var canvasWidth = f.Image.Width * Math.Min(tileSize.x, 2);
+            var canvasHeight = f.Image.Height * Math.Min(tileSize.y, 2);
+
+            var preImageSize = new Size(canvasWidth / tileSize.x, canvasHeight / tileSize.y);
+
+            var canvas = new Image<Rgba32>(canvasWidth, canvasHeight);
+
+            f.Image.Mutate(x => x.Resize(new ResizeOptions()
+            {
+                Size = preImageSize,
+                Sampler = new BicubicResampler(),
+            }));
+
+            canvas.Mutate(x =>
+            {
+                for (var w = 0; w < tileSize.x; w++)
+                {
+                    for (var h = 0; h < tileSize.y; h++)
+                    {
+                        var rect = new Rectangle(
+                            w * preImageSize.Width, h * preImageSize.Height,
+                            preImageSize.Width, preImageSize.Height);
+
+                        x.DrawImage(f.Image, rect, 1.0f);
+                    }
+                }
+            });
+
+            using var oldFrame = f;
+            return oldFrame with { Image = canvas };
+        });
     };
 }
