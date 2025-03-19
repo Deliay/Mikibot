@@ -378,7 +378,7 @@ public static class Memes
         var height = int.Parse(resolution[1]);
         
         if (width < 16 || height < 16) throw new AfterProcessError(nameof(Resize), "太小了(16-1024)");
-        if (width > 512 || height > 512) throw new AfterProcessError(nameof(Resize), "太大了(16-1024)");
+        if (width > 1024 || height > 1024) throw new AfterProcessError(nameof(Resize), "太大了(16-1024)");
 
         return seq.Resize(new ResizeOptions()
         {
