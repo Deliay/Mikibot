@@ -655,38 +655,6 @@ public static class Memes
         if (tileSize.x is < 1 or > 64 || tileSize.y is < 1 or > 64)
             throw new AfterProcessError(nameof(Tile), "必须大于0, 小于64😡");
 
-        return seq.Select(f =>
-        {
-            var canvasWidth = f.Image.Width * Math.Min(tileSize.x, 2);
-            var canvasHeight = f.Image.Height * Math.Min(tileSize.y, 2);
-
-            var preImageSize = new Size(canvasWidth / tileSize.x, canvasHeight / tileSize.y);
-
-            var canvas = new Image<Rgba32>(canvasWidth, canvasHeight);
-
-            f.Image.Mutate(x => x.Resize(new ResizeOptions()
-            {
-                Size = preImageSize,
-                Sampler = new BicubicResampler(),
-            }));
-
-            canvas.Mutate(x =>
-            {
-                for (var w = 0; w < tileSize.x; w++)
-                {
-                    for (var h = 0; h < tileSize.y; h++)
-                    {
-                        var rect = new Rectangle(
-                            w * preImageSize.Width, h * preImageSize.Height,
-                            preImageSize.Width, preImageSize.Height);
-
-                        x.DrawImage(f.Image, rect, 1.0f);
-                    }
-                }
-            });
-
-            using var oldFrame = f;
-            return oldFrame with { Image = canvas };
-        });
+        return seq.Tile(tileSize);
     };
 }
