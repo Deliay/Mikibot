@@ -633,9 +633,13 @@ public static class Memes
         if (amount > 4) amount = 4f;
         if (amount < 0.01) amount = 0.01f;
 
-        return seq.SpeedUp(amount, ffOptions: new FFOptions()
-        {
-            LogLevel = FFMpegLogLevel.Trace,
-        }, token);
+        return seq.FfmpegToGif(vf => vf.Arguments.Add(new SetPtsVideoFilter(amount)),
+            null, input =>
+            {
+                input.ForceFormat("gif");
+            }, new FFOptions()
+            {
+                LogLevel = FFMpegLogLevel.Trace,
+            }, token);
     };
 }
