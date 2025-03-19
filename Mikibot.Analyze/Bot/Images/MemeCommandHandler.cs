@@ -7,7 +7,7 @@ public class MemeCommandHandler(ILogger<MemeCommandHandler> logger)
 {
     private readonly Dictionary<string, Memes.Factory> _memeProcessors = [];
     private readonly Dictionary<string, string> _memeHelper = [];
-
+    private readonly Dictionary<string, Func<string, Memes.Factory>> _memeGroupProcessors = [];
     public IReadOnlyDictionary<string, Memes.Factory> MemeProcessors => _memeProcessors;
     public IReadOnlyDictionary<string, string> MemeHelpers => _memeHelper;
     
@@ -23,6 +23,12 @@ public class MemeCommandHandler(ILogger<MemeCommandHandler> logger)
     public void Register(string command, Memes.Factory factory)
     {
         _memeProcessors.Add(command, factory);
+    }
+
+    public void RegisterGroupCommand(string command, string help, Func<string, Memes.Factory> factoryGetter)
+    {
+        _memeGroupProcessors.Add(command, factoryGetter);
+        _memeHelper.Add(command, help);
     }
     
     public void RegisterStaticMethods(Type type)
@@ -41,7 +47,7 @@ public class MemeCommandHandler(ILogger<MemeCommandHandler> logger)
         }
     }
     
-    public Memes.FactoryComposer? GetComposePipeline(string command)
+    public Memes.FactoryComposer? GetComposePipeline(string command, string groupId)
     {
         var possibleCommands = command.Split('/', StringSplitOptions.RemoveEmptyEntries);
         logger.LogInformation("Split input commands: {}", string.Join(", ", possibleCommands));
@@ -55,8 +61,16 @@ public class MemeCommandHandler(ILogger<MemeCommandHandler> logger)
                 else return [s];
             })
             .Select(s => (s[0], s.Length > 1 ? s[1] : ""))
-            .Where(p => _memeProcessors.ContainsKey(p.Item1))
-            .Select(p => (factory: _memeProcessors[p.Item1], argument: p.Item2))
+            .Select(p =>
+            {
+                if (_memeGroupProcessors.TryGetValue(p.Item1, out var factoryFactory))
+                    return (factoryFactory(groupId), p.Item2);
+                if (_memeProcessors.TryGetValue(p.Item1, out var factory))
+                    return (factory, p.Item2);
+
+                return default;
+            })
+            .Where(f => f is { Item2.Length: > 0 })
             .ToList();
         
         logger.LogInformation("Match {} meme factory", factories.Count);

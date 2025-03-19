@@ -423,7 +423,7 @@ public static class Memes
     [MemeCommandMapping("", "高斯模糊")]
     public static Factory GaussianBlur() => (seq, arguments, token) => seq.GaussianBlur();
 
-    private static bool TryParseNumberPair(string argument, [NotNullWhen(true)]out (float x, float y)? numberPair)
+    internal static bool TryParseNumberPair(string argument, [NotNullWhen(true)]out (float x, float y)? numberPair)
     {
         numberPair = null;
         var leftIdx = argument.IndexOf('(');
@@ -442,7 +442,7 @@ public static class Memes
         return xStatus && yStatus;
     }
 
-    private static bool TryParseNamed<T1, T2, T3>(string argument, string name,
+    internal static bool TryParseNamed<T1, T2, T3>(string argument, string name,
         out (T1 x, T2 y, T3 z)? namedPair)
         where T1 : ISpanParsable<T1>
         where T2 : ISpanParsable<T2>
@@ -471,7 +471,7 @@ public static class Memes
     }
 
 
-    private static bool TryParseNamed<T1, T2>(string argument, string name,
+    internal static bool TryParseNamed<T1, T2>(string argument, string name,
         out (T1 x, T2 y)? namedPair)
         where T1 : ISpanParsable<T1>
         where T2 : ISpanParsable<T2>
@@ -497,7 +497,7 @@ public static class Memes
         return true;
     }
     
-    private static bool TryParseNamed<T1>(string argument, string name,
+    internal static bool TryParseNamed<T1>(string argument, string name,
         out T1? namedPair) where T1 : ISpanParsable<T1>
     {
         namedPair = default;

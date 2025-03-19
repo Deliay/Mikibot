@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using MemeFactory.Core.Processing;
 using MemeFactory.Core.Utilities;
 using Microsoft.Extensions.Logging;
 using Mikibot.Analyze.Bot.Images;
@@ -8,6 +9,8 @@ using Mirai.Net.Data.Messages;
 using Mirai.Net.Data.Messages.Concretes;
 using Mirai.Net.Data.Messages.Receivers;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Processing.Processors.Transforms;
 
 namespace Mikibot.Analyze.Bot;
 
@@ -29,6 +32,94 @@ public class ImageProcessorService(
     };
 
     private readonly HashSet<string> _hiddenCommands = ["shoot", "jerk"];
+    private readonly Dictionary<string, List<Image?>> SavedImages = [];
+
+    private static Func<Image, Func<Frame, Point>> GetLayoutFunction(string layoutStr)
+    {
+        return layoutStr switch
+        {
+            "lt" => Layout.LeftTop,
+            "lc" => Layout.LeftCenter,
+            "lb" => Layout.LeftBottom,
+            "tc" => Layout.TopCenter,
+            "c" => Layout.Center,
+            "bc" => Layout.BottomCenter,
+            "rt" => Layout.RightTop,
+            "rc" => Layout.RightCenter,
+            "rb" => Layout.RightBottom,
+            _ => throw new Memes.AfterProcessError(nameof(GetLayoutFunction), $"不支持的位置函数: {layoutStr}")
+        };
+    }
+
+    private Memes.Factory AppendMeme(string groupId)
+    {
+        return AppendCore;
+
+        async IAsyncEnumerable<Frame> AppendCore(IAsyncEnumerable<Frame> frames, string argument, CancellationToken token)
+        {
+            if (!Memes.TryParseNamed<int>(argument, "id", out var idx) || idx < 0)
+                throw new Memes.AfterProcessError(nameof(AppendMeme), "木有指定id，使用指令//存 存储一张图");
+            
+            if (!SavedImages.TryGetValue(groupId, out var images)
+                || images.Count == 0
+                || idx >= images.Count)
+                throw new Memes.AfterProcessError(nameof(AppendMeme), "木有已存储表情");
+            
+            var image = images[idx];
+            
+            if (image is null) 
+                throw new Memes.AfterProcessError(nameof(AppendMeme), "最大存100个表情，这个超过了被释放掉了😭");
+
+            var frameList = await frames.ToListAsync(token);
+            
+            foreach (var frame in frameList)
+            {
+                yield return frame;
+            }
+
+            var size = frameList.Count > 0 ? frameList[0].Image.Size : image.Size;
+            var shouldResize = size != image.Size;
+            await foreach (var extraFrame in image.ExtractFrames().WithCancellation(token))
+            {
+                if (shouldResize)
+                {
+                    extraFrame.Image.Mutate(x => x.Resize(size, new BicubicResampler(), true));
+                }
+                    
+                yield return extraFrame with { Sequence = extraFrame.Sequence + frameList.Count };
+            }
+        }
+    }
+    
+    private Memes.Factory GetMemePaster(string groupId)
+    {
+        return Paste; 
+        
+        IAsyncEnumerable<Frame> Paste(IAsyncEnumerable<Frame> frames, string argument, CancellationToken token)
+        {
+            if (!Memes.TryParseNamed<int>(argument, "id", out var idx) || idx < 0)
+                throw new Memes.AfterProcessError(nameof(Paste), "木有指定id，使用指令//存 存储一张图");
+            
+            if (!SavedImages.TryGetValue(groupId, out var images)
+                || images.Count == 0
+                || idx >= images.Count)
+                throw new Memes.AfterProcessError(nameof(Paste), "木有已存储表情");
+            
+            var image = images[idx];
+            
+            if (image is null) 
+                throw new Memes.AfterProcessError(nameof(Paste), "最大存100个表情，这个超过了被释放掉了😭");
+
+            if (!Memes.TryParseNamed<string>(argument, "layout", out var layoutStr))
+                layoutStr = "lb";
+
+            var layoutFn = GetLayoutFunction(layoutStr);
+            
+            return frames.FrameBasedZipSequence(image.ExtractFrames().LcmExpand(cancellationToken: token),
+                Composers.Draw(Resizer.Auto, layoutFn), cancellationToken: token);
+        }
+    }
+    
     protected override ValueTask PreRun(CancellationToken token)
     {
         memeCommandHandler.RegisterStaticMethods(typeof(Memes));
@@ -54,6 +145,9 @@ public class ImageProcessorService(
             else 
                 memeCommandHandler.Register(knownCommand, "", Memes.AutoCompose(autoComposeMemeFolder));
         }
+        
+        memeCommandHandler.RegisterGroupCommand("贴", "id(n),layout(lt/lc/lb/tc/c/bc/rt/rc/rb)", GetMemePaster);
+        memeCommandHandler.RegisterGroupCommand("合", "id(n)", GetMemePaster);
         
         Logger.LogInformation("Total {} meme processor has been registered.", memeCommandHandler.MemeProcessors.Count);
         return ValueTask.CompletedTask;
@@ -94,6 +188,31 @@ public class ImageProcessorService(
             yield return new PlainMessage(info);
         }
     }
+
+    private async IAsyncEnumerable<MessageBase> StorageImage(string groupId, List<ImageMessage> imageMessages,
+        [EnumeratorCancellation] CancellationToken token)
+    {
+        if (!SavedImages.TryGetValue(groupId, out var imageQueue))
+            SavedImages.Add(groupId, imageQueue = []);
+
+        if (imageMessages.Count == 0) yield break;
+            
+        if (imageQueue.Count > 100)
+        {
+            using var dispose = imageQueue[0];
+            imageQueue[0] = null;
+        }
+        
+        foreach (var imageMessage in imageMessages)
+        {
+            var image = await QqService.ReadImageAsync(imageMessage.Url, token);
+
+            var idx = imageQueue.Count;
+            imageQueue.Add(image);
+            
+            yield return new PlainMessage($"已添加id={idx}");
+        }
+    }
     
     protected override async ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
     {
@@ -129,8 +248,18 @@ public class ImageProcessorService(
             await QqService.SendMessageToSomeGroup([groupId], token, new PlainMessage(helpStr));
             return;
         }
+
+        if (msg.StartsWith("//存"))
+        {
+            var replyMsg = await this.StorageImage(groupId, imageMessages, token).ToArrayAsync(token);
+            if (replyMsg.Length == 0) return;
+
+            await QqService.SendMessageToSomeGroup([groupId], token, replyMsg);
+            
+            return;
+        }
         
-        var processor = memeCommandHandler.GetComposePipeline(msg);
+        var processor = memeCommandHandler.GetComposePipeline(msg, groupId);
 
         if (processor is null) return;
 
