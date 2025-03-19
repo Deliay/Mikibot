@@ -8,7 +8,6 @@ public class MemeCommandHandler(ILogger<MemeCommandHandler> logger)
     private readonly Dictionary<string, Memes.Factory> _memeProcessors = [];
     private readonly Dictionary<string, string> _memeHelper = [];
     private readonly Dictionary<string, Func<string, Memes.Factory>> _memeGroupProcessors = [];
-    public IReadOnlyDictionary<string, Memes.Factory> MemeProcessors => _memeProcessors;
     public IReadOnlyDictionary<string, string> MemeHelpers => _memeHelper;
     
     public void Register(string command, string help, Func<Memes.Factory> factoryGetter)
@@ -65,12 +64,13 @@ public class MemeCommandHandler(ILogger<MemeCommandHandler> logger)
             {
                 if (_memeGroupProcessors.TryGetValue(p.Item1, out var factoryFactory))
                     return (factoryFactory(groupId), p.Item2);
+                
                 if (_memeProcessors.TryGetValue(p.Item1, out var factory))
                     return (factory, p.Item2);
 
                 return default;
             })
-            .Where(f => f is { Item2.Length: > 0 })
+            .Where(f => f is { Item1 : not null })
             .ToList();
         
         logger.LogInformation("Match {} meme factory", factories.Count);

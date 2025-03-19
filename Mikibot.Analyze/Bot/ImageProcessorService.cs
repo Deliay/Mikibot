@@ -149,7 +149,7 @@ public class ImageProcessorService(
         memeCommandHandler.RegisterGroupCommand("贴", "id(n),layout(lt/lc/lb/tc/c/bc/rt/rc/rb)", GetMemePaster);
         memeCommandHandler.RegisterGroupCommand("合", "id(n)", GetMemePaster);
         
-        Logger.LogInformation("Total {} meme processor has been registered.", memeCommandHandler.MemeProcessors.Count);
+        Logger.LogInformation("Total {} meme processor has been registered.", memeCommandHandler.MemeHelpers.Count);
         return ValueTask.CompletedTask;
     }
 
