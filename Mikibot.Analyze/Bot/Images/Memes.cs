@@ -105,14 +105,15 @@ public static class Memes
     }
     
     
-    [MemeCommandMapping("[旋转次数]","旋转")]
+    [MemeCommandMapping("[旋转次数][正/反]","旋转")]
     public static Factory Rotation()
     {
         return (seq, arguments, token) =>
         {
-            if (!int.TryParse(arguments, out var size)) size = 5;
-            if (size is < 1 or > 64) throw new AfterProcessError(nameof(Rotation), "不准转这么多😡(1-64)");
-            return seq.Rotation(size, token);
+            var direction = arguments.Contains('反') ? -1 : 1;
+            if (!TryPluckNumber(arguments, out var times)) times = 5;
+            if (times is < 1 or > 128) throw new AfterProcessError(nameof(Rotation), "不准转这么多😡(1-128)");
+            return seq.Rotation((int)times, direction, token);
         };
     }
 
@@ -252,6 +253,19 @@ public static class Memes
         };
     }
 
+    private static bool TryPluckNumber(string argument, out decimal number)
+    {
+        number = 0u;
+        var numStart = argument.FirstOrDefault(char.IsNumber);
+        if (numStart == 0) return false;
+        
+        var numEnd = argument.LastOrDefault(char.IsNumber);
+        var numStartPos = argument.IndexOf(numStart);
+        var numEndPos = argument.LastIndexOf(numEnd);
+        var numStr = argument[numStartPos..(numEndPos + 1)];
+        return decimal.TryParse(numStr, out number);
+    }
+    
     private static (int hor, int vert, int slidingTimes) ParseSlidingArgument(string argument)
     {
         var numStart = argument.FirstOrDefault(char.IsNumber);
@@ -264,8 +278,8 @@ public static class Memes
             var numStr = argument[numStartPos..(numEndPos + 1)];
             if (int.TryParse(numStr, out var parsedSlidingTimes))
             {
-                if (parsedSlidingTimes is > 64 or < 1)
-                    throw new AfterProcessError(nameof(ParseSlidingArgument), "不准滑那么多😡 (1-64)");
+                if (parsedSlidingTimes is > 128 or < 1)
+                    throw new AfterProcessError(nameof(ParseSlidingArgument), "不准滑那么多😡 (1-128)");
             }
         }
         var hor = argument.Contains('右') ? -1 : argument.Contains('左') ? 1 : 0;
@@ -652,8 +666,8 @@ public static class Memes
 
         var tileSize = size.Value;
 
-        if (tileSize.x is < 1 or > 64 || tileSize.y is < 1 or > 64)
-            throw new AfterProcessError(nameof(Tile), "必须大于0, 小于64😡");
+        if (tileSize.x is < 1 or > 128 || tileSize.y is < 1 or > 128)
+            throw new AfterProcessError(nameof(Tile), "必须大于0, 小于128😡");
 
         return seq.Tile(tileSize);
     };
