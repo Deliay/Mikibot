@@ -37,6 +37,16 @@ public static class Memes
     public delegate ComposeResult FactoryComposer(IAsyncEnumerable<Frame> seq,
         CancellationToken cancellationToken = default);
 
+    private static async IAsyncEnumerable<Frame> WrapPipeline(IAsyncEnumerable<Frame> seq)
+    {
+        int count = 0;
+        await foreach (var frame in seq)
+        {
+            if (count++ > 1000) throw new OverflowException("超过1000帧了，拦截😡！");
+            yield return frame;
+        }
+    }
+    
     public static FactoryComposer Handle((Factory factory, string argument) pair)
     {
         var (factory, argument) = pair;
@@ -44,11 +54,11 @@ public static class Memes
         {
             try
             {
-                return new ComposeResult(factory(seq, argument, token), []);
+                return new ComposeResult(WrapPipeline(factory(seq, argument, token)), []);
             }
             catch (AfterProcessError e)
             {
-                return new ComposeResult(seq, [e]);
+                return new ComposeResult(WrapPipeline(seq), [e]);
             }
         };
     }
@@ -396,9 +406,6 @@ public static class Memes
 
         return seq.Resize(new ResizeOptions()
         {
-            Compand = true,
-            Mode = ResizeMode.Stretch,
-            PremultiplyAlpha = true,
             Size = new Size(width, height),
             Sampler = new BicubicResampler()
         });

@@ -280,11 +280,31 @@ public class ImageProcessorService(
         async IAsyncEnumerable<MessageBase> RunImage(ImageMessage imageMessage)
         {
             logger.LogInformation("Processing image, url: {}", imageMessage.Url);
-            using var image = await QqService.ReadImageAsync(imageMessage.Url, token);
-            using var seq = await image.ExtractFrames().ToSequenceAsync(token);
-            var (frames, errors) = processor(seq, token);
-            var frameDelay = !msg.Contains("间隔") ? 6 : -1;
-            using var imageResult = await frames.AutoComposeAsync(frameDelay, token);
+            MemeResult? result = null;
+            Exception? exception = null;
+            List<Memes.AfterProcessError> knownErrors = null; 
+            try
+            {
+                using var image = await QqService.ReadImageAsync(imageMessage.Url, token);
+                using var seq = await image.ExtractFrames().ToSequenceAsync(token);
+                var (frames, errors) = processor(seq, token);
+                var frameDelay = !msg.Contains("间隔") ? 6 : -1;
+                result = await frames.AutoComposeAsync(frameDelay, token);
+                knownErrors = errors;
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
+
+            if (exception is not null)
+            {
+                yield return new PlainMessage($"出错🌶！{exception.Message}");
+                yield break;
+            }
+            if (result is null) yield break;
+            using var imageResult = result.Value;
+            
             var frameCount = imageResult.Image.Frames.Count;
             if (frameCount > 1000)
             {
@@ -294,10 +314,11 @@ public class ImageProcessorService(
             {
                 yield return new ImageMessage() { Base64 = await imageResult.ToDataUri(token) };
             }
-            if (errors is { Count: > 0 })
+            if (knownErrors is { Count: > 0 })
             {
-                yield return new PlainMessage(string.Join('\n', errors.Select(v => v.Message)));
+                yield return new PlainMessage(string.Join('\n', knownErrors.Select(v => v.Message)));
             }
         }
+        
     }
 }
