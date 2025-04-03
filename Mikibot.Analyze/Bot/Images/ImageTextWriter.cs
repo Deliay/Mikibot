@@ -19,10 +19,14 @@ public static class ImageTextWriter
     {
         return Fonts.Families
             .Where(f => f.Name.StartsWith("Noto", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(f =>
-                f.Name.IndexOf("Serif", StringComparison.InvariantCultureIgnoreCase)
-                + f.Name.IndexOf("SC", StringComparison.InvariantCultureIgnoreCase)
-                + f.Name.IndexOf("CN", StringComparison.InvariantCultureIgnoreCase));
+            .OrderByDescending(f => 0
+                + Math.Sign(f.Name.IndexOf("Serif", StringComparison.InvariantCultureIgnoreCase))
+                + Math.Sign(f.Name.IndexOf("Sans", StringComparison.InvariantCultureIgnoreCase))
+                + 2 * Math.Sign(f.Name.IndexOf("CJK", StringComparison.InvariantCultureIgnoreCase))
+                + 4 * Math.Sign(f.Name.IndexOf("SC", StringComparison.InvariantCultureIgnoreCase))
+                + Math.Sign(f.Name.IndexOf("Emoji", StringComparison.InvariantCultureIgnoreCase))
+                + 4 * Math.Sign(f.Name.IndexOf("CN", StringComparison.InvariantCultureIgnoreCase))
+                );
     }
     
     static ImageTextWriter()
