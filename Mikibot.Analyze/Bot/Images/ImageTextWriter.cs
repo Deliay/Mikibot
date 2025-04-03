@@ -18,9 +18,9 @@ public static class ImageTextWriter
     private static IEnumerable<FontFamily> GetSortedFonts()
     {
         return Fonts.Families
-            .Where(f => f.Name.StartsWith("Noto", StringComparison.InvariantCultureIgnoreCase)
-                && (f.Name.Contains("CJK", StringComparison.InvariantCultureIgnoreCase)
-                || f.Name.Contains("Emoji", StringComparison.InvariantCultureIgnoreCase)))
+            .Where(f => (f.Name.StartsWith("Noto", StringComparison.InvariantCultureIgnoreCase)
+                         && f.Name.Contains("CJK", StringComparison.InvariantCultureIgnoreCase))
+                        || f.Name == "Segoe UI Emoji")
             .OrderByDescending(f => 0
                 + Math.Sign(f.Name.IndexOf("Serif", StringComparison.InvariantCultureIgnoreCase))
                 + Math.Sign(f.Name.IndexOf("Sans", StringComparison.InvariantCultureIgnoreCase))
