@@ -678,4 +678,14 @@ public static class Memes
 
         return seq.Tile(tileSize);
     };
+
+    [MemeCommandMapping("字", "写")]
+    public static Factory Write() => (seq, arguments, token) =>
+    {
+        if (arguments is not { Length: > 0 })
+            throw new AfterProcessError(nameof(Write), "写的字长度必须大于0");
+
+        return seq.WriteText(arguments, token);
+    };
 }
+

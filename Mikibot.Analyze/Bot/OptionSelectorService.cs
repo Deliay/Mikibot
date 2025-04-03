@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using MathNet.Numerics.Random;
 using Microsoft.Extensions.Logging;
 using Mikibot.Analyze.Generic;
 using Mikibot.Analyze.MiraiHttp;
@@ -50,7 +49,7 @@ public partial class OptionSelectorService(IQqService qqService, ILogger<OptionS
                 .Split(' ')
                 .Select(option => option.Trim())
                 .Where(option => option.Length > 0)
-                .Select(option => (option, roll: Random.NextDecimal() * 100))
+                .Select(option => (option, roll: Random.Next() * 100))
                 .ToList();
 
             var all = options.Select(option => option.roll).Sum();
