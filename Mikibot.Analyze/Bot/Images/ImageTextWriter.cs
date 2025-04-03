@@ -36,6 +36,8 @@ public static class ImageTextWriter
         var fontFamily = fontFamilies[0];
         IReadOnlyList<FontFamily> fallbackFonts = fontFamilies.Skip(1).ToList();
 
+        Console.WriteLine($"Fonts: {string.Join(',', fontFamilies.Select(f => f.Name))}");
+        
         RichTextOptions = new RichTextOptions(new Font(fontFamily, 72f, FontStyle.Regular))
         {
             FallbackFontFamilies = fallbackFonts,
