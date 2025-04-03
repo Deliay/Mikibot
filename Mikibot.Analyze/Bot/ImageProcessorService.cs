@@ -299,6 +299,7 @@ public class ImageProcessorService(
 
             if (exception is not null)
             {
+                Logger.LogError(exception, "An exception was thrown when processing");
                 yield return new PlainMessage($"出错🌶！{exception.Message}");
                 yield break;
             }
