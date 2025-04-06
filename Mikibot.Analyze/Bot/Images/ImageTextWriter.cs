@@ -100,7 +100,7 @@ public static class ImageTextWriter
                 ctx.DrawImage(image, 1.0f);
                 
                 using var fontImage = Draw(text, lines, size);
-                ctx.DrawImage(fontImage, new Point(size.Width / 2, image.Height + (FontCanvasLineHeight / 2)), 1.0f);
+                ctx.DrawImage(fontImage, new Point(0, image.Height + 20), 1.0f);
             });
 
             yield return frame with { Image = newImage};
