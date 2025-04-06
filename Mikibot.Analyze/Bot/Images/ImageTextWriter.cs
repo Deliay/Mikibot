@@ -97,13 +97,14 @@ public static class ImageTextWriter
             
             newImage.Mutate(ctx =>
             {
-                ctx.DrawImage(image, 1.0f);
-                
                 using var fontImage = Draw(text, lines, size);
                 ctx.DrawImage(fontImage, new Point(0, image.Height + 20), 1.0f);
+                
+                ctx.DrawImage(image, 1.0f);
+                
             });
 
-            yield return frame with { Image = newImage};
+            yield return frame with { Image = newImage };
         }
     }
 }
