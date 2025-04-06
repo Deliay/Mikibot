@@ -53,8 +53,8 @@ public static class ImageTextWriter
         };
         
         var totalSize =TextMeasurer.MeasureSize("一一二三四五六七八九十十", RichTextOptions);
-        FontCanvasWidth = (int)Math.Round(totalSize.Size.X, MidpointRounding.AwayFromZero);
-        FontCanvasLineHeight = (int)Math.Round(totalSize.Size.Y, MidpointRounding.AwayFromZero);
+        FontCanvasWidth = (int)Math.Round(totalSize.Width, MidpointRounding.AwayFromZero);
+        FontCanvasLineHeight = (int)Math.Round(totalSize.Height, MidpointRounding.AwayFromZero);
     }
 
     private static Size GetFontActualSize(int lines, Size size)
