@@ -48,7 +48,7 @@ public static class ImageTextWriter
         {
             FallbackFontFamilies = fallbackFonts,
             HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Top,
+            VerticalAlignment = VerticalAlignment.Center,
             TextJustification = TextJustification.InterWord,
         };
         
@@ -75,7 +75,6 @@ public static class ImageTextWriter
             textCtx.DrawText(RichTextOptions, text, Color.Black);
             textCtx.Resize(new ResizeOptions()
             {
-                Position = AnchorPositionMode.Center,
                 Mode = ResizeMode.Stretch,
                 Size = size,
             });
@@ -93,7 +92,7 @@ public static class ImageTextWriter
             var image = frame.Image;
             var size = GetFontActualSize(lines, image.Size);
             var newImage = new Image<Rgba32>(
-                image.Size.Width + size.Width, 
+                image.Size.Width, 
                 image.Size.Height + size.Height);
             
             newImage.Mutate(ctx =>
