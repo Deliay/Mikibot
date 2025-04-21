@@ -17,7 +17,7 @@ using Mirai.Net.Data.Shared;
 
 namespace Mikibot.Analyze.MiraiHttp;
 
-public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBridge> logger) : IQqService, IDisposable
+public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBridge> logger) : IQqService, ILagrangeBotSupported, IDisposable
 {
     private ILifetimeScope _makabakaScope = null!;
     private IBotContext _botContext = null!;
@@ -201,9 +201,33 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
         return resultDict;
     }
 
+    
+    
     public void Dispose()
     {
         _makabakaScope.Dispose();
         HttpClient.Dispose();
+    }
+
+    public async ValueTask<bool> ReactionGroupMessageAsync(string groupId, string messageId, string emotionId,
+        bool isAdd = true,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await _botContext.ExecuteAPIAsync("set_group_reaction", new
+            {
+                group_id = uint.Parse(groupId),
+                message_id = uint.Parse(messageId),
+                code = emotionId,
+                is_add = isAdd
+            }, cancellationToken);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Set reaction failed");
+            return false;
+        }
     }
 }

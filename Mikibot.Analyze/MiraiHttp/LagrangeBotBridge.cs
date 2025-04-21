@@ -18,7 +18,7 @@ using MessageChain = Lagrange.Core.Message.MessageChain;
 
 namespace Mikibot.Analyze.MiraiHttp;
 
-public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger, ILogger<BotContext> botLogger) : IQqService
+public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger, ILogger<BotContext> botLogger) : IQqService, ILagrangeBotSupported
 {
     private static readonly string BotConfigDir = Environment.GetEnvironmentVariable("BOT_CONFIG_DIR") ?? Path.GetTempPath();
 
@@ -276,5 +276,10 @@ public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger, ILogger<BotCon
         }
 
         return [];
+    }
+
+    public async ValueTask<bool> ReactionGroupMessageAsync(string groupId, string messageId, string emotionId, bool isAdd = true, CancellationToken cancellationToken = default)
+    {
+        return await bot.GroupSetMessageReaction(uint.Parse(groupId), uint.Parse(messageId), emotionId, isAdd);
     }
 }
