@@ -18,7 +18,7 @@ using MessageChain = Lagrange.Core.Message.MessageChain;
 
 namespace Mikibot.Analyze.MiraiHttp;
 
-public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger, ILogger<BotContext> botLogger) : IBotService, ILagrangeBotSupported
+public class LagrangeBotBridge(ILogger<LagrangeBotBridge> logger, ILogger<BotContext> botLogger) : IBotService, ILagrangeBot
 {
     private static readonly string BotConfigDir = Environment.GetEnvironmentVariable("BOT_CONFIG_DIR") ?? Path.GetTempPath();
 

@@ -7,11 +7,11 @@ public static class LagrangeBotExtensions
     public static async ValueTask<bool> SendGroupMessageReactionIfSupported(this IBotService bot, string groupId,
         string? messageId, string emotionId, bool isAdd = true, CancellationToken cancellationToken = default)
     {
-        if (bot is not ILagrangeBotSupported lagrangeBot) return false;
+        if (bot is not ILagrangeBot lagrangeBot) return false;
         
         if (messageId is not null)
         {
-            return await lagrangeBot.ReactionGroupMessageAsync(groupId, messageId, KnownEmojiIds.Click,
+            return await lagrangeBot.ReactionGroupMessageAsync(groupId, messageId, emotionId,
                 isAdd, cancellationToken);
         }
 

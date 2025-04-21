@@ -17,7 +17,7 @@ using Mirai.Net.Data.Shared;
 
 namespace Mikibot.Analyze.MiraiHttp;
 
-public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBridge> logger) : IBotService, ILagrangeBotSupported, IDisposable
+public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBridge> logger) : IBotService, ILagrangeBot, IDisposable
 {
     private ILifetimeScope _makabakaScope = null!;
     private IBotContext _botContext = null!;
