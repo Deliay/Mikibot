@@ -8,8 +8,8 @@ using Mirai.Net.Data.Messages.Receivers;
 
 namespace Mikibot.Analyze.Bot;
 
-public partial class OptionSelectorService(IQqService qqService, ILogger<OptionSelectorService> logger)
-    : MiraiGroupMessageProcessor<OptionSelectorService>(qqService, logger)
+public partial class OptionSelectorService(IBotService botService, ILogger<OptionSelectorService> logger)
+    : MiraiGroupMessageProcessor<OptionSelectorService>(botService, logger)
 {
 
     private static readonly MessageBase[] NoOptions = [new PlainMessage("没选项，选个屁？")];
@@ -42,7 +42,7 @@ public partial class OptionSelectorService(IQqService qqService, ILogger<OptionS
             // 选个屁
             if (optionsText is null || optionsText.Length == 0)
             {
-                await QqService.SendMessageToGroup(messages.Sender.Group, token, NoOptions);
+                await BotService.SendMessageToGroup(messages.Sender.Group, token, NoOptions);
                 return;
             }
             var options = optionsText
@@ -71,19 +71,19 @@ public partial class OptionSelectorService(IQqService qqService, ILogger<OptionS
 
             if (allOptions.Count == 1)
             {
-                await QqService.SendMessageToGroup(messages.Sender.Group, token, JustOneOption);
+                await BotService.SendMessageToGroup(messages.Sender.Group, token, JustOneOption);
                 return;
             }
             else if (selectCount >= options.Count)
             {
-                await QqService.SendMessageToGroup(messages.Sender.Group, token, OptionNotEnough);
+                await BotService.SendMessageToGroup(messages.Sender.Group, token, OptionNotEnough);
                 return;
             }
 
             var selectedText = string.Join(' ', allOptions.Take(selectCount).Select(item => item.option));
             var optionWithPercentText = string.Join('\n', allOptions.Select(option => $"- {option.option} [{option.rollStr}{option.chance}]"));
 
-            await QqService.SendMessageToGroup(messages.Sender.Group, token,
+            await BotService.SendMessageToGroup(messages.Sender.Group, token,
             [
                 new PlainMessage($"从 {options.Count} 个选项中中选 {selectCount} 个\n{optionWithPercentText}\n\n我选: {selectedText}"),
             ]);

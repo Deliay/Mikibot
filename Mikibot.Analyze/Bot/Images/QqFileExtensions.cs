@@ -7,9 +7,9 @@ namespace Mikibot.Analyze.Bot.Images;
 
 public static class QqFileExtensions
 {
-    public static async ValueTask<Image> ReadImageAsync(this IQqService qqService, string imageUrl, CancellationToken token)
+    public static async ValueTask<Image> ReadImageAsync(this IBotService botService, string imageUrl, CancellationToken token)
     {
-        await using var stream = await qqService.HttpClient.GetStreamAsync(imageUrl, token);
+        await using var stream = await botService.HttpClient.GetStreamAsync(imageUrl, token);
         return await Image.LoadAsync(stream, token);
     }
     

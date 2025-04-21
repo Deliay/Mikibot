@@ -11,14 +11,14 @@ namespace Mikibot.Analyze.Notification;
 /// <summary>
 /// 每天新增关注数量统计
 /// </summary>
-public class DailyFollowerStatisticService(IQqService qq, ILogger<DailyFollowerStatisticService> logger)
+public class DailyFollowerStatisticService(IBotService bot, ILogger<DailyFollowerStatisticService> logger)
 {
     private readonly MikibotDatabaseContext db = new(MySqlConfiguration.FromEnviroment());
 
     // 不需要登录
 
     private BiliLiveCrawler Crawler { get; } = new(new HttpClient());
-    private IQqService Qq { get; } = qq;
+    private IBotService Bot { get; } = bot;
     private ILogger<DailyFollowerStatisticService> Logger { get; } = logger;
     private readonly Random random = new();
 
@@ -136,7 +136,7 @@ public class DailyFollowerStatisticService(IQqService qq, ILogger<DailyFollowerS
 
             var msg = $"涨粉日报\n{Format(start)} ~ {Format(end)}\n涨粉 {endFollowerCount - startFollowerCount} 人\n直播场次详细：\n{status}";
             Logger.LogInformation("{}", msg);
-            await Qq.SendMessageToSomeGroup([subscription.GroupId], token,
+            await Bot.SendMessageToSomeGroup([subscription.GroupId], token,
                 new PlainMessage(msg));
         }
         catch (Exception ex)
@@ -167,7 +167,7 @@ public class DailyFollowerStatisticService(IQqService qq, ILogger<DailyFollowerS
 
         var status = await GetRecentlyLiveStreamStatus(userId, start, token);
         var msg = $"涨粉周报\n{Format(start)} ~{Format(end)} 关注:{endFollowerCount}\n涨粉 {increase}人\n直播场次详细:\n{status}\n{estimateText}"; Logger.LogInformation("{}", msg);
-        await Qq.SendMessageToSomeGroup([subscription.GroupId], token, new PlainMessage(msg));
+        await Bot.SendMessageToSomeGroup([subscription.GroupId], token, new PlainMessage(msg));
     }
 
     public async Task WeeklyReportSchedule(CancellationToken token)

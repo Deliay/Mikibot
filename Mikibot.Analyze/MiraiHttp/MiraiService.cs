@@ -8,7 +8,7 @@ using System.Reactive.Linq;
 
 namespace Mikibot.Analyze.MiraiHttp;
 
-public class MiraiService : IDisposable, IQqService
+public class MiraiService : IDisposable, IBotService
 {
     private MiraiBot Bot { get; }
     public ILogger<MiraiService> Logger { get; }

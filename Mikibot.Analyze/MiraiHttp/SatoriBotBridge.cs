@@ -11,7 +11,7 @@ using Satori.Protocol.Models;
 
 namespace Mikibot.Analyze.MiraiHttp;
 
-public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IQqService
+public class SatoriBotBridge(ILogger<SatoriBotBridge> logger) : IDisposable, IBotService
 {
     private static readonly string EnvSatoriEndpoint
         = Environment.GetEnvironmentVariable("ENV_SATORI_ENDPOINT") ?? "http://localhost:5500";

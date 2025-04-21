@@ -31,7 +31,7 @@ appBuilder.Register((_) => MiraiBotConfig.FromEnviroment());
 // appBuilder.RegisterType<MiraiService>().As<IQqService>().SingleInstance();
 // appBuilder.RegisterType<SatoriBotBridge>().As<IQqService>().SingleInstance();
 // appBuilder.RegisterType<LocalOssService>().As<IOssService>().SingleInstance();
-appBuilder.RegisterType<MakabakaOneBotBridge>().As<IQqService>().SingleInstance();
+appBuilder.RegisterType<MakabakaOneBotBridge>().As<IBotService>().SingleInstance();
 // appBuilder.RegisterType<ConsoleEmailService>().As<IEmailService>().SingleInstance();
 // #endif
 
@@ -81,7 +81,7 @@ logger.LogInformation("Initializing database connection and database structure")
 await db.Database.MigrateAsync(token);
 logger.LogInformation("Done");
 
-var mirai = app.Resolve<IQqService>();
+var mirai = app.Resolve<IBotService>();
 logger.LogInformation("Initializing qq service...");
 await mirai.Run(token);
 

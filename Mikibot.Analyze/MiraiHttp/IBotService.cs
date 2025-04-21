@@ -4,7 +4,7 @@ using Mirai.Net.Data.Shared;
 
 namespace Mikibot.Analyze.MiraiHttp;
 
-public interface IQqService
+public interface IBotService
 {
     HttpClient HttpClient { get; }   
     ValueTask Run(CancellationToken cancellationToken = default);

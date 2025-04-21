@@ -9,10 +9,10 @@ using Mirai.Net.Data.Messages.Receivers;
 namespace Mikibot.Analyze.Bot;
 
 internal class ChatHistoryService(
-    IQqService qqService,
+    IBotService botService,
     ILogger<ChatHistoryService> logger,
     MikibotDatabaseContext db)
-    : MiraiGroupMessageProcessor<ChatHistoryService>(qqService, logger)
+    : MiraiGroupMessageProcessor<ChatHistoryService>(botService, logger)
 {
     protected override async ValueTask Process(GroupMessageReceiver message, CancellationToken token = default)
     {

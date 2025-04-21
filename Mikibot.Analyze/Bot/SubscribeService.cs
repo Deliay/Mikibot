@@ -12,14 +12,14 @@ using Mirai.Net.Data.Messages.Receivers;
 namespace Mikibot.Analyze.Bot;
 
 public partial class SubscribeService(
-    IQqService qqService,
+    IBotService botService,
     ILogger<SubscribeService> logger,
     BiliLiveCrawler crawler,
     PermissionService permissions,
     MikibotDatabaseContext db)
-    : MiraiGroupMessageProcessor<SubscribeService>(qqService, logger)
+    : MiraiGroupMessageProcessor<SubscribeService>(botService, logger)
 {
-    private readonly IQqService qqService = qqService;
+    private readonly IBotService botService = botService;
 
     private async ValueTask SubscribeLive(SourceMessage? source,
         string groupId, string userId, bool isCancel,
@@ -35,7 +35,7 @@ public partial class SubscribeService(
             
             await db.SubscriptionLiveStarts.Where(s => s.GroupId == groupId && s.UserId == userId)
                 .ExecuteDeleteAsync(cancellationToken);
-            await qqService.SendMessageToSomeGroup([groupId], cancellationToken, 
+            await botService.SendMessageToSomeGroup([groupId], cancellationToken, 
                 [
                     source!,
                     new PlainMessage($"已取消 群{groupId} 订阅主播 {userId} 的开播/下播提醒"),
@@ -52,7 +52,7 @@ public partial class SubscribeService(
             EnabledFansTrendingStatistics = false,
         });
         await db.SaveChangesAsync(cancellationToken);
-        await qqService.SendMessageToSomeGroup([groupId], cancellationToken,
+        await botService.SendMessageToSomeGroup([groupId], cancellationToken,
             [
                 source!,
                 new PlainMessage($"已在 群{groupId} 订阅主播 {userId} (直播间{roomInfo.RoomId}) 的开播/下播提醒"),
@@ -73,7 +73,7 @@ public partial class SubscribeService(
             
             await db.SubscriptionFansTrends.Where(s => s.GroupId == groupId && s.UserId == userId)
                 .ExecuteDeleteAsync(cancellationToken);
-            await qqService.SendMessageToSomeGroup([groupId], cancellationToken, 
+            await botService.SendMessageToSomeGroup([groupId], cancellationToken, 
                 [
                     source!,
                     new PlainMessage($"已取消 群{groupId} 订阅主播 {userId} 的涨粉日报/周报")
@@ -89,7 +89,7 @@ public partial class SubscribeService(
             TargetFansCount = 100_0000,
         });
         await db.SaveChangesAsync(cancellationToken);
-        await qqService.SendMessageToSomeGroup([groupId], cancellationToken, 
+        await botService.SendMessageToSomeGroup([groupId], cancellationToken, 
             [
                 source!,
                 new PlainMessage($"已在 群{groupId} 订阅主播 {userId} 的涨粉日报/周报"),

@@ -13,12 +13,12 @@ namespace Mikibot.Analyze.Notification;
 /// <summary>
 /// 开播、下播通知
 /// </summary>
-public class LiveStatusCrawlService(BiliLiveCrawler crawler, IQqService qq, ILogger<LiveStatusCrawlService> logger)
+public class LiveStatusCrawlService(BiliLiveCrawler crawler, IBotService bot, ILogger<LiveStatusCrawlService> logger)
 {
     private readonly MikibotDatabaseContext db = new (MySqlConfiguration.FromEnviroment());
 
     public BiliLiveCrawler Crawler => crawler;
-    public IQqService Qq => qq;
+    public IBotService Bot => bot;
     public ILogger<LiveStatusCrawlService> Logger => logger;
 
     public async Task<LiveStatus?> GetCurrentStatus(string userId, CancellationToken token = default)
@@ -108,7 +108,7 @@ public class LiveStatusCrawlService(BiliLiveCrawler crawler, IQqService qq, ILog
                                 [
                                     new PlainMessage($"诶嘿，开始为您持续关注 {info.RoomId} 的开播信息~\n{info.Url}"),
                                 ];
-                            await Qq.SendMessageToSomeGroup([subscription.GroupId], token, msg);
+                            await Bot.SendMessageToSomeGroup([subscription.GroupId], token, msg);
                         }
                         Logger.LogInformation("同步QQ消息完成");
                     }

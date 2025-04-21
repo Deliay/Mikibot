@@ -6,14 +6,14 @@ using Mirai.Net.Data.Shared;
 
 namespace Mikibot.Analyze.MiraiHttp;
 
-public class ConsoleQqService : IQqService
+public class ConsoleBotService : IBotService
 {
-    public ConsoleQqService(ILogger<ConsoleQqService> logger)
+    public ConsoleBotService(ILogger<ConsoleBotService> logger)
     {
         Logger = logger;
     }
 
-    public ILogger<ConsoleQqService> Logger { get; }
+    public ILogger<ConsoleBotService> Logger { get; }
 
     public string UserId => throw new NotImplementedException();
 

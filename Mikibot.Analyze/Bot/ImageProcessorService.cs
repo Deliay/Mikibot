@@ -15,10 +15,10 @@ using SixLabors.ImageSharp.Processing.Processors.Transforms;
 namespace Mikibot.Analyze.Bot;
 
 public class ImageProcessorService(
-    IQqService qqService,
+    IBotService botService,
     ILogger<ImageProcessorService> logger,
     ILogger<MemeCommandHandler> memeLogger)
-    : MiraiGroupMessageProcessor<ImageProcessorService>(qqService, logger)
+    : MiraiGroupMessageProcessor<ImageProcessorService>(botService, logger)
 {
     private readonly MemeCommandHandler memeCommandHandler = new(memeLogger);
 
@@ -158,7 +158,7 @@ public class ImageProcessorService(
     {
         foreach (var imageMessage in messages)
         {
-            using var image = await QqService.ReadImageAsync(imageMessage.Url, cancellationToken);
+            using var image = await BotService.ReadImageAsync(imageMessage.Url, cancellationToken);
             var info = image.Width + "*" + image.Height;
             if (image.Metadata.DecodedImageFormat is { } decoder)
             {
@@ -205,7 +205,7 @@ public class ImageProcessorService(
         
         foreach (var imageMessage in imageMessages)
         {
-            var image = await QqService.ReadImageAsync(imageMessage.Url, token);
+            var image = await BotService.ReadImageAsync(imageMessage.Url, token);
 
             var idx = imageQueue.Count;
             imageQueue.Add(image);
@@ -233,7 +233,7 @@ public class ImageProcessorService(
             var infoMsg = await GetImageInfoAsync(imageMessages, token).ToArrayAsync(token);
             if (infoMsg.Length != 0)
             {
-                await QqService.SendMessageToSomeGroup([groupId], token, infoMsg);
+                await BotService.SendMessageToSomeGroup([groupId], token, infoMsg);
             }
             return;
         }
@@ -245,7 +245,7 @@ public class ImageProcessorService(
                     ? $"/{p.Key}:{p.Value}"
                     : $"/{p.Key}"));
             Logger.LogInformation("Sending help text to group {}, content: {}", groupId, helpStr);
-            await QqService.SendMessageToSomeGroup([groupId], token, new PlainMessage(helpStr));
+            await BotService.SendMessageToSomeGroup([groupId], token, new PlainMessage(helpStr));
             return;
         }
 
@@ -254,7 +254,7 @@ public class ImageProcessorService(
             var replyMsg = await this.StorageImage(groupId, imageMessages, token).ToArrayAsync(token);
             if (replyMsg.Length == 0) return;
 
-            await QqService.SendMessageToSomeGroup([groupId], token, replyMsg);
+            await BotService.SendMessageToSomeGroup([groupId], token, replyMsg);
             
             return;
         }
@@ -270,11 +270,18 @@ public class ImageProcessorService(
             return;
         }
 
+        var messageId = message.MessageChain
+            .OfType<SourceMessage>()
+            .Select(m => m.MessageId)
+            .FirstOrDefault();
+        await botService.SendGroupMessageReactionIfSupported(groupId, messageId, KnownEmojiIds.Click, true, token);
+        
         var result = await imageMessages.ToAsyncEnumerable()
             .SelectMany(RunImage)
             .ToArrayAsync(token);
         
-        await QqService.SendMessageToSomeGroup([groupId], token, result);
+        await botService.SendGroupMessageReactionIfSupported(groupId, messageId, KnownEmojiIds.Click, false, token);
+        await BotService.SendMessageToSomeGroup([groupId], token, result);
         
         return;
         async IAsyncEnumerable<MessageBase> RunImage(ImageMessage imageMessage)
@@ -285,7 +292,7 @@ public class ImageProcessorService(
             List<Memes.AfterProcessError> knownErrors = null; 
             try
             {
-                using var image = await QqService.ReadImageAsync(imageMessage.Url, token);
+                using var image = await BotService.ReadImageAsync(imageMessage.Url, token);
                 using var seq = await image.ExtractFrames().ToSequenceAsync(token);
                 var (frames, errors) = processor(seq, token);
                 var frameDelay = !msg.Contains("间隔") ? 6 : -1;
