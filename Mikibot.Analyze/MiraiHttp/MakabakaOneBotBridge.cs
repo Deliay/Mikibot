@@ -217,8 +217,8 @@ public class MakabakaOneBotBridge(ILifetimeScope scope, ILogger<MakabakaOneBotBr
         {
             await _botContext.ExecuteAPIAsync("set_group_reaction", new
             {
-                group_id = uint.Parse(groupId),
-                message_id = uint.Parse(messageId),
+                group_id = long.Parse(groupId),
+                message_id = long.Parse(messageId),
                 code = emotionId,
                 is_add = isAdd
             }, cancellationToken);
