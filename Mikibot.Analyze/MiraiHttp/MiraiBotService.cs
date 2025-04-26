@@ -8,16 +8,16 @@ using System.Reactive.Linq;
 
 namespace Mikibot.Analyze.MiraiHttp;
 
-public class MiraiService : IDisposable, IBotService
+public class MiraiBotService : IDisposable, IBotService
 {
     private MiraiBot Bot { get; }
-    public ILogger<MiraiService> Logger { get; }
+    public ILogger<MiraiBotService> Logger { get; }
 
     public string UserId => throw new NotImplementedException();
 
     private readonly SemaphoreSlim _lock = new(1);
 
-    public MiraiService(MiraiBotConfig config, ILogger<MiraiService> logger)
+    public MiraiBotService(MiraiBotConfig config, ILogger<MiraiBotService> logger)
     {
         Bot = new MiraiBot()
         {
