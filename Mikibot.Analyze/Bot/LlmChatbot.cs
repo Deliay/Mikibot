@@ -92,7 +92,7 @@ public class LlmChatbot(
             var histories = await db.ChatbotGroupChatHistories
                 .Where(c => c.GroupId == groupId && c.UserId == userId)
                 .OrderByDescending(c => c.Id)
-                .Take(300)
+                .Take(1000)
                 .ToListAsync(cancellationToken);
 
             histories.Reverse();
