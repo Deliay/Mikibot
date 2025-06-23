@@ -89,6 +89,8 @@ public class LlmChatbot(
         }
         else if (text.StartsWith("/我的群聊画像"))
         {
+            await botService.SendGroupMessageReactionIfSupported(groupId, messageId, KnownEmojiIds.Click, true,
+                cancellationToken);
             var histories = await db.ChatbotGroupChatHistories
                 .Where(c => c.GroupId == groupId && c.UserId == userId)
                 .OrderByDescending(c => c.Id)
@@ -131,6 +133,9 @@ public class LlmChatbot(
                 .ToArray();
             
             await BotService.SendMessageToSomeGroup([groupId], cancellationToken, messages);
+            
+            await botService.SendGroupMessageReactionIfSupported(groupId, messageId, KnownEmojiIds.Click, false,
+                cancellationToken);
         }
         else if (text.StartsWith("/character"))
         {
@@ -190,12 +195,8 @@ public class LlmChatbot(
             switch (item)
             {
                 case PlainMessage plain when plain.Text.StartsWith('/'):
-                    await botService.SendGroupMessageReactionIfSupported(group.Id, id, KnownEmojiIds.Click, true,
-                        token);
                     await ProcessCommand(id, group.Id, message.Sender.Id, plain.Text, token);
                     
-                    await botService.SendGroupMessageReactionIfSupported(group.Id, id, KnownEmojiIds.Click, false,
-                        token);
                     return;
                 case PlainMessage plain when !isGroupEnabled:
                     continue;
