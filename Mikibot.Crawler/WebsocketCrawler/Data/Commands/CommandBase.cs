@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand.ProtoCommand;
 
 namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands;
 using Getters = (Func<ICommandBase, object?> infoGetter, Func<ICommandBase, object?> dataGetter);
@@ -83,6 +84,9 @@ public static class CommandBaseHelper
         { KnownCommands.ANCHOR_LOT_AWARD, typeof(AnchorLotAward) },
         { KnownCommands.POPULARITY_RED_POCKET_START, typeof(PopularityRedPocketStart) },
         { KnownCommands.HOT_RANK_SETTLEMENT_V2, typeof(HotRankSettlementV2) },
+        { KnownCommands.INTERACT_WORD_V2, typeof(InteractWordV2) },
+        { KnownCommands.ONLINE_RANK_V3, typeof(OnlineRankV3) },
+        { KnownCommands.WATCHED_CHANGE, typeof(WatchedChange) },
     };
     private static readonly Dictionary<Type, KnownCommands> KnownCommandMapping =
         CommandTypeMapping.ToDictionary(p => p.Value, p => p.Key);

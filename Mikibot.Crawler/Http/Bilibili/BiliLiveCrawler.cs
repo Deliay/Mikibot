@@ -4,17 +4,19 @@ using System.Text.Json;
 
 namespace Mikibot.Crawler.Http.Bilibili;
 
-public class BiliLiveCrawler(HttpClient client) : HttpCrawler(client)
+public class BiliLiveCrawler(HttpClient client, BilibiliAccount account) : HttpCrawler(client)
 {
     public HttpClient Client => client;
 
     public long Uid { get; set; }
-    private const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0";
+    private const string UserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0";
     protected override ValueTask BeforeRequestAsync(CancellationToken cancellationToken)
     {
-        AddHeader("User-Agent", UserAgent);
-        AddHeader("Referer", "https://live.bilibili.com/");
-        AddHeader("Origin", "https://live.bilibili.com");
+        AddHeader("user-agent", UserAgent);
+        AddHeader("referer", "https://live.bilibili.com/");
+        AddHeader("origin", "https://live.bilibili.com");
+        AddHeader("priority", "u=1, i");
+        AddHeader("accept-language", "en,zh-CN;q=0.9,zh;q=0.8,en-GB;q=0.7,en-US;q=0.6");
             
         return base.BeforeRequestAsync(cancellationToken);
     }
@@ -75,7 +77,12 @@ public class BiliLiveCrawler(HttpClient client) : HttpCrawler(client)
 
     public async ValueTask<LiveToken> GetLiveToken(long roomId, CancellationToken token = default)
     {
-        var tokenUrl = $"https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id={roomId}";
+        var query = account.Sign([
+            new("id", $"{roomId}"),
+            new("type", "0"),
+            new("web_location", "444.8")
+        ]);
+        var tokenUrl = $"https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?{query}";
         var result = await GetAsync<BilibiliApiResponse<LiveToken>>(tokenUrl, token);
         result.AssertCode();
 

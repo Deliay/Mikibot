@@ -42,7 +42,7 @@ public class WebsocketClient : IClient, IDisposable
     {
         var packet = BasePacket.ToPacket(raw);
 #if DEBUG
-        Debug.WriteLine($"[Socket] receiving data length={raw.Length}, {packet.Type}, {packet.Version}");
+        // Debug.WriteLine($"[Socket] receiving data length={raw.Length}, {packet.Type}, {packet.Version}");
 #endif
         if (packet.Size == 0) yield break;
 
