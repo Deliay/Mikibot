@@ -5,14 +5,12 @@ namespace Mikibot.Crawler.Http;
 public class HttpCrawler : IDisposable
 {
     protected readonly HttpClient client;
+    private readonly CookieJar? cookieJar;
 
-    public HttpCrawler() : this(new HttpClient())
-    {
-    }
-        
-    public HttpCrawler(HttpClient client)
+    public HttpCrawler(HttpClient client, CookieJar? cookieJar)
     {
         this.client = client;
+        this.cookieJar = cookieJar;
         AddHeader("Origin", "https://live.bilibili.com/");
         AddHeader("Referer", "https://live.bilibili.com/");
     }
@@ -38,9 +36,15 @@ public class HttpCrawler : IDisposable
     {
         return ValueTask.CompletedTask;
     }
+
+    private void BeforeRequestInner()
+    {
+        if (cookieJar is not null) SetCookie(cookieJar.Cookie);
+    }
         
     protected async ValueTask<T?> GetAsync<T>(string url, CancellationToken token)
     {
+        BeforeRequestInner();
         await BeforeRequestAsync(token);
             
         var raw = await client.GetAsync(url, token);
@@ -59,6 +63,7 @@ public class HttpCrawler : IDisposable
 
     protected async ValueTask<T?> PostFormAsync<T>(string url, FormUrlEncodedContent ctx, CancellationToken token)
     {
+        BeforeRequestInner();
         await BeforeRequestAsync(token);
             
         var raw = await client.PostAsync(url, ctx, token);

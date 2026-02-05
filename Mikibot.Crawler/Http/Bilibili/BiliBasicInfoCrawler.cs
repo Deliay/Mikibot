@@ -2,7 +2,7 @@ using Mikibot.Crawler.Http.Bilibili.Model;
 
 namespace Mikibot.Crawler.Http.Bilibili;
 
-public class BiliBasicInfoCrawler(HttpClient client) : HttpCrawler(client)
+public class BiliBasicInfoCrawler(HttpClient client, CookieJar? cookieJar = null) : HttpCrawler(client, cookieJar)
 {
     [Obsolete("Use <see cref=\"GetNavInfoV2\"/> for instead")]
     public async ValueTask<NavInfo> GetNavInfo(CancellationToken cancellationToken = default)

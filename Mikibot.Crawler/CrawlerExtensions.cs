@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
+using Mikibot.Crawler.Http;
 using Mikibot.Crawler.Http.Bilibili;
+using Mikibot.Crawler.WebsocketCrawler.Client;
 
 namespace Mikibot.Crawler;
 
@@ -13,6 +15,8 @@ public static class CrawlerExtensions
             services.AddSingleton<BiliLiveCrawler>();
             services.AddSingleton<BiliBasicInfoCrawler>();
             services.AddSingleton<BilibiliAccount>();
+            services.AddTransient<WebsocketClient>();
+            services.AddSingleton<DanmakuClient>();
 
             return services;
         }

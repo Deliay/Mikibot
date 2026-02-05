@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Mikibot.Crawler;
+using Mikibot.Crawler.Http;
 using Mikibot.Crawler.Http.Bilibili;
 using Mikibot.Crawler.WebsocketCrawler.Client;
 using Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
@@ -9,46 +10,26 @@ using Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils;
 
 var serviceBuilder = new ServiceCollection();
 serviceBuilder.AddLogging(b => b.AddConsole());
-serviceBuilder.AddSingleton<HttpClient>();
-serviceBuilder.AddBilibiliCrawlers(addHttpClient: false);
-serviceBuilder.AddTransient<WebsocketClient>();
+var cookie = "设置cookie";
+serviceBuilder.AddSingleton(new CookieJar(cookie));
+serviceBuilder.AddBilibiliCrawlers();
 
 await using var services = serviceBuilder.BuildServiceProvider();
 using var csc = new CancellationTokenSource();
+var cancellationToken = csc.Token;
 
-var liveCrawler = services.GetRequiredService<BiliLiveCrawler>();
+// initialize wbi keys
 var account = services.GetRequiredService<BilibiliAccount>();
-// 必须设置cookie
-liveCrawler.SetCookie("");
-await account.InitializeAsync(csc.Token);
-var roomId = 42062;
+await account.InitializeAsync(cancellationToken);
 
-var wsClient = services.GetRequiredService<WebsocketClient>();
-var playAddr = await liveCrawler.GetLiveStreamAddressV2(roomId, csc.Token);
-var realRoomId = playAddr.RoomId;
-var spectatorEndpoint = await liveCrawler.GetLiveToken(realRoomId, csc.Token);
+// connect to danmaku server
+var client = services.GetRequiredService<DanmakuClient>();
+var roomId = 11306;
+await client.ConnectAsync(roomId, cancellationToken);
 
-foreach (var spectatorHost in spectatorEndpoint.Hosts)
-{
-    try
-    {
-        await wsClient.ConnectAsync(liveCrawler.Client,
-            host: spectatorHost.Host,
-            port: spectatorHost.WssPort,
-            roomId: realRoomId,
-            uid: account.Mid,
-            liveToken: spectatorEndpoint.Token,
-            protocol: "wss",
-            cancellationToken: csc.Token);
-        break;
-    }
-    catch (Exception e)
-    {
-        Console.WriteLine($"连接 {spectatorHost.Host} 失败");
-    }
-}
+Console.WriteLine($"已连接到 {roomId}");
 
-Console.WriteLine($"已连接到 {realRoomId}");
+// prepare subscribers
 using var cmdHandler = new CommandSubscriber();
 cmdHandler.Subscribe<DanmuMsg>((msg) => Console.WriteLine($"[弹幕] {msg.UserName}: {msg.Msg}"));
 cmdHandler.Subscribe<RoomRealTimeMessageUpdate>((msg) => Console.WriteLine($"直播间状态变更 粉丝数量: {msg.Fans}"));
@@ -67,7 +48,8 @@ cmdHandler.Subscribe<PopularityRedPocketStart>(msg => Console.WriteLine($"(红�
 cmdHandler.Subscribe<HotRankSettlementV2>(msg => Console.WriteLine($"(热门) {msg.Message}"));
 cmdHandler.Subscribe<WatchedChange>(msg => Console.WriteLine($"[观看] {msg.Count} 人看过"));
 
-await foreach (var @event in wsClient.Events(csc.Token))
+// handle events
+await foreach (var @event in client.Events(cancellationToken))
 {
     await cmdHandler.Handle(@event);
 }

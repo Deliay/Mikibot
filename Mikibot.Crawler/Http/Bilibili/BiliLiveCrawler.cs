@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace Mikibot.Crawler.Http.Bilibili;
 
-public class BiliLiveCrawler(HttpClient client, BilibiliAccount account) : HttpCrawler(client)
+public class BiliLiveCrawler(HttpClient client, BilibiliAccount account, CookieJar? cookieJar = null) : HttpCrawler(client, cookieJar)
 {
     public HttpClient Client => client;
 
@@ -75,7 +75,7 @@ public class BiliLiveCrawler(HttpClient client, BilibiliAccount account) : HttpC
         return await GetLiveToken(liveRoom.RoomId, token);
     }
 
-    public async ValueTask<LiveToken> GetLiveToken(long roomId, CancellationToken token = default)
+    public async ValueTask<LiveToken> GetDanmakuInfo(long roomId, CancellationToken token = default)
     {
         var query = account.Sign([
             new("id", $"{roomId}"),
@@ -87,6 +87,11 @@ public class BiliLiveCrawler(HttpClient client, BilibiliAccount account) : HttpC
         result.AssertCode();
 
         return result.Data;
+    }
+    
+    public ValueTask<LiveToken> GetLiveToken(long roomId, CancellationToken token = default)
+    {
+        return GetDanmakuInfo(roomId, token);
     }
 
     public async ValueTask<List<LiveStreamAddress>> GetLiveStreamAddress(long roomId, CancellationToken token = default)

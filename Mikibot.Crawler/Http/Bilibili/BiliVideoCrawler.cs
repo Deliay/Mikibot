@@ -2,7 +2,7 @@
 
 namespace Mikibot.Crawler.Http.Bilibili;
 
-public class BiliVideoCrawler(HttpClient client) : HttpCrawler(client)
+public class BiliVideoCrawler(HttpClient client, CookieJar? cookieJar = null) : HttpCrawler(client, cookieJar)
 {
     public async ValueTask<VideoInfo> GetVideoInfo(string? bv, int? av, CancellationToken token = default)
     {
