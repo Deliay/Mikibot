@@ -3,7 +3,7 @@ using Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils;
 
 namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 
-public struct SendGift
+public struct SendGift : IKnownCommand
 {
     [JsonPropertyName("batch_combo_id")]
     public string ComboId { get; set; }

@@ -42,7 +42,7 @@ var client = services.GetRequiredService<DanmakuClient>();
 var roomId = 11306;
 await client.ConnectAsync(roomId, cancellationToken);
 
-// start handle events
+// handle events
 await foreach(var @event in client.Events(cancellationToken))
 {
     ...@event的使用见下方处理事件示例
@@ -51,7 +51,7 @@ await foreach(var @event in client.Events(cancellationToken))
 
 #### 处理事件：使用CommandSubscriber
 ```csharp
-// 事先准备好CommandSubscriber类
+// 事先准备好CommandSubscriber类，可以在继承了 IKnownCommand 的类中找到可用的事件
 using var cmdHandler = new CommandSubscriber();
 cmdHandler.Subscribe<DanmuMsg>((msg) => ...);
 cmdHandler.Subscribe<DanmuMsg>(async (msg) => ...);

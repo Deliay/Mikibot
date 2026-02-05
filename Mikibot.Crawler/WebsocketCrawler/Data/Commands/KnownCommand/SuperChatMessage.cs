@@ -3,7 +3,7 @@ using Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils;
 
 namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 
-public struct SuperChatMessage
+public struct SuperChatMessage : IKnownCommand
 {
     public string Message { get; set; }
     [JsonPropertyName("message_trans")]

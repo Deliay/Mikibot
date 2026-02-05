@@ -31,7 +31,7 @@ public class CommandSubscriber : IDisposable
         _handlers[command].Add((obj) => handler((T)obj));
     }
 
-    public void Subscribe<T>(Func<T, Task> handler)
+    public void Subscribe<T>(Func<T, Task> handler) where T : IKnownCommand
     {
         if (CommandBaseHelper.IsKnown(typeof(T)))
         {
@@ -43,7 +43,7 @@ public class CommandSubscriber : IDisposable
         }
     }
     
-    public void Subscribe<T>(Action<T> handler) => Subscribe(Wrap(handler));
+    public void Subscribe<T>(Action<T> handler) where T : IKnownCommand => Subscribe(Wrap(handler));
 
     private static object SelectData(ICommandBase cmd)
     {

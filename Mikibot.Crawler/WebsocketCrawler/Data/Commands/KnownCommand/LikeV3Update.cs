@@ -2,7 +2,7 @@
 
 namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 
-public struct LikeV3Update
+public struct LikeV3Update : IKnownCommand
 {
     [JsonPropertyName("click_count")]
     public int ClickCount { get; set; }

@@ -3,7 +3,7 @@ using Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils;
 
 namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 
-public struct GuardBuy
+public struct GuardBuy : IKnownCommand
 {
     public long Uid { get; set; }
     [JsonPropertyName("username")]

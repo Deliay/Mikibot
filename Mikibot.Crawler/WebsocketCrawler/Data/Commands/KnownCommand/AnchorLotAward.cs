@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 
-public struct AnchorLotAward
+public struct AnchorLotAward : IKnownCommand
 {
 
     [JsonPropertyName("award_dont_popup")]

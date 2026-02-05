@@ -2,7 +2,7 @@
 
 namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 
-public struct InteractFansMedal
+public struct InteractFansMedal : IKnownCommand
 {
     [JsonPropertyName("fans_medal")]
     public int GuardLevel { get; set; }

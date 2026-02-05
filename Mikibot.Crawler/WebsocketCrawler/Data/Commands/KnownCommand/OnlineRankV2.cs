@@ -2,7 +2,7 @@
 
 namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 
-public struct OnlineRankV2
+public struct OnlineRankV2 : IKnownCommand
 {
     public struct RankUser
     {

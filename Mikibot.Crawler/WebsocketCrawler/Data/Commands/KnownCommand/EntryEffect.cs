@@ -3,7 +3,7 @@ using Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils;
 
 namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 
-public struct EntryEffect
+public struct EntryEffect : IKnownCommand
 {
     [JsonPropertyName("uid")]
     public long UserId { get; set; }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 
-public struct AnchorLotStart
+public struct AnchorLotStart : IKnownCommand
 {
     [JsonPropertyName("asset_icon")]
     public string AssetIconUrl { get; set; }

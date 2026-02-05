@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 
-public struct PopularityRedPocketStart
+public struct PopularityRedPocketStart : IKnownCommand
 {
     [JsonPropertyName("lot_id")]
     public int LotId { get; set; }

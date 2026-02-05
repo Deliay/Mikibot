@@ -2,7 +2,7 @@
 
 namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 
-public struct ComboSend
+public struct ComboSend : IKnownCommand
 {
     [JsonPropertyName("combo_id")]
     public string ComboId { get; set; }

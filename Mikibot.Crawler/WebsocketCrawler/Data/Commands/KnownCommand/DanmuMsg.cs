@@ -4,7 +4,7 @@ using Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils;
 namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 
 [JsonConverter(typeof(DanmuMsgJsonConverter))]
-public struct DanmuMsg
+public struct DanmuMsg : IKnownCommand
 {
     public string Msg { get; set; }
     public long UserId { get; set; }

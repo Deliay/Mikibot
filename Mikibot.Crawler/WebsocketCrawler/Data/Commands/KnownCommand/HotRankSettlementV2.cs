@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 
-public struct HotRankSettlementV2
+public struct HotRankSettlementV2 : IKnownCommand
 {
     [JsonPropertyName("rank")]
     public int Rank { get; set; }

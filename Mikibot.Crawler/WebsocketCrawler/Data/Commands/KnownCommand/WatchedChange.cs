@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 
-public struct WatchedChange
+public struct WatchedChange : IKnownCommand
 {
     [JsonPropertyName("num")] public uint Count { get; set; }
     [JsonPropertyName("text_small")] public string Text { get; set; }

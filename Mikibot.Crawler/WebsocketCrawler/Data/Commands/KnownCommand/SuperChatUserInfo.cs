@@ -2,7 +2,7 @@
 
 namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 
-public struct SuperChatUserInfo
+public struct SuperChatUserInfo : IKnownCommand
 {
     [JsonPropertyName("guard_level")]
     public int GuardLevel { get; set; }

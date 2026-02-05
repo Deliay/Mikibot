@@ -24,12 +24,12 @@ await account.InitializeAsync(cancellationToken);
 
 // connect to danmaku server
 var client = services.GetRequiredService<DanmakuClient>();
-var roomId = 11306;
+var roomId = 123456;
 await client.ConnectAsync(roomId, cancellationToken);
 
 Console.WriteLine($"已连接到 {roomId}");
 
-// prepare subscribers
+// prepare subscribers, can handle classes that inherit from IKnownCommand
 using var cmdHandler = new CommandSubscriber();
 cmdHandler.Subscribe<DanmuMsg>((msg) => Console.WriteLine($"[弹幕] {msg.UserName}: {msg.Msg}"));
 cmdHandler.Subscribe<RoomRealTimeMessageUpdate>((msg) => Console.WriteLine($"直播间状态变更 粉丝数量: {msg.Fans}"));

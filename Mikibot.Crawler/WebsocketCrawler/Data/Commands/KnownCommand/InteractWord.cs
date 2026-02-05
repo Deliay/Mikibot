@@ -3,7 +3,7 @@ using Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils;
 
 namespace Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
 
-public struct InteractWord
+public struct InteractWord : IKnownCommand
 {
     [JsonPropertyName("uname")]
     public string UserName { get; set; }
