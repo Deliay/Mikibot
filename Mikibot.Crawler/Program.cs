@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Mikibot.Crawler;
 using Mikibot.Crawler.Http.Bilibili;
 using Mikibot.Crawler.WebsocketCrawler.Client;
 using Mikibot.Crawler.WebsocketCrawler.Data.Commands.KnownCommand;
@@ -9,15 +10,12 @@ using Mikibot.Crawler.WebsocketCrawler.Data.Commands.Utils;
 var serviceBuilder = new ServiceCollection();
 serviceBuilder.AddLogging(b => b.AddConsole());
 serviceBuilder.AddSingleton<HttpClient>();
-serviceBuilder.AddSingleton<BiliLiveCrawler>();
-serviceBuilder.AddSingleton<BiliBasicInfoCrawler>();
+serviceBuilder.AddBilibiliCrawlers(addHttpClient: false);
 serviceBuilder.AddTransient<WebsocketClient>();
-serviceBuilder.AddSingleton<BilibiliAccount>();
 
 await using var services = serviceBuilder.BuildServiceProvider();
 using var csc = new CancellationTokenSource();
 
-var logger = services.GetRequiredService<ILogger<Program>>();
 var liveCrawler = services.GetRequiredService<BiliLiveCrawler>();
 var account = services.GetRequiredService<BilibiliAccount>();
 // 必须设置cookie

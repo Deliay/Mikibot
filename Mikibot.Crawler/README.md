@@ -1,52 +1,61 @@
 # B站信息获取库
+[![NuGet version](https://badge.fury.io/nu/Mikibot.Crawler.svg)](https://www.nuget.org/packages/Mikibot.Crawler)
+
 该项目主要用于直播弹幕获取，支持登陆到指定账号进行获取
+
 
 ## Websocket 弹幕抓取实现
 见 `WebsocketCrawler` 文件夹的 `README`，可用事件可以在`ICommandBase`类实现中找到。
 
 ## API实现
-| 类 | 用途
-| - | - |
-| BiliLiveCrawler | 直播弹幕、直播流相关API |
-| BiliVideoCrawler | 视频相关信息API |
-| BiliBasicInfoCrawler | 个人基本信息 |
-| BiliVideoCrawler | 视频信息 |
+| 类                    | 用途            |
+|----------------------|---------------|
+| BiliLiveCrawler      | 直播弹幕、直播流相关API |
+| BiliVideoCrawler     | 视频相关信息API     |
+| BiliBasicInfoCrawler | 个人基本信息        |
+| BiliVideoCrawler     | 视频信息          |
 
 ## 使用示例
+`Program.cs` 中附带了一个可以运行的示例
 
-### 共享Cookie
+### 举个例子
 ```csharp
-var client = new HttpClient();
-var liveCrawler = new BiliLiveCrawler(client);
-var personalCrawler = new BiliBasicInfoCrawler(client);
-// 使用任意crawler设置cookie即可
+using Mikibot.Crawler;
+var serviceBuilder = new ServiceCollection();
+serviceBuilder.AddBilibiliCrawlers();
+serviceBuilder.AddTransient<WebsocketClient>();
+await using var services = serviceBuilder.BuildServiceProvider();
+
+var liveCrawler = services.GetRequiredService<BiliLiveCrawler>();
+var account = services.GetRequiredService<BilibiliAccount>();
+
+// 使用任意crawler设置cookie
 liveCrawler.SetCookie("...");
-```
 
-### 获得直播间弹幕流
-代码示例：
-```csharp
+// 初始化 account 及 wbi keys
+var account = new BilibiliAccount(personalCrawler);
+await account.InitializeAsync();
+
+// 要抓的房间id
 var uid = 403496L;
 var uidCookie = "...";
 var roomId = 11306L;
 
-// 用于获得登陆状态下观看直播的token，及弹幕服务器地址等等
-var crawler = new BiliLiveCrawler();
-crawler.SetCookie(uidCookie);
-
-// 一些主播的直播房间号并不是真实房间号
-// 需要调用B站API拿到真实房间号
+// 有些主播房间有靓号
 var realRoomId = await crawler.GetRealRoomId(roomId, cancellationToken);
 
-var liveToken = await crawler.GetLiveToken(realRoomId, cancellationToken);
+// 选择一个弹幕服务器
 var spectatorHost = liveToken.Hosts[0];
 
-// 初始化wsClient实例
 // 连接弹幕服务器，填入使用cookie获得的token
-using var wsClient = new WebsocketClient();
+var wsClient = services.GetRequiredService<WebsocketClient>();
 
-// 可以不传crawler.Client，最好传一下，里面设置了Http Referer和Cookies
-await wsClient.ConnectAsync(crawler.Client, spectatorHost.Host, spectatorHost.WssPort, realRoomId, uid, token, "wss", cancellationToken);
+// 拿到websocket认证需要的live token
+var liveToken = await crawler.GetLiveToken(realRoomId, cancellationToken);
+
+// 可以不传client，最好传一下，里面设置了Http Referer和Cookies
+var client = services.GetRequiredService<HttpClient>();
+await wsClient.ConnectAsync(client, spectatorHost.Host, spectatorHost.WssPort, realRoomId, uid, token, "wss", cancellationToken);
 
 // 获得事件
 await foreach(var @event in wsClient.Events(cancellationToken))
