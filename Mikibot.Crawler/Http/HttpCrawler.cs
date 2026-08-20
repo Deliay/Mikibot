@@ -48,7 +48,7 @@ public class HttpCrawler : IDisposable
         await BeforeRequestAsync(token);
             
         var raw = await client.GetAsync(url, token);
-        var stream = await raw.Content.ReadAsStreamAsync(token);
+        await using var stream = await raw.Content.ReadAsStreamAsync(token);
         try
         {
             return await JsonSerializer.DeserializeAsync<T>(stream, JsonParseOptions, token);

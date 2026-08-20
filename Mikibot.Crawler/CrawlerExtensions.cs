@@ -17,6 +17,7 @@ public static class CrawlerExtensions
             services.AddSingleton<BilibiliAccount>();
             services.AddTransient<WebsocketClient>();
             services.AddSingleton<DanmakuClient>();
+            services.AddSingleton<BiliUserCrawler>();
 
             return services;
         }
