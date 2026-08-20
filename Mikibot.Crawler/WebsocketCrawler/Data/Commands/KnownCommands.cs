@@ -38,6 +38,7 @@ public enum KnownCommands
     // SUPER_CHAT_MESSAGE_DELETE,
     // LIVE_INTERACTIVE_GAME,
     SEND_GIFT,
+    SEND_GIFT_V2,
     // ROOM_BLOCK_MSG,
     COMBO_SEND,
     ANCHOR_LOT_START,

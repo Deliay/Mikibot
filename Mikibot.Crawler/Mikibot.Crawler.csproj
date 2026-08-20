@@ -17,8 +17,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-	  <PackageReference Include="Lagrange.Proto" Version="1.0.8" />
-	  <PackageReference Include="Lagrange.Proto.Generator" Version="1.0.3">
+	  <PackageReference Include="Lagrange.Proto" Version="1.0.10" />
+	  <PackageReference Include="Lagrange.Proto.Generator" Version="1.0.4">
 	    <PrivateAssets>all</PrivateAssets>
 	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	  </PackageReference>
@@ -34,6 +34,7 @@
 	  <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.3" />
 	  <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.3" />
 	  <PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.3" />
+	  <PackageReference Include="protobuf-net" Version="3.3.21" />
   </ItemGroup>
 
   <ItemGroup>

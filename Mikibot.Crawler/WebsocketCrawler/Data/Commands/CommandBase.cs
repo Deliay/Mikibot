@@ -72,6 +72,7 @@ public static class CommandBaseHelper
     {
         { KnownCommands.DANMU_MSG, typeof(DanmuMsg) },
         { KnownCommands.SEND_GIFT, typeof(SendGift) },
+        { KnownCommands.SEND_GIFT_V2, typeof(SendGiftV2) },
         { KnownCommands.GUARD_BUY, typeof(GuardBuy) },
         { KnownCommands.ROOM_REAL_TIME_MESSAGE_UPDATE, typeof(RoomRealTimeMessageUpdate) },
         { KnownCommands.SUPER_CHAT_MESSAGE, typeof(SuperChatMessage) },

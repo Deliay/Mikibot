@@ -42,6 +42,11 @@ cmdHandler.Subscribe<InteractWordV2>((msg) =>
 });
 cmdHandler.Subscribe<SuperChatMessage>((msg) => Console.WriteLine($"[SC] {msg.User.UserName} ({msg.Price}): {msg.Message}"));
 cmdHandler.Subscribe<SendGift>((msg) => Console.WriteLine($"[礼物] {msg.SenderName} ({msg.CoinType} {msg.DiscountPrice}): {msg.Action}{msg.GiftName}"));
+cmdHandler.Subscribe<SendGiftV2>((msg) =>
+{
+    var data = msg.Parse();
+    Console.WriteLine($"[礼物v2] {data.Uname}({data.Uid}): {data.GiftList.CoinType} {data.GiftList.DiscountPrice}: {data.GiftList.Action}{data.GiftList.GiftName}");
+});
 cmdHandler.Subscribe<AnchorLotStart>(msg => Console.WriteLine($"(天选开始) {msg.AwardName} 条件为{msg.RequireText} 发送弹幕{msg.Danmu}"));
 cmdHandler.Subscribe<AnchorLotAward>(msg => Console.WriteLine($"(天选结束) {msg.AwardName} {string.Join(",", msg.AwardUsers.Select(u => u.UserName))}"));
 cmdHandler.Subscribe<PopularityRedPocketStart>(msg => Console.WriteLine($"(红包开始) {msg.SenderName} 价值{msg.TotalPrice / 100}电池 发送弹幕{msg.Danmu}"));
